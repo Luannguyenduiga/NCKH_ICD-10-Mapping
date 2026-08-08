@@ -1,0 +1,3 @@
+# Danh sách phụ thuộc đã gộp về requirements.txt ở thư mục gốc dự án.
+# Giữ file này để các lệnh cũ (pip install -r backend/requirements.txt) vẫn chạy được.
+-r ../requirements.txt

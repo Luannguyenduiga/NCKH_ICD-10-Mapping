@@ -1,0 +1,31 @@
+# --- Môi trường Python ---
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# --- Trọng số mô hình (~540 MB) ---
+# Mô hình đã fine-tune KHÔNG nên đưa vào git. Hãy tải riêng hoặc để hệ thống tự
+# tải 'Keepitreal/vietnamese-sbert' khi thiếu thư mục này.
+nlp/my_medical_nlp_model/
+!nlp/my_medical_nlp_model/README.md
+
+# --- Cache embedding sinh tự động (~150 MB mỗi bộ) ---
+nlp/data/embeddings_*.npy
+nlp/data/entries_*.json
+nlp/data/alias_embeddings_*.npy
+
+# --- Dữ liệu thời gian chạy ---
+hospital_his/his_db.sqlite
+backend/data/synced_records.json
+
+# --- File tạm của Excel / hệ điều hành ---
+~$*.xlsx
+Thumbs.db
+.DS_Store
+
+# --- IDE ---
+.vscode/
+.idea/

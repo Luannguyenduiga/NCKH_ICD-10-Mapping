@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Medical Interoperability Gateway</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar/Header -->
+        <header class="app-header">
+            <div class="header-logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-file-medical-shield"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>SMIG Gateway</h1>
+                    <span>Smart Medical Interoperability Gateway</span>
+                </div>
+            </div>
+            <div class="header-status">
+                <span class="status-badge" id="api-status">
+                    <span class="status-dot"></span>
+                    <span id="api-status-text">Đang kết nối API...</span>
+                </span>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="app-main">
+            <!-- Grid Layout: 3 Columns -->
+            <div class="dashboard-grid">
+                
+                <!-- Panel 1: Clinician Input & Patient Details -->
+                <section class="grid-panel panel-input glassmorphic">
+                    <div class="panel-header">
+                        <div class="panel-icon"><i class="fa-solid fa-user-doctor"></i></div>
+                        <h2>Thông tin khám lâm sàng</h2>
+                    </div>
+                    
+                    <!-- Patient ID & Name -->
+                    <div class="patient-card">
+                        <h3>Thông tin hành chính bệnh nhân</h3>
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label for="patient-id"><i class="fa-solid fa-id-card"></i> Số CCCD / Mã HS</label>
+                                <input type="text" id="patient-id" value="037098001234" placeholder="Nhập số định danh/CCCD">
+                            </div>
+                            <div class="form-group">
+                                <label for="patient-name"><i class="fa-solid fa-user"></i> Họ và tên</label>
+                                <input type="text" id="patient-name" value="Nguyễn Văn An" placeholder="Nhập tên bệnh nhân">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clinical Diagnosis Input -->
+                    <div class="diagnosis-card">
+                        <h3>Chẩn đoán của Bác sĩ</h3>
+                        <div class="form-group">
+                            <label for="clinical-note">Ghi chú lâm sàng tự do (Tiếng Việt)</label>
+                            <textarea id="clinical-note" rows="4" placeholder="Nhập chẩn đoán của bác sĩ, có thể dùng viết tắt (VD: BN ĐTĐ typ 2 kèm THA)"></textarea>
+                        </div>
+
+                        <div class="sample-group">
+                            <label><i class="fa-solid fa-flask-vial"></i> Mẫu chẩn đoán nhanh</label>
+                            <div class="sample-buttons" id="sample-buttons">
+                                <button type="button" class="btn-sample"
+                                    data-sample="Bệnh nhân ĐTĐ typ 2 không biến chứng kèm theo cao huyết áp nhẹ">
+                                    ĐTĐ tuýp 2 &amp; THA
+                                </button>
+                                <button type="button" class="btn-sample"
+                                    data-sample="Theo dõi NMCT cấp, đau ngực trái lan lên vai">
+                                    NMCT cấp
+                                </button>
+                                <button type="button" class="btn-sample"
+                                    data-sample="Chẩn đoán lâm sàng: Hen phế quản cấp (HPQ cấp)">
+                                    Hen phế quản
+                                </button>
+                                <button type="button" class="btn-sample"
+                                    data-sample="Chẩn đoán: Suy thận mạn giai đoạn 3 (CKD)">
+                                    Suy thận mạn
+                                </button>
+                                <button type="button" class="btn-sample"
+                                    data-sample="hen phe quan cap tinh khong di ung">
+                                    Gõ không dấu
+                                </button>
+                            </div>
+                        </div>
+
+
+                        <div class="button-group">
+                            <button id="btn-analyze" class="btn btn-primary">
+                                <i class="fa-solid fa-microchip-ai"></i> Phân tích với NLP
+                            </button>
+                            <button id="btn-clear" class="btn btn-secondary">
+                                <i class="fa-solid fa-eraser"></i> Xóa
+                            </button>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- Panel 2: NLP Pipeline Steps -->
+                <section class="grid-panel panel-nlp glassmorphic">
+                    <div class="panel-header">
+                        <div class="panel-icon"><i class="fa-solid fa-diagram-project"></i></div>
+                        <h2>Tiến trình xử lý NLP</h2>
+                    </div>
+
+                    <div class="pipeline-flow">
+                        <!-- Step 1: Text Normalization -->
+                        <div class="pipeline-step" id="step-normalization">
+                            <div class="step-badge">1</div>
+                            <div class="step-content">
+                                <h3>Chuẩn hóa văn bản & Viết tắt</h3>
+                                <div class="step-result-box" id="norm-output">
+                                    <span class="placeholder-text">Chờ phân tích dữ liệu lâm sàng...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Named Entity Recognition -->
+                        <div class="pipeline-step" id="step-ner">
+                            <div class="step-badge">2</div>
+                            <div class="step-content">
+                                <h3>Nhận diện thực thể y khoa (NER)</h3>
+                                <div class="step-result-box" id="ner-output">
+                                    <span class="placeholder-text">Chờ nhận dạng thực thể y tế...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Match & Link ICD-10 -->
+                        <div class="pipeline-step" id="step-matching">
+                            <div class="step-badge">3</div>
+                            <div class="step-content">
+                                <h3>Ánh xạ ngữ nghĩa mã ICD-10 (Top 4)</h3>
+                                <div class="predictions-list" id="predictions-output">
+                                    <span class="placeholder-text">Chờ kết quả so khớp tương đồng...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="latency-indicator" id="latency-box" style="display:none;">
+                        <i class="fa-regular fa-clock"></i> Thời gian xử lý: <span id="latency-time">0</span> ms
+                    </div>
+                </section>
+
+                <!-- Panel 3: HL7 FHIR & Sync -->
+                <section class="grid-panel panel-fhir glassmorphic">
+                    <div class="panel-header">
+                        <div class="panel-icon"><i class="fa-solid fa-code"></i></div>
+                        <h2>Đầu ra HL7 FHIR Condition</h2>
+                    </div>
+
+                    <div class="fhir-view-container">
+                        <div class="fhir-header">
+                            <span class="fhir-format-label"><i class="fa-brands fa-js"></i> JSON Payload</span>
+                            <button class="btn-copy" id="btn-copy-fhir" title="Copy payload">
+                                <i class="fa-regular fa-copy"></i> Sao chép
+                            </button>
+                        </div>
+                        <pre class="fhir-code-box"><code id="fhir-output" class="language-json">{
+  <span class="json-placeholder">// Sau khi chọn mã ICD-10 ở cột 2</span>
+  <span class="json-placeholder">// Bản ghi FHIR Condition Resource sẽ hiển thị tại đây</span>
+}</code></pre>
+                    </div>
+
+                    <div class="sync-action-box">
+                        <button id="btn-sync" class="btn btn-accent btn-full" disabled>
+                            <i class="fa-solid fa-cloud-arrow-up"></i> ĐỒNG BỘ LÊN EMR CLOUD
+                        </button>
+                    </div>
+
+                    <!-- EMR Cloud Mock Portal View -->
+                    <div class="emr-mock-portal" id="emr-portal-view">
+                        <div class="portal-header">
+                            <span><i class="fa-solid fa-server"></i> TRỤC LIÊN THÔNG DỮ LIỆU EMR CLOUD</span>
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <span id="sync-latency-box" style="display: none; font-size: 0.65rem; color: var(--color-primary); font-weight: 600;">
+                                    <i class="fa-regular fa-clock"></i> Sync: <span id="sync-latency-time">0</span> ms
+                                </span>
+                                <button id="btn-clear-history" class="btn-clear-history" title="Xóa lịch sử liên thông">
+                                    <i class="fa-solid fa-trash-can"></i> Xóa lịch sử
+                                </button>
+                            </div>
+                        </div>
+                        <div class="portal-status-idle" id="portal-status">
+                            <i class="fa-solid fa-database-lock"></i> Chưa có bệnh án nào được liên thông.
+                        </div>
+                        <div class="portal-records-list" id="portal-records-list" style="display:none;">
+                            <!-- Dynamic record cards will be appended here -->
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Script imports -->
+    <script src="app.js"></script>
+</body>
+</html>

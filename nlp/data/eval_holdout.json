@@ -1,0 +1,69 @@
+{
+  "description": "TẬP KIỂM TRA ĐỘC LẬP (held-out). Được soạn SAU khi hoàn tất việc tinh chỉnh luật trên eval_set.json và KHÔNG được dùng để điều chỉnh trọng số, alias hay ngưỡng. Con số trên tập này mới phản ánh khả năng tổng quát hóa; con số trên eval_set.json chỉ là kết quả tập phát triển.",
+  "version": "1.0",
+  "protocol": "Nếu phải sửa nhãn của một ca (do gán sai mã), hãy ghi lại lý do. Không được sửa engine để 'chữa' một ca cụ thể của tập này rồi báo cáo lại như kết quả held-out.",
+  "cases": [
+    {"query": "viêm loét đại tràng", "expected": ["K51", "K51.9"], "tag": "plain"},
+    {"query": "bệnh Crohn", "expected": ["K50", "K50.9"], "tag": "plain"},
+    {"query": "viêm tụy cấp", "expected": ["K85", "K85.9"], "tag": "plain"},
+    {"query": "thoát vị bẹn", "expected": ["K40", "K40.9"], "tag": "plain"},
+    {"query": "viêm gan do rượu", "expected": ["K70.1", "K70"], "tag": "plain"},
+
+    {"query": "viêm mũi dị ứng", "expected": ["J30", "J30.4", "J30.3", "J30.1", "J30.2"], "tag": "plain"},
+    {"query": "viêm mũi không dị ứng", "expected": ["J31.0", "J31", "J30.0"], "tag": "polarity"},
+    {"query": "tràn khí màng phổi", "expected": ["J93", "J93.9"], "tag": "plain"},
+    {"query": "giãn phế quản", "expected": ["J47"], "tag": "plain"},
+    {"query": "viem phoi thuy", "expected": ["J18.1", "J18"], "tag": "diacritic_free"},
+
+    {"query": "bloc nhĩ thất độ III", "expected": ["I44.2", "I44"], "tag": "specificity"},
+    {"query": "bệnh van hai lá do thấp", "expected": ["I05", "I05.9"], "tag": "plain"},
+    {"query": "phình động mạch chủ bụng", "expected": ["I71.4", "I71"], "tag": "specificity"},
+    {"query": "huyết khối tĩnh mạch sâu chi dưới", "expected": ["I80.2", "I80", "I82"], "tag": "plain"},
+    {"query": "viem co tim cap", "expected": ["I40", "I40.9"], "tag": "diacritic_free"},
+    {"query": "BN có suy tim, td suy tim mất bù", "expected": ["I50", "I50.9", "I50.0"], "tag": "abbreviation"},
+
+    {"query": "đái tháo đường tuýp 2 có hôn mê", "expected": ["E11.0", "E11"], "tag": "polarity"},
+    {"query": "đái tháo đường tuýp 1 chưa có biến chứng", "expected": ["E10.9", "E10"], "tag": "polarity"},
+    {"query": "hạ đường huyết", "expected": ["E16.2", "E16", "E16.1"], "tag": "plain"},
+    {"query": "suy tuyến thượng thận", "expected": ["E27.4", "E27", "E27.1"], "tag": "plain"},
+    {"query": "thiếu vitamin D", "expected": ["E55", "E55.9"], "tag": "plain"},
+
+    {"query": "viêm bể thận cấp", "expected": ["N10"], "tag": "plain"},
+    {"query": "sỏi niệu quản", "expected": ["N20.1", "N20"], "tag": "specificity"},
+    {"query": "viêm bàng quang", "expected": ["N30", "N30.9"], "tag": "plain"},
+    {"query": "suy than cap", "expected": ["N17", "N17.9"], "tag": "diacritic_free"},
+
+    {"query": "u xơ tử cung", "expected": ["D25", "D25.9"], "tag": "plain"},
+    {"query": "lạc nội mạc tử cung", "expected": ["N80", "N80.9"], "tag": "plain"},
+    {"query": "viêm âm đạo", "expected": ["N76.0", "N76", "N77.1"], "tag": "plain"},
+
+    {"query": "gãy xương đùi do tai nạn giao thông", "expected": ["S72", "S72.9", "S72.0"], "tag": "noisy"},
+    {"query": "bỏng độ II vùng cẳng tay", "expected": ["T22", "T22.2", "T22.1"], "tag": "plain"},
+    {"query": "chấn thương sọ não kín", "expected": ["S06", "S06.9"], "tag": "plain"},
+
+    {"query": "ung thư phổi", "expected": ["C34", "C34.9"], "tag": "plain"},
+    {"query": "ung thư dạ dày", "expected": ["C16", "C16.9"], "tag": "plain"},
+    {"query": "ung thư vú", "expected": ["C50", "C50.9"], "tag": "plain"},
+    {"query": "ung thư đại tràng", "expected": ["C18", "C18.9"], "tag": "plain"},
+
+    {"query": "tâm thần phân liệt", "expected": ["F20", "F20.9"], "tag": "plain"},
+    {"query": "rối loạn lưỡng cực", "expected": ["F31", "F31.9"], "tag": "plain"},
+    {"query": "nghiện rượu", "expected": ["F10.2", "F10"], "tag": "plain"},
+
+    {"query": "viêm kết mạc dị ứng", "expected": ["H10.1", "H10"], "tag": "polarity"},
+    {"query": "glocom góc mở", "expected": ["H40.1", "H40"], "tag": "specificity"},
+    {"query": "điếc dẫn truyền", "expected": ["H90", "H90.2", "H90.0", "H90.1"], "tag": "plain"},
+
+    {"query": "sởi", "expected": ["B05", "B05.9"], "tag": "plain"},
+    {"query": "nhiễm HIV", "expected": ["B24", "B20", "Z21"], "tag": "plain"},
+    {"query": "nhiễm khuẩn huyết", "expected": ["A41", "A41.9"], "tag": "plain"},
+    {"query": "uốn ván", "expected": ["A35", "A33", "A34"], "tag": "plain"},
+
+    {"query": "cd: viem tuy cap do soi mat", "expected": ["K85", "K85.1", "K85.9"], "tag": "diacritic_free"},
+    {"query": "Kết luận: Thiếu máu thiếu sắt mức độ vừa", "expected": ["D50", "D50.9", "D50.8"], "tag": "noisy"},
+    {"query": "bn nam 60t, cdls: phì đại lành tính tuyến tiền liệt", "expected": ["N40"], "tag": "noisy"},
+    {"query": "vpq cấp", "expected": ["J20", "J20.9"], "tag": "abbreviation"},
+    {"query": "td xgan mất bù", "expected": ["K74", "K74.6", "K70.3"], "tag": "abbreviation"},
+    {"query": "hctht nguyên phát", "expected": ["N04", "N04.9"], "tag": "abbreviation"}
+  ]
+}

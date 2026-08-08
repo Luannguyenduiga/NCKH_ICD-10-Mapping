@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý Bệnh viện - HIS Demo</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for medical icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="glass-app">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <i class="fa-solid fa-laptop-medical logo-icon"></i>
+                <div class="logo-text">
+                    <h1>City Hospital</h1>
+                    <span>Hệ thống HIS Nội bộ v2.5</span>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="active"><i class="fa-solid fa-hospital-user"></i> Hồ sơ Bệnh nhân</a>
+                <a href="#" onclick="alert('Tính năng đang phát triển trong dự án HIS đầy đủ')"><i class="fa-solid fa-user-doctor"></i> Bác sĩ điều trị</a>
+                <a href="#" onclick="alert('Tính năng đang phát triển trong dự án HIS đầy đủ')"><i class="fa-solid fa-receipt"></i> Viện phí & Bảo hiểm</a>
+                <a href="#" onclick="alert('Tính năng đang phát triển trong dự án HIS đầy đủ')"><i class="fa-solid fa-warehouse"></i> Quản lý Dược phẩm</a>
+            </nav>
+            <div class="connection-status-box">
+                <div class="status-header">
+                    <span class="status-dot disconnected" id="gateway-status-dot"></span>
+                    <span class="status-title">SMIG Gateway Status</span>
+                </div>
+                <p id="gateway-status-text">Đang kiểm tra kết nối...</p>
+                <div class="gateway-link">
+                    <a href="http://127.0.0.1:8000" target="_blank" class="gateway-btn">
+                        <i class="fa-solid fa-external-link"></i> Mở Portal Gateway
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="patient-search" placeholder="Tìm kiếm bệnh nhân bằng Tên hoặc Mã số (MRN)...">
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="btn-reset-db">
+                        <i class="fa-solid fa-arrows-rotate"></i> Reset Dữ liệu
+                    </button>
+                    <button class="btn btn-primary" id="btn-add-patient-modal">
+                        <i class="fa-solid fa-plus"></i> Thêm Bệnh nhân mới
+                    </button>
+                </div>
+            </header>
+
+            <!-- Grid Layout: Table & JSON Viewer -->
+            <div class="content-grid">
+                <!-- Left Section: Patient Database Table -->
+                <section class="table-container">
+                    <div class="container-header">
+                        <h2>Danh sách Chẩn đoán Lâm sàng Cục bộ</h2>
+                        <span class="badge" id="patient-count">0 bệnh nhân</span>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="his-table">
+                            <thead>
+                                <tr>
+                                    <th>Mã bệnh nhân</th>
+                                    <th>Họ và Tên</th>
+                                    <th>Giới tính</th>
+                                    <th>Ngày sinh</th>
+                                    <th>Chẩn đoán lâm sàng của Bác sĩ</th>
+                                    <th>Mã ICD-10</th>
+                                    <th>Trạng thái liên thông</th>
+                                    <th class="text-center">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patient-table-body">
+                                <!-- Data rows injected by JS -->
+                                <tr>
+                                    <td colspan="8" class="text-center loading-row">
+                                        <i class="fa-solid fa-spinner fa-spin"></i> Đang tải dữ liệu bệnh nhân...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Right Section: FHIR / Gateway Log Inspector -->
+                <section class="inspector-container">
+                    <div class="container-header">
+                        <h2>Bộ kiểm tra hồ sơ liên thông FHIR</h2>
+                    </div>
+                    <div class="inspector-card">
+                        <div class="inspector-tabs">
+                            <button class="tab-btn active" data-tab="fhir-json">HL7 FHIR JSON</button>
+                            <button class="tab-btn" data-tab="raw-response">Log chi tiết</button>
+                        </div>
+                        <div class="inspector-content">
+                            <div id="fhir-json" class="tab-pane active">
+                                <pre><code id="fhir-json-display">// Chọn bệnh nhân và bấm 'Đồng bộ' để hiển thị cấu trúc tài nguyên HL7 FHIR Condition tiêu chuẩn quốc tế...</code></pre>
+                            </div>
+                            <div id="raw-response" class="tab-pane">
+                                <div class="log-console" id="log-console-display">
+                                    <div class="log-line info">Hệ thống HIS đã sẵn sàng kiểm thử liên thông.</div>
+                                    <div class="log-line info">Vui lòng bấm nút 'Đồng bộ' của một bệnh nhân để thực thi quy trình chuẩn hóa NLP mã ICD-10 và đóng gói HL7 FHIR Condition.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="inspector-footer">
+                            <button class="btn btn-sm btn-outline" id="btn-copy-fhir" disabled>
+                                <i class="fa-solid fa-copy"></i> Sao chép JSON
+                            </button>
+                            <button class="btn btn-sm btn-outline" id="btn-clear-inspector">
+                                <i class="fa-solid fa-trash-can"></i> Xóa bảng log
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Patient Modal Dialog -->
+    <div class="modal" id="add-patient-modal">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h3>Thêm hồ sơ bệnh án mới</h3>
+                <span class="close-modal" id="close-modal-btn">&times;</span>
+            </div>
+            <form id="add-patient-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="p-id">Mã số Bệnh nhân (MRN/CCCD)</label>
+                        <input type="text" id="p-id" required placeholder="Ví dụ: MRN-2026-007 hoặc số CCCD">
+                    </div>
+                    <div class="form-group">
+                        <label for="p-name">Họ và Tên bệnh nhân</label>
+                        <input type="text" id="p-name" required placeholder="Ví dụ: Nguyễn Văn Hùng">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="p-gender">Giới tính</label>
+                        <select id="p-gender" required>
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="p-dob">Ngày sinh</label>
+                        <input type="date" id="p-dob" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="p-clinical">Chẩn đoán lâm sàng thô (Sử dụng viết tắt tiếng Việt tự do để test NLP)</label>
+                    <textarea id="p-clinical" rows="3" required placeholder="Ví dụ: Bệnh nhân bị đtđ tuýp 2 kèm cao huyết áp nhẹ và trào ngược dạ dày thực quản..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btn-cancel-modal">Hủy bỏ</button>
+                    <button type="submit" class="btn btn-primary">Lưu Bệnh án</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+# Phụ thuộc của SMIG Gateway.
+# Ghim khoảng phiên bản để môi trường tái lập được - yêu cầu bắt buộc với một
+# đề tài nghiên cứu cần kiểm chứng lại kết quả.
+
+# --- API & web ---
+fastapi>=0.110,<1.0
+uvicorn[standard]>=0.27,<1.0
+pydantic>=2.6,<3.0
+requests>=2.31,<3.0
+
+# --- NLP ---
+torch>=2.2
+transformers>=4.38
+sentence-transformers>=2.5
+numpy>=1.26
+
+# --- Chuẩn bị dữ liệu (ChangeJson.py) ---
+pandas>=2.2
+openpyxl>=3.1
+
+# --- Kiểm thử ---
+pytest>=8.0
+httpx>=0.27
