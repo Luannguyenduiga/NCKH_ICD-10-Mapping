@@ -134,7 +134,7 @@ async function analyzeText() {
 
         renderNormalization(data.query, data.normalized_query);
         renderNER(data.query, data.entities);
-        renderPredictions(data.predictions);
+        renderPredictions(data.predictions, data.diagnoses);
     } catch (error) {
         console.error(error);
         elNormOutput.innerHTML = `<span style="color:var(--status-offline)"><i class="fa-solid fa-circle-exclamation"></i> Lỗi: ${esc(error.message)}</span>`;
@@ -217,54 +217,87 @@ function renderNER(originalText, entities) {
 }
 
 // Bước 3: danh sách mã ICD-10 ứng viên
-function renderPredictions(predictions) {
+const BANDS = {
+    high: ['conf-high', 'conf-high-bg'],
+    medium: ['conf-med', 'conf-med-bg'],
+    low: ['conf-low', 'conf-low-bg'],
+};
+
+function predictionCard(pred, index) {
+    const [confClass, confBgClass] = BANDS[pred.confidence_band] || BANDS.low;
+    const reviewFlag = pred.requires_review
+        ? `<div class="pred-review-flag"><i class="fa-solid fa-triangle-exclamation"></i> `
+          + `Dưới ngưỡng tự động - cần bác sĩ xác nhận (FHIR: ${esc(pred.suggested_verification_status)})</div>`
+        : '';
+    const reason = (pred.explanation || []).length
+        ? `<div class="pred-explain"><i class="fa-solid fa-lightbulb"></i> ${esc(pred.explanation.join('; '))}</div>`
+        : '';
+
+    return `
+        <div class="pred-item" data-index="${index}">
+            <div class="pred-header">
+                <span class="pred-code">${esc(pred.code)}</span>
+                <span class="pred-code-nodot" title="Mã dạng liền không dấu chấm - dùng cho phần mềm viện và báo cáo BHYT">${esc(pred.code_no_dot || '')}</span>
+                <span class="pred-confidence ${confClass}"> Độ tin cậy: ${pred.confidence}%</span>
+            </div>
+            <div class="pred-details">${esc(pred.name_vi)}</div>
+            <div class="pred-match-meta">
+                <span>Khớp với: "${esc(pred.matched_by)}"</span>
+                <span>Tương đồng ngữ nghĩa: ${pred.similarity_score}</span>
+            </div>
+            <div class="confidence-bar-bg">
+                <div class="confidence-bar-fill ${confBgClass}" style="width: ${pred.confidence}%"></div>
+            </div>
+            ${reason}
+            ${reviewFlag}
+        </div>
+    `;
+}
+
+/**
+ * Vẽ danh sách mã ứng viên, nhóm theo từng chẩn đoán khi câu chứa nhiều bệnh.
+ *
+ * Nhóm lại là bắt buộc chứ không phải trang trí: với "sỏi bàng quang, suy thận
+ * cấp" thì N21.0 và N17.9 đều là mã ĐÚNG cho hai bệnh khác nhau, để chung một
+ * danh sách phẳng sẽ bị đọc nhầm thành hai phương án loại trừ nhau và bác sĩ
+ * chỉ chọn một.
+ */
+function renderPredictions(predictions, diagnoses) {
     if (!predictions.length) {
         elPredictionsOutput.innerHTML = `<span class="placeholder-text">Không tìm thấy mã ICD-10 phù hợp.</span>`;
         return;
     }
 
-    const BANDS = {
-        high: ['conf-high', 'conf-high-bg'],
-        medium: ['conf-med', 'conf-med-bg'],
-        low: ['conf-low', 'conf-low-bg'],
-    };
+    const multi = Array.isArray(diagnoses) && diagnoses.length > 1;
+    const groups = multi ? diagnoses : [{ fragment: null, predictions }];
 
-    elPredictionsOutput.innerHTML = predictions.map((pred, index) => {
-        const [confClass, confBgClass] = BANDS[pred.confidence_band] || BANDS.low;
-        const reviewFlag = pred.requires_review
-            ? `<div class="pred-review-flag"><i class="fa-solid fa-triangle-exclamation"></i> `
-              + `Dưới ngưỡng tự động - cần bác sĩ xác nhận (FHIR: ${esc(pred.suggested_verification_status)})</div>`
-            : '';
-        const reason = (pred.explanation || []).length
-            ? `<div class="pred-explain"><i class="fa-solid fa-lightbulb"></i> ${esc(pred.explanation.join('; '))}</div>`
-            : '';
+    const ordered = [];
+    let html = multi
+        ? `<div class="diagnosis-notice"><i class="fa-solid fa-circle-info"></i> `
+          + `Dòng chẩn đoán này chứa ${diagnoses.length} bệnh độc lập - mỗi bệnh cần một `
+          + `FHIR Condition riêng.</div>`
+        : '';
 
-        return `
-            <div class="pred-item" data-index="${index}">
-                <div class="pred-header">
-                    <span class="pred-code">${esc(pred.code)}</span>
-                    <span class="pred-confidence ${confClass}"> Độ tin cậy: ${pred.confidence}%</span>
-                </div>
-                <div class="pred-details">${esc(pred.name_vi)}</div>
-                <div class="pred-match-meta">
-                    <span>Khớp với: "${esc(pred.matched_by)}"</span>
-                    <span>Tương đồng ngữ nghĩa: ${pred.similarity_score}</span>
-                </div>
-                <div class="confidence-bar-bg">
-                    <div class="confidence-bar-fill ${confBgClass}" style="width: ${pred.confidence}%"></div>
-                </div>
-                ${reason}
-                ${reviewFlag}
-            </div>
-        `;
-    }).join('');
+    groups.forEach((group, groupIndex) => {
+        if (group.fragment) {
+            html += `<div class="diagnosis-group-header">`
+                + `<span class="diagnosis-index">Chẩn đoán ${groupIndex + 1}</span>`
+                + `<span class="diagnosis-fragment">"${esc(group.fragment)}"</span></div>`;
+        }
+        html += (group.predictions || []).map(pred => {
+            ordered.push(pred);
+            return predictionCard(pred, ordered.length - 1);
+        }).join('');
+    });
+
+    elPredictionsOutput.innerHTML = html;
 
     const predItems = elPredictionsOutput.querySelectorAll('.pred-item');
     predItems.forEach(item => {
         item.addEventListener('click', () => {
             predItems.forEach(i => i.classList.remove('selected'));
             item.classList.add('selected');
-            selectedPrediction = predictions[parseInt(item.dataset.index, 10)];
+            selectedPrediction = ordered[parseInt(item.dataset.index, 10)];
             generateFhirResource(selectedPrediction);
         });
     });

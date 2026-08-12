@@ -88,11 +88,15 @@ class EntityModel(BaseModel):
     text: str
     normalized: str
     code: str
+    # Dạng liền không dấu chấm (A00.0 -> A000) cho HIS/báo cáo dùng mã rút gọn.
+    # Mã để liên thông FHIR luôn là `code`.
+    code_no_dot: str
     type: str
 
 
 class PredictionModel(BaseModel):
     code: str
+    code_no_dot: str
     raw_code: str
     name_vi: str
     name_en: str
@@ -107,11 +111,42 @@ class PredictionModel(BaseModel):
     requires_review: bool
 
 
+class CombinationMemberModel(BaseModel):
+    code: str
+    code_no_dot: str
+    raw_code: str
+    name_vi: str
+    confidence: float
+    # "etiology" = mã bệnh nguyên (†), "manifestation" = mã biểu hiện (*).
+    role: str
+
+
+class CombinationModel(BaseModel):
+    """Cặp mã dao găm/sao khi chẩn đoán mô tả cả bệnh nguyên lẫn biểu hiện."""
+    display: str
+    members: List[CombinationMemberModel]
+    rationale: List[str]
+
+
+class DiagnosisModel(BaseModel):
+    """
+    Một chẩn đoán độc lập tách từ dòng bệnh án.
+
+    Câu một bệnh cho đúng một mục. Câu nhiều bệnh ("sỏi bàng quang, suy thận
+    cấp") cho nhiều mục, mỗi mục giữ độ tin cậy riêng thay vì chia nhau.
+    """
+    fragment: str
+    predictions: List[PredictionModel]
+
+
 class StandardizeResponse(BaseModel):
     query: str
     normalized_query: str
     entities: List[EntityModel]
     predictions: List[PredictionModel]
+    diagnoses: List[DiagnosisModel] = []
+    # None khi chẩn đoán chỉ có một vế - phần lớn trường hợp.
+    combination: Optional[CombinationModel] = None
     latency_ms: float
 
 
@@ -186,11 +221,17 @@ def standardize_diagnosis(request: StandardizeRequest):
     try:
         normalized_query = engine.expand_query(request.query)
         entities = engine.extract_entities_regex(request.query)
-        predictions = engine.query(request.query, top_k=request.top_k)
+        composite = engine.query_composite(request.query, top_k=request.top_k)
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=500, detail=f"Lỗi khi xử lý NLP: {exc}") from exc
 
-    for pred in predictions:
+    predictions = composite["predictions"]
+    diagnoses = composite.get("diagnoses") or []
+
+    # Danh sách phẳng và các chẩn đoán dùng chung phần lớn bản ghi, nhưng ứng
+    # viên hạng thấp của từng vế thì chỉ nằm trong `diagnoses`. Duyệt cả hai để
+    # không bản ghi nào thiếu trường trạng thái - Pydantic bắt buộc có.
+    for pred in [p for p in predictions] + [p for d in diagnoses for p in d["predictions"]]:
         status = verification_status_for(pred["confidence"])
         pred["suggested_verification_status"] = status
         pred["requires_review"] = status != "confirmed"
@@ -200,6 +241,8 @@ def standardize_diagnosis(request: StandardizeRequest):
         "normalized_query": normalized_query,
         "entities": entities,
         "predictions": predictions,
+        "diagnoses": diagnoses,
+        "combination": composite["combination"],
         "latency_ms": round((time.time() - start_time) * 1000, 2),
     }
 

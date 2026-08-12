@@ -18,6 +18,7 @@ if (-not (Test-Path ".venv")) {
 # EMR Cloud (HAPI FHIR) la thanh phan bat buoc cho chuc nang dong bo.
 $fhirUp = $false
 try {
+    $ProgressPreference = 'SilentlyContinue' #Close progress bar
     $r = Invoke-WebRequest -Uri "http://127.0.0.1:8090/fhir/metadata" -TimeoutSec 3 -UseBasicParsing
     $fhirUp = $r.StatusCode -eq 200
 } catch { $fhirUp = $false }

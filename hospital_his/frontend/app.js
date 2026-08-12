@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
             addLog(`Lỗi tải danh sách bệnh nhân: ${e.message}`, "error");
             patientTableBody.innerHTML = `
                 <tr>
-                    <td colspan="8" class="text-center" style="color: var(--status-failed)">
+                    <td colspan="9" class="text-center" style="color: var(--status-failed)">
                         <i class="fa-solid fa-triangle-exclamation"></i> Không thể kết nối đến backend HIS
                     </td>
                 </tr>
@@ -104,6 +104,17 @@ document.addEventListener("DOMContentLoaded", () => {
         "Needs Review": ['review', 'fa-user-doctor', 'Chờ bác sĩ duyệt'],
     };
 
+    /**
+     * Mã ICD-10 dạng liền không dấu chấm (A00.0 -> A000).
+     *
+     * Suy ra từ mã đã lưu thay vì thêm cột vào SQLite: hai dạng luôn phải khớp
+     * nhau nên lưu cả hai là tạo cơ hội cho chúng lệch nhau. Ký hiệu †/* cũng
+     * được gỡ vì chúng không thuộc mã.
+     */
+    function noDotCode(code) {
+        return (code || "").replace(/[†*‡]/g, "").replace(/\./g, "").trim();
+    }
+
     function confidenceTag(score) {
         if (score === null || score === undefined) return "";
         const band = score >= 85 ? "high" : score >= 60 ? "medium" : "low";
@@ -116,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (patients.length === 0) {
             patientTableBody.innerHTML = `
-                <tr><td colspan="8" class="text-center text-muted">Không tìm thấy bệnh nhân nào.</td></tr>
+                <tr><td colspan="9" class="text-center text-muted">Không tìm thấy bệnh nhân nào.</td></tr>
             `;
             return;
         }
@@ -126,12 +137,34 @@ document.addEventListener("DOMContentLoaded", () => {
                 || ['unsynced', 'fa-circle-minus', 'Chưa liên thông'];
             const statusPill = `<span class="status-pill ${cls}"><i class="fa-solid ${icon}"></i> ${label}</span>`;
 
-            const icdCodeStr = p.icd10_code
-                ? `<span class="icd-code-badge">${esc(p.icd10_code)}</span>${confidenceTag(p.confidence_score)}`
-                : `<span style="color: var(--text-muted)">-</span>`;
-            const icdDescStr = p.icd10_display
-                ? `<span class="icd-desc-text" title="${esc(p.icd10_display)}">${esc(p.icd10_display)}</span>`
-                : "";
+            // Một dòng chẩn đoán có thể ra nhiều bệnh. Bảng patients chỉ giữ được
+            // chẩn đoán chính nên danh sách đầy đủ lấy từ `conditions`; hồ sơ cũ
+            // (đồng bộ trước khi có bảng này) vẫn hiển thị được nhờ nhánh dự phòng.
+            const conditions = (p.conditions && p.conditions.length)
+                ? p.conditions
+                : (p.icd10_code
+                    ? [{ icd10_code: p.icd10_code, icd10_display: p.icd10_display,
+                         confidence_score: p.confidence_score, status: p.sync_status }]
+                    : []);
+            const empty = `<span style="color: var(--text-muted)">-</span>`;
+
+            const icdCodeStr = conditions.length
+                ? conditions.map(c => {
+                    const pending = c.status && c.status !== "Synced"
+                        ? ` <i class="fa-solid fa-hourglass-half" title="${esc(c.status)}"></i>` : "";
+                    const desc = c.icd10_display
+                        ? `<span class="icd-desc-text" title="${esc(c.icd10_display)}${c.fragment ? ` ← "${esc(c.fragment)}"` : ""}">${esc(c.icd10_display)}</span>`
+                        : "";
+                    return `<div class="icd-line"><span class="icd-code-badge">${esc(c.icd10_code)}</span>`
+                        + `${confidenceTag(c.confidence_score)}${pending}${desc}</div>`;
+                }).join("")
+                : empty;
+            const icdNoDotStr = conditions.length
+                ? conditions.map(c =>
+                    `<div class="icd-line"><span class="icd-code-nodot">${esc(noDotCode(c.icd10_code))}</span></div>`
+                  ).join("")
+                : empty;
+            const icdDescStr = "";
 
             const syncBtnContent = p.sync_status === "Synced"
                 ? `<i class="fa-solid fa-arrows-spin"></i> Đồng bộ lại`
@@ -145,6 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <td>${esc(p.birth_date)}</td>
                     <td class="diagnosis-text" title="${esc(p.clinical_note)}">${esc(p.clinical_note)}</td>
                     <td>${icdCodeStr}${icdDescStr}</td>
+                    <td>${icdNoDotStr}</td>
                     <td>
                         ${statusPill}
                         ${p.sync_time ? `<div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">${esc(p.sync_time)}</div>` : ""}
@@ -288,12 +322,29 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await res.json();
             if (!res.ok) throw new Error(data.detail || "Unknown sync error");
 
+            // Một dòng chẩn đoán có thể ra nhiều bệnh, mỗi bệnh một Condition
+            // riêng, nên nhật ký phải kể từng mã thay vì chỉ mã chính.
+            const conditions = data.conditions || [];
+            if (conditions.length > 1) {
+                addLog(`[BƯỚC 2/3] Tách được ${conditions.length} chẩn đoán độc lập `
+                     + `trong một dòng bệnh án.`, "info");
+            }
+            conditions.forEach(c => {
+                const line = `${c.icd10_code || c.code} - ${c.icd10_display || c.name_vi} `
+                    + `(${c.confidence_score ?? c.confidence}%)`
+                    + (c.fragment ? ` ← "${c.fragment}"` : "");
+                if (c.status === "Synced") {
+                    addLog(`   ✓ ${line} → FHIR Condition ${c.fhir_condition_id}`, "success");
+                } else if (c.status === "Needs Review") {
+                    addLog(`   ⏸ ${line} → chờ bác sĩ xác nhận`, "error");
+                } else {
+                    addLog(`   ✗ ${line} → ${c.message || "lỗi liên thông"}`, "error");
+                }
+            });
+
             if (data.status === "Synced") {
-                addLog(`[BƯỚC 2/3] Chuẩn hóa thành công: mã ICD-10 [${data.icd10_code}] `
-                     + `(${data.icd10_display}), độ tin cậy ${data.confidence_score}% `
-                     + `-> trạng thái FHIR "${data.verification_status}".`, "success");
-                addLog(`[BƯỚC 3/3] Đã truyền HL7 FHIR Condition lên EMR Cloud. `
-                     + `ID tài nguyên: ${data.fhir_condition_id}`, "success");
+                addLog(`[BƯỚC 3/3] Đã truyền ${conditions.length} HL7 FHIR Condition `
+                     + `lên EMR Cloud.`, "success");
                 fetchPatients();
                 await loadAndDisplayFhirResource(data.fhir_condition_id);
             } else if (data.status === "Needs Review") {
@@ -303,6 +354,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 (data.candidates || []).slice(1).forEach(c =>
                     addLog(`   • ${c.code} - ${c.name_vi} (${c.confidence}%)`, "info"));
                 fetchPatients();
+                // Vẫn còn mã đã liên thông được thì hiển thị tài nguyên của nó.
+                const firstSynced = conditions.find(c => c.status === "Synced");
+                if (firstSynced) await loadAndDisplayFhirResource(firstSynced.fhir_condition_id);
             } else {
                 addLog(`Đồng bộ thất bại: ${data.message}`, "error");
                 fetchPatients();

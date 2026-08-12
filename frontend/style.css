@@ -496,6 +496,58 @@ body {
     border-radius: 4px;
 }
 
+/* Khi một dòng bệnh án chứa nhiều bệnh, các mã phải được nhóm theo từng chẩn
+   đoán, nếu không bác sĩ sẽ đọc chúng như các phương án loại trừ nhau. */
+.diagnosis-notice {
+    font-size: 0.78rem;
+    color: var(--color-accent);
+    background: rgba(0, 212, 255, 0.08);
+    border: 1px solid rgba(0, 212, 255, 0.25);
+    border-radius: 6px;
+    padding: 0.4rem 0.6rem;
+    margin-bottom: 0.6rem;
+}
+
+.diagnosis-group-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin: 0.7rem 0 0.35rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid rgba(139, 144, 168, 0.25);
+}
+
+.diagnosis-index {
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+}
+
+.diagnosis-fragment {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Mã không dấu chấm chỉ là dạng phụ trợ cho phần mềm viện: để viền mờ, không
+   tô nền gradient như mã chuẩn để bác sĩ không nhầm hai mã với nhau. */
+.pred-code-nodot {
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    border: 1px dashed rgba(139, 144, 168, 0.45);
+    padding: 0.1rem 0.45rem;
+    border-radius: 4px;
+    /* .pred-header là flex space-between: margin-right tự động giữ nhãn này nằm
+       sát mã chuẩn, để phần trăm độ tin cậy vẫn dạt về mép phải như trước. */
+    margin-left: 0.4rem;
+    margin-right: auto;
+}
+
 .pred-item.selected .pred-code {
     background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
 }

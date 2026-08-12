@@ -443,6 +443,31 @@ body {
     display: inline-block;
 }
 
+/* Mỗi chẩn đoán một dòng: hồ sơ nhiều bệnh phải đọc được từng mã tách bạch
+   thay vì dính thành một khối chữ. */
+.icd-line {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.icd-line:last-child {
+    margin-bottom: 0;
+}
+
+/* Mã không dấu chấm là dạng phụ trợ, để nhạt hơn mã chuẩn để không ai nhầm
+   nó với mã dùng liên thông FHIR. */
+.icd-code-nodot {
+    background: rgba(148, 163, 184, 0.12);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    color: var(--text-muted);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-weight: 700;
+    font-size: 0.8rem;
+    display: inline-block;
+}
+
 .icd-desc-text {
     font-size: 0.75rem;
     color: var(--text-muted);

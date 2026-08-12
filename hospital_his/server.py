@@ -39,7 +39,7 @@ REQUEST_TIMEOUT = float(os.getenv("SMIG_HIS_TIMEOUT", "60"))
 # Dưới ngưỡng này, hồ sơ KHÔNG được tự động liên thông mà phải chờ bác sĩ duyệt.
 # Giá trị thực tế do Gateway quyết định (nlp/clinical_rules.py) và được đọc về
 # lúc đồng bộ; đây chỉ là giá trị dự phòng khi Gateway không trả về chính sách.
-FALLBACK_AUTO_CONFIRM = 85.0
+FALLBACK_AUTO_CONFIRM = 80.0
 
 
 ALLOWED_ORIGINS = [
@@ -76,26 +76,11 @@ def db_cursor(commit: bool = False):
         conn.close()
 
 
-DEFAULT_PATIENTS = [
-    ("MRN-2026-001", "Nguyễn Văn An", "Nam", "1980-05-14",
-     "Bệnh nhân bị ĐTĐ typ 2 không biến chứng"),
-    ("MRN-2026-002", "Trần Thị Bình", "Nữ", "1975-10-22",
-     "Bệnh nhân có tiền sử THA vô căn kèm đau ngực nhẹ"),
-    ("MRN-2026-003", "Phạm Minh Đức", "Nam", "1992-03-08",
-     "Chẩn đoán lâm sàng: Hen phế quản cấp (HPQ cấp)"),
-    ("MRN-2026-004", "Lê Thị Hồng", "Nữ", "1968-12-01",
-     "Theo dõi trào ngược dạ dày thực quản (GERD) mức độ nhẹ"),
-    ("MRN-2026-005", "Vũ Hoàng Long", "Nam", "1985-07-30",
-     "Chẩn đoán: Suy thận mạn giai đoạn 3 (CKD)"),
-    ("MRN-2026-006", "Hoàng Anh Thư", "Nữ", "2000-09-15",
-     "Cơn đau dạ dày cấp nghi do loét dạ dày tá tràng"),
-]
-
-
 def init_db(force: bool = False):
     with db_cursor(commit=True) as cursor:
         if force:
             cursor.execute("DROP TABLE IF EXISTS patients")
+            cursor.execute("DROP TABLE IF EXISTS patient_conditions")
 
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS patients (
@@ -113,6 +98,27 @@ def init_db(force: bool = False):
                 sync_time TEXT
             )
         """)
+        # Một dòng chẩn đoán có thể chứa nhiều bệnh ("sỏi bàng quang, suy thận
+        # cấp"), mỗi bệnh là một FHIR Condition riêng. Các cột icd10_* trên bảng
+        # patients chỉ giữ được một mã nên chúng được giữ lại làm chẩn đoán
+        # chính (để tương thích với phần hiển thị cũ), còn danh sách đầy đủ nằm ở
+        # bảng này.
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS patient_conditions (
+                patient_id TEXT NOT NULL,
+                icd10_code TEXT NOT NULL,
+                icd10_display TEXT,
+                fragment TEXT,
+                confidence_score REAL,
+                verification_status TEXT,
+                fhir_condition_id TEXT,
+                status TEXT,
+                message TEXT,
+                sync_time TEXT,
+                PRIMARY KEY (patient_id, icd10_code)
+            )
+        """)
+
         # Nâng cấp lược đồ cho cơ sở dữ liệu đã tạo từ phiên bản trước.
         existing = {row[1] for row in cursor.execute("PRAGMA table_info(patients)")}
         if "verification_status" not in existing:
@@ -120,11 +126,7 @@ def init_db(force: bool = False):
 
         cursor.execute("SELECT COUNT(*) FROM patients")
         if cursor.fetchone()[0] == 0:
-            cursor.executemany(
-                "INSERT INTO patients (id, name, gender, birth_date, clinical_note)"
-                " VALUES (?, ?, ?, ?, ?)",
-                DEFAULT_PATIENTS,
-            )
+            pass # Không có dữ liệu mẫu, vì danh mục ICD-10 đã được chuẩn hóa từ file Excel.
 
 
 class PatientCreate(BaseModel):
@@ -140,7 +142,16 @@ def get_patients():
     try:
         with db_cursor() as cursor:
             cursor.execute("SELECT * FROM patients ORDER BY id")
-            return [dict(row) for row in cursor.fetchall()]
+            patients = [dict(row) for row in cursor.fetchall()]
+            cursor.execute(
+                "SELECT * FROM patient_conditions ORDER BY patient_id, rowid")
+            by_patient = {}
+            for row in cursor.fetchall():
+                condition = dict(row)
+                by_patient.setdefault(condition["patient_id"], []).append(condition)
+        for patient in patients:
+            patient["conditions"] = by_patient.get(patient["id"], [])
+        return patients
     except sqlite3.Error as exc:
         raise HTTPException(status_code=500, detail=f"Lỗi cơ sở dữ liệu: {exc}") from exc
 
@@ -173,14 +184,134 @@ def _mark_sync_result(patient_id: str, status: str, **fields):
         )
 
 
+def _save_conditions(patient_id: str, conditions: list):
+    """
+    Ghi đè toàn bộ danh sách chẩn đoán của một hồ sơ.
+
+    Xóa trước rồi chèn lại thay vì chèn thêm: đồng bộ lại một hồ sơ đã sửa chẩn
+    đoán phải bỏ đi những mã không còn đúng, nếu chỉ chèn thêm thì mã cũ nằm lại
+    vĩnh viễn trong bệnh án.
+    """
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with db_cursor(commit=True) as cursor:
+        cursor.execute("DELETE FROM patient_conditions WHERE patient_id = ?", (patient_id,))
+        cursor.executemany(
+            "INSERT INTO patient_conditions (patient_id, icd10_code, icd10_display,"
+            " fragment, confidence_score, verification_status, fhir_condition_id,"
+            " status, message, sync_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [
+                (patient_id, c["code"], c["name_vi"], c["fragment"], c["confidence"],
+                 c["verification_status"], c.get("fhir_condition_id"), c["status"],
+                 c.get("message"), now)
+                for c in conditions
+            ],
+        )
+
+
+def _fetch_diagnoses(patient: dict) -> list:
+    """
+    Gọi Gateway chuẩn hóa và quy về danh sách chẩn đoán, mỗi chẩn đoán một mã chính.
+
+    Gateway trả `diagnoses` khi tách được nhiều bệnh trong một dòng. Bản Gateway
+    cũ chưa có trường này nên vẫn đọc `predictions` làm phương án dự phòng, coi
+    cả câu là một chẩn đoán.
+    """
+    try:
+        std_resp = requests.post(
+            f"{GATEWAY_URL}/api/standardize",
+            json={"query": patient["clinical_note"]},
+            timeout=REQUEST_TIMEOUT,
+        )
+        std_resp.raise_for_status()
+        data = std_resp.json()
+    except requests.RequestException as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=(f"Không thể kết nối Gateway tại {GATEWAY_URL}. "
+                    f"Hãy đảm bảo Gateway đang chạy. Chi tiết: {exc}"),
+        ) from exc
+
+    groups = data.get("diagnoses") or []
+    if not groups and data.get("predictions"):
+        groups = [{"fragment": patient["clinical_note"], "predictions": data["predictions"]}]
+
+    diagnoses, seen = [], set()
+    for group in groups:
+        candidates = group.get("predictions") or []
+        if not candidates:
+            continue
+        best = candidates[0]
+        # Hai vế cho ra cùng một mã thì chỉ liên thông một lần: EMR không nên
+        # nhận hai Condition trùng mã cho cùng một bệnh nhân.
+        if best["code"] in seen:
+            continue
+        seen.add(best["code"])
+        confidence = float(best["confidence"])
+        diagnoses.append({
+            "fragment": group.get("fragment") or patient["clinical_note"],
+            "code": best["code"],
+            "code_no_dot": best.get("code_no_dot", ""),
+            "name_vi": best["name_vi"],
+            "confidence": confidence,
+            "verification_status": best.get("suggested_verification_status", "unconfirmed"),
+            "requires_review": bool(
+                best.get("requires_review", confidence < FALLBACK_AUTO_CONFIRM)),
+            "candidates": [
+                {"code": p["code"], "code_no_dot": p.get("code_no_dot", ""),
+                 "name_vi": p["name_vi"], "confidence": p["confidence"]}
+                for p in candidates
+            ],
+        })
+    return diagnoses
+
+
+def _push_condition(patient: dict, diagnosis: dict) -> str:
+    """Sinh FHIR Condition cho một chẩn đoán rồi đẩy lên EMR Cloud, trả id đã xác nhận."""
+    fhir_resp = requests.post(
+        f"{GATEWAY_URL}/api/fhir/condition",
+        json={
+            "patient_id": patient["id"],
+            "patient_name": patient["name"],
+            "raw_clinical_note": patient["clinical_note"],
+            "icd10_code": diagnosis["code"],
+            "icd10_display": diagnosis["name_vi"],
+            "confidence_score": diagnosis["confidence"],
+            "clinical_status": "active",
+            "gender": patient["gender"],
+            "birth_date": patient["birth_date"],
+        },
+        timeout=REQUEST_TIMEOUT,
+    )
+    fhir_resp.raise_for_status()
+    fhir_resource = fhir_resp.json()
+
+    sync_resp = requests.post(
+        f"{GATEWAY_URL}/api/fhir/sync",
+        json={
+            "condition": fhir_resource,
+            "patient": {
+                "id": patient["id"], "name": patient["name"],
+                "gender": patient["gender"], "birth_date": patient["birth_date"],
+            },
+        },
+        timeout=REQUEST_TIMEOUT,
+    )
+    sync_resp.raise_for_status()
+    # Id do EMR Cloud xác nhận, không phải id tự đoán -> truy vết được thật.
+    return sync_resp.json().get("condition_id") or fhir_resource.get("id")
+
+
 @app.post("/api/sync/{patient_id}")
 def sync_patient(patient_id: str):
     """
     Liên thông một hồ sơ: chuẩn hóa -> sinh FHIR -> đẩy lên EMR Cloud.
 
-    Điểm khác biệt quan trọng so với bản trước: kết quả có độ tin cậy thấp KHÔNG
-    còn được tự động gắn nhãn "confirmed" và đẩy thẳng lên EMR. Mã dưới ngưỡng
-    tự động sẽ dừng lại ở trạng thái chờ bác sĩ duyệt.
+    Một dòng chẩn đoán có thể chứa nhiều bệnh, và mỗi bệnh phải thành một FHIR
+    Condition riêng. Bản trước chỉ lấy `predictions[0]` nên bệnh thứ hai trong
+    câu biến mất khỏi hồ sơ liên thông.
+
+    Chốt chặn an toàn lâm sàng được xét cho TỪNG chẩn đoán: mã dưới ngưỡng dừng
+    lại chờ bác sĩ duyệt, nhưng không chặn những mã đã đủ tin cậy trong cùng câu.
     """
     with db_cursor() as cursor:
         cursor.execute("SELECT * FROM patients WHERE id = ?", (patient_id,))
@@ -189,112 +320,107 @@ def sync_patient(patient_id: str):
         raise HTTPException(status_code=404, detail="Không tìm thấy hồ sơ bệnh án")
     patient = dict(row)
 
-    try:
-        # Bước 1: chuẩn hóa chẩn đoán qua mô hình NLP của Gateway.
-        std_resp = requests.post(
-            f"{GATEWAY_URL}/api/standardize",
-            json={"query": patient["clinical_note"]},
-            timeout=REQUEST_TIMEOUT,
-        )
-        std_resp.raise_for_status()
-        predictions = std_resp.json().get("predictions", [])
-    except requests.RequestException as exc:
-        raise HTTPException(
-            status_code=503,
-            detail=(f"Không thể kết nối Gateway tại {GATEWAY_URL}. "
-                    f"Hãy đảm bảo Gateway đang chạy. Chi tiết: {exc}"),
-        ) from exc
-
-    if not predictions:
+    # Bước 1: chuẩn hóa chẩn đoán qua mô hình NLP của Gateway.
+    diagnoses = _fetch_diagnoses(patient)
+    if not diagnoses:
         _mark_sync_result(patient_id, "Failed")
+        _save_conditions(patient_id, [])
         return {
             "patient_id": patient_id, "status": "Failed",
             "icd10_code": None, "icd10_display": None, "fhir_condition_id": None,
-            "confidence_score": 0.0,
+            "confidence_score": 0.0, "conditions": [],
             "message": "Không tìm thấy mã ICD-10 phù hợp cho chẩn đoán lâm sàng này.",
         }
 
-    best = predictions[0]
-    confidence = float(best["confidence"])
-    verification = best.get("suggested_verification_status", "unconfirmed")
+    # Bước 2 và 3: sinh Condition rồi đẩy lên EMR Cloud, làm riêng từng chẩn đoán.
+    results, transport_errors = [], []
+    for diagnosis in diagnoses:
+        record = dict(diagnosis)
+        if diagnosis["requires_review"]:
+            record.update({
+                "status": "Needs Review",
+                "fhir_condition_id": None,
+                "message": (
+                    f"Độ tin cậy {diagnosis['confidence']}% chưa đạt ngưỡng tự động "
+                    f"({FALLBACK_AUTO_CONFIRM}%), chờ bác sĩ xác nhận."
+                ),
+            })
+            results.append(record)
+            continue
+        try:
+            condition_id = _push_condition(patient, diagnosis)
+        except requests.HTTPError as exc:
+            detail = exc.response.text[:300] if exc.response is not None else str(exc)
+            transport_errors.append(("http", f"Gateway trả về lỗi: {detail}"))
+            record.update({"status": "Failed", "fhir_condition_id": None,
+                           "message": f"Gateway trả về lỗi: {detail}"})
+        except requests.RequestException as exc:
+            transport_errors.append(("net", f"Mất kết nối trong quá trình liên thông: {exc}"))
+            record.update({"status": "Failed", "fhir_condition_id": None,
+                           "message": f"Mất kết nối: {exc}"})
+        else:
+            record.update({
+                "status": "Synced",
+                "fhir_condition_id": condition_id,
+                "message": f"Đã tạo FHIR Condition {condition_id}.",
+            })
+        results.append(record)
 
-    # Chốt chặn an toàn lâm sàng: dưới ngưỡng thì dừng, không liên thông tự động.
-    if best.get("requires_review", confidence < FALLBACK_AUTO_CONFIRM):
-        _mark_sync_result(
-            patient_id, "Needs Review",
-            icd10_code=best["code"], icd10_display=best["name_vi"],
-            confidence_score=confidence, verification_status=verification,
-        )
-        return {
-            "patient_id": patient_id, "status": "Needs Review",
-            "icd10_code": best["code"], "icd10_display": best["name_vi"],
-            "fhir_condition_id": None, "confidence_score": confidence,
-            "verification_status": verification,
-            "candidates": [
-                {"code": p["code"], "name_vi": p["name_vi"], "confidence": p["confidence"]}
-                for p in predictions
-            ],
-            "message": (
-                f"Độ tin cậy {confidence}% chưa đạt ngưỡng tự động ({FALLBACK_AUTO_CONFIRM}%). "
-                f"Hồ sơ được giữ lại chờ bác sĩ xác nhận mã ICD-10 trước khi liên thông."
-            ),
-        }
+    synced = [r for r in results if r["status"] == "Synced"]
+    review = [r for r in results if r["status"] == "Needs Review"]
+    failed = [r for r in results if r["status"] == "Failed"]
 
-    try:
-        # Bước 2: sinh HL7 FHIR Condition Resource.
-        fhir_resp = requests.post(
-            f"{GATEWAY_URL}/api/fhir/condition",
-            json={
-                "patient_id": patient["id"],
-                "patient_name": patient["name"],
-                "raw_clinical_note": patient["clinical_note"],
-                "icd10_code": best["code"],
-                "icd10_display": best["name_vi"],
-                "confidence_score": confidence,
-                "clinical_status": "active",
-                "gender": patient["gender"],
-                "birth_date": patient["birth_date"],
-            },
-            timeout=REQUEST_TIMEOUT,
-        )
-        fhir_resp.raise_for_status()
-        fhir_resource = fhir_resp.json()
-
-        # Bước 3: đẩy lên EMR Cloud, kèm thông tin hành chính bệnh nhân.
-        sync_resp = requests.post(
-            f"{GATEWAY_URL}/api/fhir/sync",
-            json={
-                "condition": fhir_resource,
-                "patient": {
-                    "id": patient["id"], "name": patient["name"],
-                    "gender": patient["gender"], "birth_date": patient["birth_date"],
-                },
-            },
-            timeout=REQUEST_TIMEOUT,
-        )
-        sync_resp.raise_for_status()
-        # Id do EMR Cloud xác nhận, không phải id tự đoán -> truy vết được thật.
-        condition_id = sync_resp.json().get("condition_id") or fhir_resource.get("id")
-    except requests.HTTPError as exc:
-        detail = exc.response.text[:300] if exc.response is not None else str(exc)
+    # Không có mã nào đi được vì lỗi hạ tầng: giữ nguyên hành vi cũ là ném lỗi,
+    # để giao diện phân biệt được "hệ thống hỏng" với "chờ bác sĩ duyệt".
+    if failed and not synced and not review:
         _mark_sync_result(patient_id, "Failed")
-        raise HTTPException(status_code=502, detail=f"Gateway trả về lỗi: {detail}") from exc
-    except requests.RequestException as exc:
-        _mark_sync_result(patient_id, "Failed")
-        raise HTTPException(status_code=503, detail=f"Mất kết nối trong quá trình liên thông: {exc}") from exc
+        _save_conditions(patient_id, results)
+        kind, detail = transport_errors[0]
+        raise HTTPException(status_code=502 if kind == "http" else 503, detail=detail)
 
+    status = "Failed" if failed else ("Needs Review" if review else "Synced")
+    # Chẩn đoán đầu câu đóng vai chẩn đoán chính trên bảng bệnh án; danh sách đầy
+    # đủ nằm ở patient_conditions.
+    primary = results[0]
     _mark_sync_result(
-        patient_id, "Synced",
-        icd10_code=best["code"], icd10_display=best["name_vi"],
-        fhir_condition_id=condition_id, confidence_score=confidence,
-        verification_status=verification,
+        patient_id, status,
+        icd10_code=primary["code"], icd10_display=primary["name_vi"],
+        fhir_condition_id=primary.get("fhir_condition_id"),
+        confidence_score=primary["confidence"],
+        verification_status=primary["verification_status"],
     )
+    _save_conditions(patient_id, results)
+
+    if status == "Synced":
+        ids = ", ".join(r["fhir_condition_id"] for r in synced)
+        message = (f"Liên thông thành công {len(synced)} chẩn đoán! "
+                   f"Tài nguyên FHIR Condition: {ids}.")
+    elif status == "Needs Review":
+        message = (
+            f"{len(synced)}/{len(results)} chẩn đoán đã liên thông; "
+            f"{len(review)} mã chưa đạt ngưỡng tự động ({FALLBACK_AUTO_CONFIRM}%), "
+            f"chờ bác sĩ xác nhận: {', '.join(r['code'] for r in review)}."
+        )
+    else:
+        message = (
+            f"{len(synced)}/{len(results)} chẩn đoán đã liên thông; "
+            f"{len(failed)} mã gặp lỗi: {', '.join(r['code'] for r in failed)}."
+        )
+
     return {
-        "patient_id": patient_id, "status": "Synced",
-        "icd10_code": best["code"], "icd10_display": best["name_vi"],
-        "fhir_condition_id": condition_id, "confidence_score": confidence,
-        "verification_status": verification,
-        "message": f"Liên thông thành công! Tài nguyên FHIR Condition: {condition_id}.",
+        "patient_id": patient_id, "status": status,
+        "icd10_code": primary["code"], "icd10_display": primary["name_vi"],
+        # Dạng liền không dấu chấm cho phần mềm viện dùng mã rút gọn; mã đẩy lên
+        # EMR vẫn là dạng có dấu chấm theo chuẩn FHIR.
+        "icd10_code_no_dot": primary.get("code_no_dot", ""),
+        "fhir_condition_id": primary.get("fhir_condition_id"),
+        "confidence_score": primary["confidence"],
+        "verification_status": primary["verification_status"],
+        "conditions": [
+            {k: v for k, v in r.items() if k != "candidates"} for r in results
+        ],
+        "candidates": primary["candidates"],
+        "message": message,
     }
 
 
@@ -305,6 +431,9 @@ def delete_patient(patient_id: str):
             cursor.execute("DELETE FROM patients WHERE id = ?", (patient_id,))
             if cursor.rowcount == 0:
                 raise HTTPException(status_code=404, detail="Không tìm thấy bệnh nhân")
+            # SQLite không tự thi hành khóa ngoại nếu chưa bật PRAGMA, nên phải
+            # dọn tay để bảng chẩn đoán không giữ lại hồ sơ đã xóa.
+            cursor.execute("DELETE FROM patient_conditions WHERE patient_id = ?", (patient_id,))
         return {"status": "success", "message": f"Đã xóa hồ sơ bệnh nhân {patient_id}."}
     except HTTPException:
         raise
