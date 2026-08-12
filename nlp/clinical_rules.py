@@ -235,6 +235,26 @@ OTHER_PENALTY = 0.04         # mã .8 chỉ dùng khi thể bệnh đã nêu mà
 
 
 # ---------------------------------------------------------------------------
+# 3c. Nhãn phụ thuộc nhóm cha
+# ---------------------------------------------------------------------------
+# Chương II đặt tên một số mã bằng VỊ TRÍ GIẢI PHẪU trần: D16.6 tên chỉ là "Cột
+# sống", nghĩa "u lành của xương và sụn khớp" nằm ở nhóm cha chứ không nằm trong
+# tên mã. Những nhãn như vậy khớp NER y hệt một tên bệnh, nên khi tách một vế
+# thành nhiều chẩn đoán thì "cột sống" trong "thoát vị đĩa đệm cột sống" bị nhận
+# thành chẩn đoán u xương riêng - sinh ra một bệnh không có trong hồ sơ.
+#
+# Dấu hiệu nhận biết: tên mã KHÔNG chứa từ khóa khối u nào trong khi tên nhóm cha
+# thì có, tức nghĩa bệnh chỉ tồn tại ở nhóm cha. Toàn danh mục chỉ 27/889 mã
+# chương II rơi vào diện này, và luật chỉ áp khi tách vế nên không ảnh hưởng tới
+# câu chẩn đoán chỉ có một bệnh.
+NEOPLASM_TERMS = [
+    r"u", r"ung thư", r"bướu", r"khối u", r"đa u tủy", r"polyp", r"nốt ruồi",
+    r"bạch cầu", r"tân sinh", r"loạn sản", r"di căn", r"ác tính", r"lành tính",
+    r"carcinom\w*", r"sarcom\w*", r"lympho\w*", r"melanom\w*", r"mesotheliom\w*",
+]
+
+
+# ---------------------------------------------------------------------------
 # 4. Cổng chương ICD-10
 # ---------------------------------------------------------------------------
 # Chương O (thai sản), S/T (chấn thương, ngộ độc), V-Y (nguyên nhân ngoại sinh)

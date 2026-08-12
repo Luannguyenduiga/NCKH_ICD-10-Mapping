@@ -128,6 +128,91 @@ def test_confidence_is_discriminative(engine):
     assert confident >= 85, f"Ca chuẩn phải đạt mức tự động xác nhận, đang là {confident}%"
 
 
+# --- Chuẩn hóa Unicode ------------------------------------------------------
+# Danh mục Bộ Y tế lưu 198 mã ở dạng tổ hợp (NFD): "không" = k h o U+0302 n g.
+# Dấu tổ hợp không thuộc lớp \w nên bộ chuẩn hóa cắt "không" thành "kho ng", làm
+# A99 tụt từ hạng 1 (94.5%) xuống hạng 3 (42.9%) dù câu truy vấn trùng từng chữ
+# với tên mã. Bác sĩ dán bệnh án từ macOS/HIS cũng sinh ra dạng NFD y hệt.
+NFC_CASES = [
+    ("sốt xuất huyết do virus không xác định", "A99"),
+    ("hôn mê hạ đường máu không do đái tháo đường", "E15"),
+]
+
+
+@pytest.mark.parametrize("query,expected", NFC_CASES)
+def test_composed_and_decomposed_unicode_match_equally(engine, query, expected):
+    """Câu gõ dạng dựng sẵn phải khớp cả những mã lưu ở dạng tổ hợp."""
+    import unicodedata
+
+    for form in ("NFC", "NFD"):
+        variant = unicodedata.normalize(form, query)
+        top = engine.query(variant)[0]
+        assert sanitize_icd10_code(top["code"]) == expected, (
+            f"Dạng {form} của '{query}' cho {top['code']} thay vì {expected}")
+        assert top["confidence"] >= 85, (
+            f"Dạng {form}: câu trùng từng chữ với tên mã mà chỉ đạt {top['confidence']}%")
+
+
+# --- Nhiều bệnh trong một dòng chẩn đoán ------------------------------------
+MULTI_CASES = [
+    ("đái tháo đường tuýp 2 tăng huyết áp", {"E11", "I10"},
+     "Hai bệnh viết liền, KHÔNG có dấu phân cách"),
+    ("Đái tháo đường tuýp 2, tăng huyết áp vô căn", {"E11", "I10"},
+     "Hai bệnh ngăn bằng dấu phẩy"),
+    ("Bệnh nhân bị viêm phổi đã điều trị 3 ngày kèm tăng huyết áp", {"J18", "I10"},
+     "Bỏ qua phần chữ không phải chẩn đoán"),
+    ("sỏi bàng quang, suy thận cấp, thiếu máu thiếu sắt", {"N21", "N17", "D50"},
+     "Ba bệnh độc lập"),
+]
+
+
+@pytest.mark.parametrize("query,blocks,description", MULTI_CASES)
+def test_multiple_diagnoses_each_keep_high_confidence(engine, query, blocks, description):
+    """
+    Mọi bệnh có mặt trong dòng chẩn đoán đều phải ra mã VÀ giữ độ tin cậy cao.
+
+    Mã hóa cả câu thành một vector khiến các mã chia nhau xác suất: với
+    "đái tháo đường tuýp 2 tăng huyết áp" thì I10 rơi khỏi cả top-8 của cả câu.
+    Tra riêng từng tên bệnh mới giữ được mức tự động xác nhận cho cả hai.
+    """
+    composite = engine.query_composite(query, top_k=5)
+    primaries = {sanitize_icd10_code(d["predictions"][0]["code"]): d["predictions"][0]
+                 for d in composite["diagnoses"]}
+
+    for block in blocks:
+        hit = next((r for c, r in primaries.items() if c.startswith(block)), None)
+        assert hit is not None, (
+            f"{description}\n  Thiếu mã khối {block} trong {sorted(primaries)}")
+        assert hit["confidence"] >= 85, (
+            f"{description}\n  {hit['code']} chỉ đạt {hit['confidence']}%, "
+            f"dưới ngưỡng tự động xác nhận")
+
+
+def test_single_diagnosis_is_not_split(engine):
+    """
+    Một chẩn đoán duy nhất không được xé thành nhiều bệnh.
+
+    "cột sống" trong "thoát vị đĩa đệm cột sống" là bổ ngữ vị trí, nhưng danh mục
+    có mã D16.6 tên đúng là "Cột sống" (u lành xương) nên NER khớp trúng. Nhận
+    nhầm cụm này sẽ ghi vào hồ sơ một bệnh u xương không hề có.
+    """
+    for query in ("Thoát vị đĩa đệm cột sống", "tăng huyết áp vô căn",
+                  "viêm phổi thùy dưới phải"):
+        composite = engine.query_composite(query, top_k=5)
+        assert len(composite["diagnoses"]) == 1, (
+            f"'{query}' bị tách thành {len(composite['diagnoses'])} chẩn đoán: "
+            f"{[d['fragment'] for d in composite['diagnoses']]}")
+
+
+def test_dagger_pair_survives_term_splitting(engine):
+    """Cặp †/* là MỘT chẩn đoán hai mã, không được tách thành hai bệnh."""
+    composite = engine.query_composite(
+        "Thoát vị đĩa đệm cột sống, chèn ép rễ dây thần kinh", top_k=5)
+    assert composite["combination"] is not None, "Mất cặp †/*"
+    codes = [m["code"] for m in composite["combination"]["members"]]
+    assert codes[0].startswith("M51") and codes[1].startswith("G55"), codes
+
+
 def test_dev_set_regression(engine):
     """Chặn hồi quy trên tập phát triển."""
     result = evaluate(engine, load_eval_set())

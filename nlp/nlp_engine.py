@@ -19,7 +19,7 @@ import json
 import os
 import re
 import unicodedata
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 import numpy as np
 from sentence_transformers import SentenceTransformer, util
@@ -30,6 +30,7 @@ from nlp.clinical_rules import (
     CHAPTER_GATES,
     DATA_FIXES,
     DIRECT_ALIASES,
+    NEOPLASM_TERMS,
     NOISE_PREFIXES,
     NOISE_SUFFIXES,
     OTHER_MARKERS,
@@ -66,11 +67,35 @@ SOFTMAX_SCOPE = 20        # số mã đưa vào chuẩn hóa softmax
 SIM_FLOOR = 0.40
 SIM_CEIL = 0.90
 
+# --- Chẩn đoán kép (dao găm/sao) -------------------------------------------
+# Tên mã trong danh mục ghi kèm mã đối tác: "(G55.1*)" hoặc dải "(M50-M51†)".
+_CODE_REF_RE = re.compile(
+    r"\(\s*([A-Z]\d{2}(?:\.\d+)?)\s*(?:-\s*([A-Z]\d{2}(?:\.\d+)?)\s*)?[†*]\s*\)"
+)
+# Ranh giới giữa các vế lâm sàng trong một dòng chẩn đoán. KHÔNG tách theo "và":
+# "rễ và đám rối thần kinh" là một cụm, tách ra sẽ vỡ nghĩa.
+_FRAGMENT_SPLIT_RE = re.compile(
+    r"[,;/+]|\bkèm theo\b|\bkèm\b|\bcó biến chứng\b|\bbiến chứng\b|\bgây\b|\bdẫn đến\b",
+    re.IGNORECASE,
+)
+MAX_FRAGMENTS = 6         # số vế tối đa đưa vào truy vấn riêng, chặn chi phí encode
+FRAGMENT_TOP_K = 5        # số ứng viên xét cho mỗi vế khi dò cặp †/*
+# Cụm ngắn hơn ngần này không đủ nghĩa để coi là một chẩn đoán riêng.
+MIN_TERM_FRAGMENT_LEN = 5
+# Ngưỡng để coi một vế là chẩn đoán độc lập. Đặt cao vì hậu quả của việc tách
+# nhầm (sinh thêm một bệnh không có thật trong hồ sơ) nặng hơn việc bỏ sót:
+# vế mô tả bổ sung cho bệnh chính thường chỉ đạt 30-50% khi tra riêng.
+MULTI_DIAGNOSIS_MIN_CONF = 60.0
+
 _NOISE_RE = [re.compile(p) for p in NOISE_PREFIXES]
 _NOISE_SUFFIX_RE = [re.compile(p) for p in NOISE_SUFFIXES]
 _ABBR_RE = [(re.compile(p), r) for p, r in ABBREVIATIONS.items()]
 _QUERY_ABBR_RE = [(re.compile(p), r) for p, r in QUERY_ABBREVIATIONS.items()]
 _MAX_NER_NGRAM = 12
+# Danh mục sinh cả biến thể mã rút gọn làm synonym ("a988"). Chúng khớp NER như
+# một thuật ngữ nhưng không phải tên bệnh, không được tính là một chẩn đoán.
+_CODE_LIKE_RE = re.compile(r"^[a-z]\d{2,4}$")
+_NEOPLASM_RE = re.compile(r"\b(?:%s)\b" % "|".join(NEOPLASM_TERMS))
 
 
 def strip_diacritics(text: str) -> str:
@@ -91,6 +116,17 @@ def sanitize_icd10_code(code: str) -> str:
     chối, nên phải gỡ trước khi đưa vào tài nguyên liên thông.
     """
     return re.sub(r"[†*‡]", "", code or "").strip()
+
+
+def code_no_dot(code: str) -> str:
+    """
+    Dạng liền không dấu chấm của mã ICD-10 (A00.0 -> A000).
+
+    Danh mục Bộ Y tế có sẵn cột "MÃ BỆNH KHÔNG DẤU" và nó đúng bằng mã đã gỡ
+    dấu chấm, nên suy ra tại chỗ thay vì phụ thuộc vào danh mục có trường đó
+    hay không. Chỉ dùng cho HIS/báo cáo: FHIR yêu cầu dạng có dấu chấm.
+    """
+    return sanitize_icd10_code(code).replace(".", "")
 
 
 class NLPEngine:
@@ -119,6 +155,7 @@ class NLPEngine:
             model_name = os.path.abspath(os.path.join(os.path.dirname(__file__), model_name))
 
         self.model_name = model_name
+        self._fingerprint: Optional[str] = None
         print(f"Loading NLP Model: {model_name} (this may take a minute on first run)...")
         self.model = SentenceTransformer(model_name)
 
@@ -147,19 +184,96 @@ class NLPEngine:
         if fixed:
             print(f"Đã áp dụng {fixed} bản vá dữ liệu danh mục nguồn.")
 
+    def _model_fingerprint(self) -> str:
+        """
+        Vân tay của TRỌNG SỐ mô hình cục bộ.
+
+        Khóa cache bản trước chỉ gồm TÊN thư mục mô hình, nên khi fine-tune lại
+        vào cùng thư mục, hệ thống vẫn nạp vector của checkpoint cũ: một truy vấn
+        trùng khít mục từ ("đậu khỉ" -> "Đậu khỉ") chỉ đạt cosine 0.77 thay vì
+        1.0, kéo độ tin cậy xuống ~86% và làm lệch thứ hạng.
+
+        Chỉ băm kích thước + 1 MB đầu và 1 MB cuối của file trọng số thay vì toàn
+        bộ ~540 MB, để không thêm vài giây vào mỗi lần khởi động; huấn luyện lại
+        luôn làm đổi các byte này. Dùng NỘI DUNG file chứ không dùng mtime để
+        cache vẫn hiệu lực khi chép dự án sang máy khác.
+        """
+        if self._fingerprint is not None:
+            return self._fingerprint
+
+        if not os.path.isdir(self.model_name):
+            # Mô hình trên hub: tên đã bao hàm định danh phiên bản.
+            self._fingerprint = ""
+            return self._fingerprint
+
+        chunk = 1 << 20
+        digest = hashlib.sha1()
+        for relative in ("model.safetensors", "pytorch_model.bin", "model.onnx",
+                         "config.json", "sentence_bert_config.json",
+                         os.path.join("1_Pooling", "config.json")):
+            path = os.path.join(self.model_name, relative)
+            if not os.path.exists(path):
+                continue
+            size = os.path.getsize(path)
+            digest.update(f"{relative}:{size}".encode("utf-8"))
+            try:
+                with open(path, "rb") as f:
+                    digest.update(f.read(chunk))
+                    if size > 2 * chunk:
+                        f.seek(-chunk, os.SEEK_END)
+                        digest.update(f.read(chunk))
+            except OSError:
+                continue
+
+        self._fingerprint = digest.hexdigest()[:12]
+        return self._fingerprint
+
+    def _cache_matches_model(self, emb_path: str, entries: List[dict]) -> bool:
+        """
+        Xác nhận vector trong cache đúng là do mô hình đang nạp sinh ra.
+
+        Mã hóa lại vài mục từ mẫu rồi so cosine với vector tương ứng trong cache:
+        cùng mô hình thì phải xấp xỉ 1.0. Đây là lưới an toàn cuối cùng cho các
+        trường hợp vân tay không bắt được (cache chép tay, đổi tên file...).
+        """
+        try:
+            cached = np.load(emb_path, mmap_mode="r")
+        except Exception:
+            return False
+        if cached.shape[0] != len(entries) or not len(entries):
+            return False
+
+        probes = sorted({0, len(entries) // 2, len(entries) - 1})
+        fresh = self.model.encode(
+            [self.normalize_text(entries[i]["text"]) for i in probes],
+            convert_to_tensor=False,
+        )
+        for row, idx in enumerate(probes):
+            a = np.asarray(fresh[row], dtype=np.float64)
+            b = np.asarray(cached[idx], dtype=np.float64)
+            norm = np.linalg.norm(a) * np.linalg.norm(b)
+            if norm == 0 or float(np.dot(a, b) / norm) < 0.999:
+                return False
+        return True
+
     def _cache_key(self) -> Tuple[str, str]:
         """
         Sinh khóa cache từ (định danh mô hình, nội dung danh mục).
 
-        Dùng tên thư mục thay cho đường dẫn tuyệt đối để cache còn dùng được khi
-        chép dự án sang máy khác, và dùng hash NỘI DUNG thay cho số lượng bản ghi
-        để không bao giờ nạp nhầm cache cũ khi danh mục đổi nội dung mà giữ
+        Dùng tên thư mục + vân tay trọng số thay cho đường dẫn tuyệt đối để cache
+        còn dùng được khi chép dự án sang máy khác nhưng tự vô hiệu khi mô hình
+        được huấn luyện lại, và dùng hash NỘI DUNG danh mục thay cho số lượng bản
+        ghi để không bao giờ nạp nhầm cache cũ khi danh mục đổi nội dung mà giữ
         nguyên số dòng.
         """
         if os.path.isdir(self.model_name):
             model_key = os.path.basename(os.path.normpath(self.model_name))
         else:
             model_key = self.model_name.replace("/", "_").replace("\\", "_").replace(":", "_")
+
+        fingerprint = self._model_fingerprint()
+        if fingerprint:
+            model_key = f"{model_key}_{fingerprint}"
 
         digest = hashlib.sha1()
         for entry in self.db:
@@ -210,6 +324,13 @@ class NLPEngine:
             if legacy_entries != entries:
                 continue
 
+            # Trùng danh sách mục từ KHÔNG có nghĩa là cùng mô hình: mọi checkpoint
+            # đều sinh ra đúng ngần ấy vector. Thiếu bước này, cache của mô hình cũ
+            # bị đổi tên sang khóa mới và âm thầm làm sai toàn bộ điểm cosine.
+            if not self._cache_matches_model(legacy_emb, entries):
+                print(f"Bỏ qua cache cũ {fname}: vector không do mô hình hiện tại sinh ra.")
+                continue
+
             print(f"Phát hiện cache cũ tương thích ({fname}) -> chuyển sang khóa mới, bỏ qua bước tính lại.")
             os.replace(legacy_emb, emb_path)
             os.replace(legacy_ent, ent_path)
@@ -236,6 +357,10 @@ class NLPEngine:
             try:
                 with open(ent_path, "r", encoding="utf-8") as f:
                     self.reference_entries = json.load(f)
+                # Lưới an toàn cuối: cache sai mô hình làm mọi điểm cosine lệch mà
+                # không có lỗi nào được ném ra, nên phải phát hiện tại đây.
+                if not self._cache_matches_model(emb_path, self.reference_entries):
+                    raise ValueError("cache không khớp mô hình đang nạp")
                 self.reference_embeddings = torch.from_numpy(np.load(emb_path)).to(self.model.device)
                 print(f"Loaded {len(self.reference_entries)} reference embeddings from cache.")
                 return
@@ -370,6 +495,53 @@ class NLPEngine:
         self._alias_norm = {self.normalize_text(k): v for k, v in DIRECT_ALIASES.items()}
         self._alias_ascii = {strip_diacritics(k): v for k, v in self._alias_norm.items()}
 
+        self._build_dagger_links()
+
+    def _build_dagger_links(self):
+        """
+        Dựng bảng liên kết dao găm/sao (†/*) trực tiếp từ tên mã trong danh mục.
+
+        ICD-10 mã hóa chẩn đoán kép bằng một CẶP: mã † cho bệnh nguyên và mã * cho
+        biểu hiện. Danh mục của Bộ Y tế ghi sẵn mã đối tác ngay trong tên, nên
+        không cần bảng đối chiếu chép tay:
+
+            M51.1† "... có kèm tổn thương của rễ tủy sống (G55.1*)"
+            G55.1* "Chèn ép rễ và đám rối thần kinh trong bệnh đĩa đệm (M50-M51†)"
+
+        Tham chiếu ĐÍCH DANH (197 mã) đủ chặt để suy ra cặp; tham chiếu dạng DẢI
+        (86 mã, "M50-M51†") chỉ khoanh vùng khối hợp lệ nên chỉ dùng để kiểm tra
+        tính hợp lệ, không dùng để chọn mã.
+        """
+        self._link_exact: Dict[str, Set[str]] = {}
+        self._link_range: Dict[str, List[Tuple[Tuple[str, int], Tuple[str, int]]]] = {}
+        self._marked_dagger: Set[str] = set()
+        self._marked_asterisk: Set[str] = set()
+
+        for raw_code, entry in self.db_index.items():
+            code = sanitize_icd10_code(raw_code)
+            if "†" in raw_code:
+                self._marked_dagger.add(code)
+            if "*" in raw_code:
+                self._marked_asterisk.add(code)
+
+            surface = f"{entry['name_vi']} {entry.get('name_en') or ''}"
+            for match in _CODE_REF_RE.finditer(surface):
+                start, end = match.group(1), match.group(2)
+                if end:
+                    lo, hi = self._block_key(self._block_of(start)), self._block_key(self._block_of(end))
+                    if lo and hi:
+                        self._link_range.setdefault(code, []).append((lo, hi))
+                    continue
+                # Liên kết hai chiều: mã * thường không nhắc lại từng mã † và ngược lại.
+                self._link_exact.setdefault(code, set()).add(start)
+                self._link_exact.setdefault(start, set()).add(code)
+
+    @staticmethod
+    def _block_key(block: str) -> Optional[Tuple[str, int]]:
+        """Khóa so sánh thứ tự của một khối ICD-10 ('M51' -> ('M', 51))."""
+        match = re.match(r"^([A-Z])(\d{2})$", block)
+        return (match.group(1), int(match.group(2))) if match else None
+
     # ------------------------------------------------------------------
     # Chuẩn hóa văn bản
     # ------------------------------------------------------------------
@@ -383,6 +555,12 @@ class NLPEngine:
         """
         if not text:
             return ""
+        # Bắt buộc dựng lại ký tự tổ hợp thành ký tự dựng sẵn TRƯỚC khi lọc ký tự
+        # đặc biệt. Danh mục Bộ Y tế có 197 mã lưu dạng NFD ("không" = k h o U+0302
+        # n g); dấu tổ hợp không thuộc \w nên bị dòng dưới thay bằng dấu cách, cắt
+        # "không" thành "kho ng" - mất token, mất điểm khớp trọn cụm, mất cả điểm
+        # thưởng mã "không đặc hiệu". Bệnh án dán từ macOS/HIS cũng hay ở dạng NFD.
+        text = unicodedata.normalize("NFC", text)
         text = text.lower().strip()
         text = re.sub(r"[^\w\s\-\/\.]", " ", text)
         text = re.sub(r"\s+", " ", text)
@@ -633,6 +811,7 @@ class NLPEngine:
                 "text": self._surface_form(text, phrase) or phrase,
                 "normalized": phrase,
                 "code": sanitize_icd10_code(entry["code"]),
+                "code_no_dot": code_no_dot(entry["code"]),
                 "type": entry["type"],
             })
 
@@ -753,6 +932,7 @@ class NLPEngine:
             confidence = self._calibrate(relative, info["raw"])
             results.append({
                 "code": sanitize_icd10_code(code),
+                "code_no_dot": code_no_dot(code),
                 "raw_code": code,
                 "name_vi": db_entry["name_vi"],
                 "name_en": db_entry.get("name_en") or "",
@@ -765,6 +945,337 @@ class NLPEngine:
                 "explanation": info["notes"],
             })
         return results
+
+    # ------------------------------------------------------------------
+    # Chẩn đoán kép (†/*)
+    # ------------------------------------------------------------------
+    def split_clinical_fragments(self, text: str) -> List[str]:
+        """
+        Tách một dòng chẩn đoán thành các vế lâm sàng độc lập.
+
+        Cần thiết vì khi mã hóa cả câu thành MỘT vector, vế phụ bị vế chính lấn át:
+        "Thoát vị đĩa đệm cột sống, chèn rễ dây thần kinh" đẩy G55.1* xuống hạng 5,
+        nhưng riêng vế "chèn rễ dây thần kinh" thì G55.1* đứng đầu với 67%.
+        """
+        parts = []
+        for raw in _FRAGMENT_SPLIT_RE.split(text or ""):
+            fragment = raw.strip(" .-\t")
+            # Bỏ vế quá ngắn: "cấp", "(P)" ... không đủ ngữ nghĩa để truy vấn riêng.
+            if len(fragment) >= 6 and len(fragment.split()) >= 2:
+                parts.append(fragment)
+            if len(parts) >= MAX_FRAGMENTS:
+                break
+        return parts
+
+    def _is_group_label(self, code: str) -> bool:
+        """
+        Tên mã có phải nhãn chỉ mang nghĩa khi đặt dưới nhóm cha không.
+
+        D16.6 tên là "Cột sống" nằm dưới nhóm "U lành của xương và sụn khớp":
+        bản thân "cột sống" là vị trí giải phẫu, không phải một chẩn đoán. Dùng
+        để loại những cụm như vậy khỏi việc tách một vế thành nhiều bệnh.
+        """
+        entry = next(
+            (self.db_index[c] for c in (code, f"{code}†", f"{code}*") if c in self.db_index),
+            None)
+        if entry is None:
+            return False
+        parent = (entry.get("meta") or {}).get("type_name") or ""
+        return bool(_NEOPLASM_RE.search(parent.lower())
+                    and not _NEOPLASM_RE.search(entry["name_vi"].lower()))
+
+    def _term_fragments(self, fragment: str) -> List[str]:
+        """
+        Các tên bệnh của danh mục nằm trong MỘT vế, khi vế đó chứa từ hai bệnh.
+
+        Cắt theo dấu câu bỏ sót trường hợp bác sĩ viết hai bệnh liền nhau không có
+        dấu phân cách: "đái tháo đường tuýp 2 tăng huyết áp" là một vế duy nhất,
+        mã hóa cả cụm thành một vector thì E11 và I10 chia nhau xác suất và không
+        mã nào đạt ngưỡng duyệt.
+
+        Chỉ nhận cụm THỰC SỰ có trong danh mục ICD-10, nên phần chữ không phải
+        chẩn đoán ("đã điều trị 3 ngày", "theo dõi thêm") tự bị bỏ qua - không
+        cần cắt câu theo hành văn rồi tra những vế vô nghĩa.
+
+        Trả [] khi vế chỉ chứa một bệnh, để phía gọi giữ nguyên vế gốc: vế đầy đủ
+        mang nhiều thông tin lâm sàng hơn nên cho mã chi tiết hơn tên bệnh trần.
+        """
+        seen_blocks, terms = set(), []
+        for entity in self.extract_entities_regex(fragment):
+            phrase = entity["normalized"]
+            if len(phrase) < MIN_TERM_FRAGMENT_LEN or _CODE_LIKE_RE.match(phrase):
+                continue
+            if self._is_group_label(entity["code"]):
+                continue
+            # Hai thuật ngữ cùng khối ICD-10 là hai cách gọi một bệnh, không phải
+            # hai chẩn đoán. Giữ cụm đầu tiên (NER đã ưu tiên cụm dài nhất).
+            block = self._block_of(entity["code"])
+            if block in seen_blocks:
+                continue
+            seen_blocks.add(block)
+            terms.append(entity["text"] or phrase)
+        return terms if len(terms) >= 2 else []
+
+    def _candidate_fragments(self, text: str) -> List[str]:
+        """Vế cắt theo dấu câu, vế nào gộp nhiều bệnh thì tách tiếp theo tên bệnh."""
+        fragments = self.split_clinical_fragments(text) or [text]
+
+        expanded: List[str] = []
+        for fragment in fragments:
+            expanded.extend(self._term_fragments(fragment) or [fragment])
+
+        # Khử trùng lặp nhưng giữ thứ tự xuất hiện trong câu.
+        unique = list(dict.fromkeys(f for f in expanded if f.strip()))
+        return unique[:MAX_FRAGMENTS]
+
+    def _is_valid_pair(self, etiology: str, manifestation: str) -> bool:
+        """Cặp (bệnh nguyên †, biểu hiện *) có hợp lệ theo danh mục không."""
+        if etiology == manifestation:
+            return False
+        if manifestation not in self._marked_asterisk:
+            return False
+        if etiology in self._link_exact.get(manifestation, ()):
+            return True
+        # Mã * thường chỉ khoanh dải bệnh nguyên ("M50-M51†") thay vì liệt kê từng mã.
+        key = self._block_key(self._block_of(etiology))
+        if key is None:
+            return False
+        return any(lo <= key <= hi for lo, hi in self._link_range.get(manifestation, ()))
+
+    def _prefer_dagger_sibling(self, etiology: str, manifestation: str) -> Optional[str]:
+        """
+        Đổi mã bệnh nguyên sang mã anh em có dấu † trỏ đích danh mã biểu hiện.
+
+        Đây là định nghĩa của mã †, không phải luật chỉnh tay: khi biểu hiện đã
+        được xác nhận (G55.1* - chèn ép rễ), thì trong khối M51 phải chọn M51.1†
+        "có kèm tổn thương rễ tủy sống" chứ không phải M51.2 "đặc hiệu khác".
+        """
+        block = self._block_of(etiology)
+        for candidate in self._link_exact.get(manifestation, ()):
+            if (candidate != etiology
+                    and candidate in self._marked_dagger
+                    and self._block_of(candidate) == block):
+                return candidate
+        return None
+
+    def _prediction_for(self, code: str) -> Optional[dict]:
+        """Dựng bản ghi kết quả cho một mã được luật †/* kéo vào, dù nó ngoài top-k."""
+        raw_code = next(
+            (c for c in (code, f"{code}†", f"{code}*") if c in self.db_index), None)
+        if raw_code is None:
+            return None
+        entry = self.db_index[raw_code]
+        return {
+            "code": code,
+            "code_no_dot": code_no_dot(code),
+            "raw_code": raw_code,
+            "name_vi": entry["name_vi"],
+            "name_en": entry.get("name_en") or "",
+            "confidence": 0.0,
+            "confidence_band": confidence_band(0.0),
+            "similarity_score": 0.0,
+            "rerank_score": 0.0,
+            "matched_by": entry["name_vi"],
+            "match_type": "dagger_asterisk",
+            "explanation": [],
+        }
+
+    def query_composite(self, user_query: str, top_k: int = 4) -> dict:
+        """
+        Truy vấn có nhận diện chẩn đoán kép †/*.
+
+        Trả về danh sách top-k phẳng như `query()` (giữ nguyên hợp đồng với phía
+        gọi) kèm trường `combination` mô tả cặp mã khi phát hiện được.
+
+        Độ tin cậy của hai mã KHÔNG cộng vào nhau: chúng cùng đến từ một câu nên
+        không phải hai bằng chứng độc lập, cộng lại là đếm trùng. Cái được cộng là
+        bằng chứng - một cặp †/* hợp lệ mới là lý do để nâng hạng mã bệnh nguyên.
+        """
+        predictions = self.query(user_query, top_k=top_k)
+        fragments = self._candidate_fragments(user_query)
+
+        # Ứng viên gộp từ cả câu lẫn từng vế, giữ bản ghi có độ tin cậy cao nhất.
+        pool: Dict[str, dict] = {}
+        origin: Dict[str, str] = {}
+        fragment_results: Dict[str, List[dict]] = {}
+        sources = [(user_query, predictions)]
+        if len(fragments) >= 2:
+            for fragment in fragments:
+                fragment_results[fragment] = self.query(fragment, top_k=FRAGMENT_TOP_K)
+                sources.append((fragment, fragment_results[fragment]))
+        for source, items in sources:
+            for item in items:
+                current = pool.get(item["code"])
+                if current is None or item["confidence"] > current["confidence"]:
+                    pool[item["code"]] = item
+                    origin[item["code"]] = source
+
+        pairs = []
+        for manifestation in pool:
+            for etiology in pool:
+                if self._is_valid_pair(etiology, manifestation):
+                    pairs.append((
+                        pool[etiology]["confidence"] + pool[manifestation]["confidence"],
+                        etiology, manifestation,
+                    ))
+        # Câu một vế vẫn có thể ra mã †: bản thân mã † là chẩn đoán CHƯA đủ theo
+        # ICD-10, phải kèm mã * biểu hiện, nên bổ sung nốt vế còn thiếu.
+        if not pairs:
+            for code, record in pool.items():
+                if code not in self._marked_dagger:
+                    continue
+                partner = next(
+                    (p for p in self._link_exact.get(code, ()) if p in self._marked_asterisk), None)
+                if partner:
+                    pairs.append((record["confidence"], code, partner))
+                    origin.setdefault(partner, f"mã đi kèm bắt buộc của {code}†")
+        if not pairs:
+            # Không ghép được cặp †/* thì câu nhiều vế mới được xét như nhiều
+            # bệnh độc lập. Thứ tự này là bắt buộc: ở ca "Thoát vị đĩa đệm cột
+            # sống, chèn ép rễ thần kinh" thì vế sau CŨNG khớp mã riêng rất
+            # mạnh (G55.1), nên nếu xét tách trước thì một chẩn đoán ghép sẽ bị
+            # xé thành hai bệnh không có thật.
+            separate = self._separate_diagnoses(fragments, fragment_results)
+            if separate:
+                return {
+                    "predictions": self._flatten_diagnoses(separate, top_k),
+                    "combination": None,
+                    "diagnoses": separate,
+                }
+            return {
+                "predictions": predictions,
+                "combination": None,
+                "diagnoses": [{"fragment": user_query, "predictions": predictions}],
+            }
+
+        _, etiology, manifestation = max(pairs)
+        rationale = [
+            f"'{origin[manifestation]}' → {manifestation} (biểu hiện *)",
+            f"'{origin.get(etiology, user_query)}' → {etiology} (bệnh nguyên)",
+        ]
+
+        preferred = self._prefer_dagger_sibling(etiology, manifestation)
+        if preferred:
+            rationale.append(
+                f"{preferred}† là mã cùng khối có dấu † trỏ đích danh {manifestation}, "
+                f"nên thay cho {etiology}")
+
+        members = []
+        for code, role in ((preferred or etiology, "etiology"), (manifestation, "manifestation")):
+            record = pool.get(code) or self._prediction_for(code)
+            if record is None:
+                return {"predictions": predictions, "combination": None}
+            if preferred and code == preferred and not pool.get(code):
+                # Mã † thay thế không tự đạt điểm cao (nó tả cả hai vế nên không
+                # khớp trọn vế nào). Lấy min của hai vế: một chẩn đoán ghép chỉ
+                # chắc chắn bằng vế yếu nhất của nó - và KHÔNG cộng hai vế lại,
+                # vì chúng đến từ cùng một câu nên không phải bằng chứng độc lập.
+                record = dict(record)
+                record["confidence"] = round(
+                    min(pool[etiology]["confidence"], pool[manifestation]["confidence"]), 2)
+                record["confidence_band"] = confidence_band(record["confidence"])
+                record["explanation"] = [
+                    f"chọn theo luật †/*: kế thừa từ {etiology} "
+                    f"({pool[etiology]['confidence']}%) và {manifestation} "
+                    f"({pool[manifestation]['confidence']}%)"
+                ]
+            members.append({
+                "code": code,
+                "code_no_dot": code_no_dot(code),
+                "raw_code": record["raw_code"],
+                "name_vi": record["name_vi"],
+                "confidence": record["confidence"],
+                "role": role,
+            })
+            # Cặp †/* là câu trả lời được khuyến nghị, nên đưa lên đầu danh sách
+            # phẳng: mã do luật kéo vào có thể vốn nằm ngoài top-k của cả câu.
+            predictions = [p for p in predictions if p["code"] != code]
+            predictions.append(record)
+
+        # Hai vòng lặp trên đẩy lần lượt từng thành viên xuống cuối; đảo lại để
+        # bệnh nguyên đứng trước biểu hiện, rồi mới tới các ứng viên còn lại.
+        members_codes = [m["code"] for m in members]
+        head = sorted((p for p in predictions if p["code"] in members_codes),
+                      key=lambda p: members_codes.index(p["code"]))
+        predictions = head + [p for p in predictions if p["code"] not in members_codes]
+
+        return {
+            "predictions": predictions,
+            "combination": {
+                "display": " ".join(m["raw_code"] for m in members),
+                "members": members,
+                "rationale": rationale,
+            },
+            # Cặp †/* là MỘT chẩn đoán được diễn đạt bằng hai mã, không phải hai
+            # bệnh, nên vẫn chỉ có một mục ở đây.
+            "diagnoses": [{"fragment": user_query, "predictions": predictions}],
+        }
+
+    def _separate_diagnoses(
+        self, fragments: List[str], fragment_results: Dict[str, List[dict]]
+    ) -> List[dict]:
+        """
+        Xét các vế của một dòng chẩn đoán xem có phải nhiều bệnh độc lập không.
+
+        Chấm điểm từng vế trong pool ứng viên RIÊNG của nó, nên độ tin cậy không
+        bị chia đôi: "sỏi bàng quang, suy thận cấp" cho N21.0 và N17.9 giữ nguyên
+        mức 91% và 99% thay vì tụt xuống 61% và 38% như khi mã hóa cả câu thành
+        một vector. Cách cũ còn sinh mã ma: "bàng quang" ở vế đầu trộn với "cấp"
+        ở vế sau đẩy N30.0 "Viêm bàng quang cấp" lên hạng hai dù không ai chẩn
+        đoán viêm bàng quang.
+
+        Trả về [] khi không đủ căn cứ, để phía gọi giữ nguyên kết quả cả câu.
+        """
+        if len(fragments) < 2:
+            return []
+
+        diagnoses = []
+        claimed_blocks = set()
+        for fragment in fragments:
+            results = fragment_results.get(fragment) or []
+            if not results:
+                continue
+            best = results[0]
+            if best["confidence"] < MULTI_DIAGNOSIS_MIN_CONF:
+                continue
+            # Hai vế cùng khối ICD-10 là hai cách nói về một bệnh ("suy thận cấp,
+            # vô niệu" đều rơi vào N17), không phải hai chẩn đoán.
+            block = self._block_of(best["code"])
+            if block in claimed_blocks:
+                continue
+            claimed_blocks.add(block)
+            diagnoses.append({"fragment": fragment, "predictions": results})
+
+        return diagnoses if len(diagnoses) >= 2 else []
+
+    @staticmethod
+    def _flatten_diagnoses(diagnoses: List[dict], top_k: int) -> List[dict]:
+        """
+        Dựng danh sách phẳng từ nhiều chẩn đoán, giữ hợp đồng cũ với phía gọi.
+
+        Mã chính của từng chẩn đoán lên đầu theo đúng thứ tự xuất hiện trong câu,
+        rồi mới tới các ứng viên còn lại. Danh sách chỉ lấy từ kết quả của từng
+        vế, KHÔNG trộn lại kết quả cả câu, vì đó chính là nguồn sinh mã ma.
+        """
+        flat, seen = [], set()
+
+        def take(record: dict):
+            if record["code"] in seen:
+                return
+            seen.add(record["code"])
+            flat.append(record)
+
+        for diagnosis in diagnoses:
+            take(diagnosis["predictions"][0])
+
+        limit = max(top_k, len(flat))
+        for rank in range(1, FRAGMENT_TOP_K):
+            for diagnosis in diagnoses:
+                if len(flat) >= limit:
+                    return flat
+                if rank < len(diagnosis["predictions"]):
+                    take(diagnosis["predictions"][rank])
+        return flat
 
 
 if __name__ == "__main__":

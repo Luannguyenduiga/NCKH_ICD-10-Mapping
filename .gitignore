@@ -21,8 +21,9 @@ nlp/data/alias_embeddings_*.npy
 hospital_his/his_db.sqlite
 backend/data/synced_records.json
 
-# --- File tạm của Excel / hệ điều hành ---
+# --- File tạm của Word, Excel / hệ điều hành ---
 ~$*.xlsx
+~$*.docx
 Thumbs.db
 .DS_Store
 

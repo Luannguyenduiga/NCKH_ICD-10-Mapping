@@ -31,6 +31,19 @@ EXCEL_PATH = "dataICD10.xlsx"
 OUTPUT_PATH = os.path.join("nlp", "data", "icd10_db.json")
 
 
+def nfc(text: str) -> str:
+    """
+    Dựng ký tự tổ hợp thành ký tự dựng sẵn.
+
+    File Excel nguồn trộn hai cách mã hóa: phần lớn ở dạng dựng sẵn (NFC) nhưng
+    197 dòng ở dạng tổ hợp (NFD), ví dụ "không" được lưu là k h o U+0302 n g.
+    Dấu tổ hợp không thuộc lớp \\w nên bộ chuẩn hóa của NLPEngine thay nó bằng
+    dấu cách và cắt "không" thành "kho ng" - mã A99 vì thế tụt từ hạng 1 xuống
+    hạng 3. Chuẩn hóa ngay từ khâu nhập liệu để lỗi không quay lại.
+    """
+    return unicodedata.normalize("NFC", text)
+
+
 def strip_diacritics(text: str) -> str:
     text = text.replace("đ", "d").replace("Đ", "D")
     return "".join(c for c in unicodedata.normalize("NFD", text)
@@ -98,19 +111,26 @@ def main():
         seen_codes.add(code)
 
         code_no_dot = clean_code(row["MÃ BỆNH KHÔNG DẤU"]) if pd.notna(row["MÃ BỆNH KHÔNG DẤU"]) else ""
-        name_vi = str(row["TÊN BỆNH"]).strip()
-        name_en = str(row["DISEASE NAME"]).strip() if pd.notna(row["DISEASE NAME"]) else ""
+        # Cột nguồn để trống ở một số dòng, mà dạng không dấu chỉ là mã đã gỡ dấu
+        # chấm nên suy ra được: giữ trường này luôn có giá trị để phía dùng khỏi
+        # phải tự xử lý trường hợp rỗng.
+        code_no_dot = code_no_dot or code.replace(".", "")
+        name_vi = nfc(str(row["TÊN BỆNH"]).strip())
+        name_en = nfc(str(row["DISEASE NAME"]).strip()) if pd.notna(row["DISEASE NAME"]) else ""
 
         icd10_list.append({
             "code": code,
+            # Dạng liền không dấu chấm (A00.0 -> A000) cho HIS/báo cáo dùng mã
+            # rút gọn. Mã chuẩn để liên thông FHIR vẫn là `code`.
+            "code_no_dot": code_no_dot,
             "name_vi": name_vi,
             "name_en": name_en,
             "synonyms": build_synonyms(name_vi, code_no_dot, code),
             "meta": {
-                "chapter_no": str(row["STT CHƯƠNG"]).strip() if pd.notna(row["STT CHƯƠNG"]) else "",
-                "chapter_name": str(row["TÊN CHƯƠNG"]).strip() if pd.notna(row["TÊN CHƯƠNG"]) else "",
-                "group_code": str(row["MÃ NHÓM PHỤ 1"]).strip() if pd.notna(row["MÃ NHÓM PHỤ 1"]) else "",
-                "type_name": str(row["TÊN LOẠI"]).strip() if pd.notna(row["TÊN LOẠI"]) else "",
+                "chapter_no": nfc(str(row["STT CHƯƠNG"]).strip()) if pd.notna(row["STT CHƯƠNG"]) else "",
+                "chapter_name": nfc(str(row["TÊN CHƯƠNG"]).strip()) if pd.notna(row["TÊN CHƯƠNG"]) else "",
+                "group_code": nfc(str(row["MÃ NHÓM PHỤ 1"]).strip()) if pd.notna(row["MÃ NHÓM PHỤ 1"]) else "",
+                "type_name": nfc(str(row["TÊN LOẠI"]).strip()) if pd.notna(row["TÊN LOẠI"]) else "",
             },
         })
 
