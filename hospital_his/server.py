@@ -138,8 +138,97 @@ class PatientCreate(BaseModel):
 
 
 @app.get("/api/patients")
-def get_patients():
+def get_patients(search_id: str = None):
     try:
+        # If search_id is specified, we query locally or pull from EMR Cloud
+        if search_id:
+            search_id = search_id.strip()
+            # 1. Search locally
+            with db_cursor() as cursor:
+                cursor.execute("SELECT * FROM patients WHERE id = ?", (search_id,))
+                row = cursor.fetchone()
+                if row:
+                    patient = dict(row)
+                    cursor.execute(
+                        "SELECT * FROM patient_conditions WHERE patient_id = ?", (search_id,))
+                    patient["conditions"] = [dict(r) for r in cursor.fetchall()]
+                    return [patient]
+            
+            # 2. If not found locally, query HAPI FHIR (EMR Cloud)
+            try:
+                resp = requests.get(f"http://127.0.0.1:8090/fhir/Patient/{search_id}", timeout=3)
+                if resp.status_code == 200:
+                    resource = resp.json()
+                    p_id = resource.get("id")
+                    
+                    # Extract name
+                    name_list = resource.get("name", [])
+                    p_name = ""
+                    if name_list:
+                        p_name = name_list[0].get("text")
+                        if not p_name:
+                            given = name_list[0].get("given", [])
+                            family = name_list[0].get("family", "")
+                            p_name = (" ".join(given) + " " + family).strip()
+                    if not p_name:
+                        p_name = "Bệnh nhân EMR"
+                    
+                    # Extract gender
+                    gender = resource.get("gender", "")
+                    p_gender = "Nam" if gender == "male" else ("Nữ" if gender == "female" else "Khác")
+                    
+                    # Extract birth date
+                    p_birth = resource.get("birthDate", "---")
+                    
+                    patient = {
+                        "id": p_id,
+                        "name": p_name,
+                        "gender": p_gender,
+                        "birth_date": p_birth,
+                        "clinical_note": "Hồ sơ liên thông từ VNPT HIS",
+                        "sync_status": "Synced",
+                        "sync_time": "EMR Cloud",
+                        "conditions": []
+                    }
+                    
+                    # Fetch conditions for this patient from HAPI FHIR
+                    try:
+                        resp_cond = requests.get(f"http://127.0.0.1:8090/fhir/Condition?subject=Patient/{search_id}", timeout=3)
+                        if resp_cond.status_code == 200:
+                            bundle_cond = resp_cond.json()
+                            for entry in bundle_cond.get("entry", []):
+                                cond_res = entry.get("resource", {})
+                                code_coding = cond_res.get("code", {}).get("coding", [])
+                                icd_code = code_coding[0].get("code", "") if code_coding else ""
+                                icd_display = code_coding[0].get("display", "") if code_coding else ""
+                                
+                                notes = cond_res.get("note", [])
+                                clinical_note = notes[0].get("text") if notes else ""
+                                
+                                patient["conditions"].append({
+                                    "patient_id": p_id,
+                                    "icd10_code": icd_code,
+                                    "icd10_display": icd_display,
+                                    "fragment": clinical_note or "Chẩn đoán liên thông",
+                                    "confidence_score": 100.0,
+                                    "verification_status": "confirmed",
+                                    "fhir_condition_id": cond_res.get("id"),
+                                    "status": "Synced"
+                                })
+                                patient["icd10_code"] = icd_code
+                                patient["icd10_display"] = icd_display
+                                if clinical_note:
+                                    patient["clinical_note"] = clinical_note
+                    except Exception as e:
+                        print("Failed to fetch conditions from FHIR:", e)
+                        
+                    return [patient]
+            except Exception as e:
+                print("Failed to fetch patient from FHIR:", e)
+                
+            return []
+
+        # If search_id is NOT specified, return local SQLite patients ONLY
         with db_cursor() as cursor:
             cursor.execute("SELECT * FROM patients ORDER BY id")
             patients = [dict(row) for row in cursor.fetchall()]
@@ -152,6 +241,8 @@ def get_patients():
         for patient in patients:
             patient["conditions"] = by_patient.get(patient["id"], [])
         return patients
+    except sqlite3.Error as exc:
+        raise HTTPException(status_code=500, detail=f"Lỗi cơ sở dữ liệu: {exc}") from exc
     except sqlite3.Error as exc:
         raise HTTPException(status_code=500, detail=f"Lỗi cơ sở dữ liệu: {exc}") from exc
 

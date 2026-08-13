@@ -225,6 +225,45 @@ document.addEventListener("DOMContentLoaded", () => {
         ));
     });
 
+    searchInput.addEventListener("keydown", async (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            const query = searchInput.value.trim();
+            if (!query) return;
+
+            // Search locally first
+            const localResults = patientsData.filter(p =>
+                p.id.toLowerCase() === query.toLowerCase()
+            );
+
+            if (localResults.length === 0) {
+                // If not found locally, query backend to pull from EMR Cloud
+                addLog(`Không tìm thấy bệnh nhân "${query}" cục bộ. Đang truy vấn EMR Cloud...`, "info");
+                try {
+                    const response = await fetch(`/api/patients?search_id=${encodeURIComponent(query)}`);
+                    if (response.ok) {
+                        const results = await response.json();
+                        if (results && results.length > 0) {
+                            addLog(`Đã tải thành công hồ sơ bệnh nhân "${query}" từ EMR Cloud!`, "success");
+                            // Add to local patientsData if not already present
+                            const existingIds = patientsData.map(p => p.id);
+                            results.forEach(p => {
+                                if (!existingIds.includes(p.id)) {
+                                    patientsData.push(p);
+                                }
+                            });
+                            renderPatientTable(patientsData.filter(p => p.id.toLowerCase() === query.toLowerCase()));
+                        } else {
+                            addLog(`Không tìm thấy bệnh nhân "${query}" trên cả cục bộ lẫn EMR Cloud.`, "error");
+                        }
+                    }
+                } catch (err) {
+                    addLog(`Lỗi truy vấn EMR Cloud: ${err.message}`, "error");
+                }
+            }
+        }
+    });
+
     // --- Reset Database ---
     btnResetDb.addEventListener("click", async () => {
         if (!confirm("Bạn có chắc chắn muốn reset cơ sở dữ liệu HIS về danh sách mẫu mặc định không?")) return;
