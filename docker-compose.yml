@@ -5,7 +5,7 @@ services:
     image: hapiproject/hapi:latest
     container_name: hapi-fhir-server
     ports:
-      - '8090:8080'
+      - '127.0.0.1:8090:8080'
     environment:
       # Set FHIR version to R4 (consistent with fhir_helper.py)
       - hapi.fhir.fhir_version=R4

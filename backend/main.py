@@ -26,7 +26,7 @@ from backend.fhir_helper import (
     sanitize_icd10_code,
     to_fhir_id,
 )
-from nlp.clinical_rules import CONFIDENCE_POLICY, verification_status_for
+from nlp.clinical_rules import CONFIDENCE_POLICY, confidence_band, verification_status_for
 from nlp.nlp_engine import NLPEngine
 
 # --- Cấu hình (đọc từ biến môi trường, có giá trị mặc định cho môi trường demo) ---
@@ -232,9 +232,13 @@ def standardize_diagnosis(request: StandardizeRequest):
     # viên hạng thấp của từng vế thì chỉ nằm trong `diagnoses`. Duyệt cả hai để
     # không bản ghi nào thiếu trường trạng thái - Pydantic bắt buộc có.
     for pred in [p for p in predictions] + [p for d in diagnoses for p in d["predictions"]]:
-        status = verification_status_for(pred["confidence"])
-        pred["suggested_verification_status"] = status
-        pred["requires_review"] = status != "confirmed"
+        pred["suggested_verification_status"] = verification_status_for(pred["confidence"])
+        # Suy từ mức tin cậy, KHÔNG suy từ trạng thái FHIR. Hai việc này vốn khác
+        # nhau: `requires_review` quyết định có được tự động đẩy lên trục hay
+        # không, còn `verificationStatus` là bản ghi tự khai độ chắc chắn của nó.
+        # Từ khi máy thôi tự gán "confirmed", nếu vẫn so với chuỗi đó thì mọi ca
+        # đều thành cần duyệt và luồng tự động liên thông chết hẳn.
+        pred["requires_review"] = confidence_band(pred["confidence"]) != "high"
 
     return {
         "query": request.query,

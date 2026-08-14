@@ -67,6 +67,13 @@ SOFTMAX_SCOPE = 20        # số mã đưa vào chuẩn hóa softmax
 SIM_FLOOR = 0.40
 SIM_CEIL = 0.90
 
+# Sàn tin cậy cho ca khớp trọn nghĩa. Áp dụng khi mọi từ trong câu đều có mặt ở
+# tên mã và độ tương đồng thô rất cao - lúc đó việc danh mục còn mã lân cận
+# không nói lên điều gì về việc mã này đúng hay sai.
+COVERAGE_FULL = 1.0       # câu phải được phủ trọn, thiếu một từ cũng không tính
+COVERAGE_FLOOR_SIM = 0.90 # ngưỡng tương đồng thô để được hưởng sàn
+COVERAGE_FLOOR_CONF = 0.88
+
 # --- Chẩn đoán kép (dao găm/sao) -------------------------------------------
 # Tên mã trong danh mục ghi kèm mã đối tác: "(G55.1*)" hoặc dải "(M50-M51†)".
 _CODE_REF_RE = re.compile(
@@ -681,6 +688,32 @@ class NLPEngine:
                 notes.append(f"xung đột {name}: chẩn đoán '{q}' vs mã '{c}'")
         return delta, notes
 
+    def _polarity_compatible(self, q_labels: Dict[str, str], code: str) -> bool:
+        """
+        Mã có khẳng định điều gì mà câu chẩn đoán không hề nói tới không.
+
+        Dùng làm chốt cho sàn tin cậy theo độ phủ. Độ phủ đếm theo túi từ nên mù
+        với hai kiểu sai nguy hiểm, cả hai đều từng lọt lên mức "tự động liên
+        thông" trong lần đo trước:
+
+          - Mã khẳng định thêm: câu "phình động mạch chủ bụng" không nói vỡ hay
+            không, mã I71.3 lại là "Phình động mạch chủ bụng, vỡ". Đủ từ nhưng mã
+            tự thêm một tình trạng cấp cứu mà bác sĩ chưa hề ghi.
+          - Phủ định gắn sai chỗ: câu "viêm mũi không dị ứng" và tên mã J30.4
+            "Viêm mũi dị ứng, không phân loại" dùng chung đúng bấy nhiêu từ, chỉ
+            khác chỗ đặt chữ "không" - mà nghĩa thì ngược hẳn nhau.
+
+        Nguyên tắc: trục nào mã khẳng định thì câu phải khẳng định y hệt. Câu im
+        lặng ở trục đó cũng không đủ điều kiện - im lặng không phải là đồng ý.
+        """
+        c_labels = self._code_polarity.get(code, {})
+        for axis in POLARITY_AXES:
+            name = axis["name"]
+            code_label = c_labels.get(name)
+            if code_label and q_labels.get(name) != code_label:
+                return False
+        return True
+
     @staticmethod
     def _specificity_delta(q_tokens: frozenset, entry_norm: str,
                            entry_tokens: frozenset) -> Tuple[float, List[str]]:
@@ -763,11 +796,34 @@ class NLPEngine:
         return sanitize_icd10_code(code).split(".")[0]
 
     @staticmethod
-    def _calibrate(relative: float, similarity: float) -> float:
-        """Quy đổi (xác suất tương đối, độ tương đồng thô) sang độ tin cậy %."""
+    def _calibrate(relative: float, similarity: float, coverage: float = 0.0) -> float:
+        """
+        Quy đổi (xác suất tương đối, độ tương đồng thô, độ phủ) sang độ tin cậy %.
+
+        Thành phần `relative` đo mức áp đảo so với ứng viên khác, và nó chiếm 65%
+        điểm số. Điều đó khiến một câu khớp gần như tuyệt đối vẫn bị điểm thấp chỉ
+        vì trong danh mục còn vài mã lân cận: "bệnh van hai lá do thấp" khớp I05
+        "Bệnh lý van hai lá do thấp" với cosine 0,991 - tức gần như trùng nghĩa
+        hoàn toàn - nhưng chỉ được 56,26% vì các mã van tim khác chia mất xác suất.
+        Bác sĩ gõ đúng tên bệnh mà máy vẫn báo "cần duyệt lại" là phản trực giác.
+
+        Gộp khối 3 ký tự đã xử lý phần anh em cùng mã cha (I05 với I05.1), nhưng
+        không xử lý được các khối lân cận về mặt lâm sàng (I05 với I08, I34).
+
+        Nên bổ sung sàn theo độ phủ: khi mọi từ mang nghĩa trong câu đều xuất hiện
+        ở tên mã VÀ độ tương đồng thô rất cao, đó là khớp trọn nghĩa - không để
+        yếu tố cạnh tranh kéo xuống dưới sàn.
+
+        Độ phủ cũng chặn được chiều ngược lại, thứ mà cosine không chặn nổi:
+        "viêm kết mạc dị ứng" khớp H10.9 "Viêm kết mạc, không đặc hiệu" ở cosine
+        0,953 nhưng thiếu hẳn hai từ "dị ứng" - đúng phần mang nghĩa phân biệt.
+        Độ phủ chưa trọn thì không được hưởng sàn.
+        """
         absolute = (similarity - SIM_FLOOR) / (SIM_CEIL - SIM_FLOOR)
         absolute = max(0.0, min(1.0, absolute))
         blended = W_RELATIVE * relative + W_ABSOLUTE * absolute
+        if coverage >= COVERAGE_FULL and similarity >= COVERAGE_FLOOR_SIM:
+            blended = max(blended, COVERAGE_FLOOR_CONF)
         return round(max(0.0, min(1.0, blended)) * 100, 2)
 
     # ------------------------------------------------------------------
@@ -890,11 +946,17 @@ class NLPEngine:
             score += chapter_delta
             notes.extend(chapter_notes)
 
+            # Tỉ lệ từ trong câu hỏi được tên mã phủ. Giữ lại để khâu hiệu chuẩn
+            # phân biệt "khớp trọn nghĩa" với "khớp phần đầu rồi bỏ mất chi tiết".
+            coverage = (len(q_tokens & self._entry_tokens[idx]) / len(q_tokens)
+                        if q_tokens else 0.0)
+
             current = best.get(code)
             if current is None or score > current["score"]:
                 best[code] = {
                     "score": score,
                     "raw": float(cos_scores[idx]),
+                    "coverage": coverage,
                     "matched_text": entry["text"],
                     "match_type": entry["type"],
                     "notes": notes,
@@ -929,7 +991,10 @@ class NLPEngine:
                     claimed_blocks.add(block)
             else:
                 relative = 0.0
-            confidence = self._calibrate(relative, info["raw"])
+            # Chỉ ca khớp trọn nghĩa VÀ không xung đột phủ định mới được hưởng sàn.
+            eligible = (info.get("coverage", 0.0)
+                        if self._polarity_compatible(q_labels, code) else 0.0)
+            confidence = self._calibrate(relative, info["raw"], eligible)
             results.append({
                 "code": sanitize_icd10_code(code),
                 "code_no_dot": code_no_dot(code),
@@ -980,6 +1045,7 @@ class NLPEngine:
             None)
         if entry is None:
             return False
+
         parent = (entry.get("meta") or {}).get("type_name") or ""
         return bool(_NEOPLASM_RE.search(parent.lower())
                     and not _NEOPLASM_RE.search(entry["name_vi"].lower()))

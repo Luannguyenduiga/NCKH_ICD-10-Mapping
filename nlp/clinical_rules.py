@@ -214,6 +214,28 @@ POLARITY_AXES = [
         "penalty": 0.10,
         "bonus": 0.03,
     },
+    {
+        # Phình động mạch vỡ là cấp cứu ngoại khoa, chưa vỡ là theo dõi định kỳ.
+        # Cùng một vị trí giải phẫu nhưng hai hướng xử trí khác hẳn nhau, nên đây
+        # là trục cần phạt nặng nhất trong nhóm.
+        #
+        # Đo trên tập kiểm tra độc lập: câu "phình động mạch chủ bụng" - bác sĩ
+        # không nói vỡ hay chưa - lại khớp I71.3 "Phình động mạch chủ bụng, vỡ".
+        # Mọi từ trong câu đều có trong tên mã nên các phép đo theo túi từ đều coi
+        # là khớp hoàn hảo; chỉ có trục này mới thấy mã đang tự khẳng định thêm
+        # một tình trạng mà bệnh án không hề ghi.
+        #
+        # Thứ tự nhãn quan trọng: "không vỡ" phải đứng trước "vỡ", vì nhãn khớp
+        # đầu tiên thắng mà chuỗi "không vỡ" có chứa sẵn "vỡ".
+        "name": "rupture",
+        "scope": ["phình", "aneurysm", "vỡ", "rupture"],
+        "labels": [
+            ("unruptured", ["không vỡ", "chưa vỡ", "unruptured", "without rupture"]),
+            ("ruptured", ["vỡ", "ruptured", "rupture"]),
+        ],
+        "penalty": 0.20,
+        "bonus": 0.04,
+    },
 ]
 
 # ---------------------------------------------------------------------------
@@ -447,10 +469,34 @@ def confidence_band(confidence: float) -> str:
     return "low"
 
 
-def verification_status_for(confidence: float) -> str:
-    """Ánh xạ độ tin cậy sang Condition.verificationStatus theo HL7 FHIR R4."""
-    if confidence >= CONFIDENCE_POLICY["auto_confirm"]:
+def verification_status_for(confidence: float, *, clinician_confirmed: bool = False) -> str:
+    """
+    Ánh xạ độ tin cậy sang Condition.verificationStatus theo HL7 FHIR R4.
+
+    Máy KHÔNG BAO GIỜ được tự gán "confirmed". Trong đặc tả FHIR, `confirmed`
+    nghĩa là chẩn đoán đã được xác nhận - hàm ý có người đủ thẩm quyền đứng sau,
+    chứ không phải thuật toán tự chấm mình 85 điểm.
+
+    Bản trước gán confirmed ở mọi ca >= 85%. Đo trên tập kiểm tra độc lập thì
+    trong nhóm đó vẫn còn ca sai, cao nhất là "viêm kết mạc dị ứng" ra H10.9
+    "không đặc hiệu" với 96,78%. Những bản ghi ấy lên trục dữ liệu mang nhãn
+    "đã xác nhận", bệnh viện khác đọc về không có cách nào biết chưa ai duyệt.
+    Đó là sai lệch thông tin y tế do chính khâu gắn nhãn tạo ra, không phải do
+    mô hình đoán sai - mô hình đoán sai là chuyện bình thường và chấp nhận được,
+    miễn là bản ghi nói đúng sự thật về độ chắc chắn của nó.
+
+    Ba mức máy được phép dùng, theo đúng nghĩa của từng giá trị trong FHIR:
+      provisional   - chẩn đoán sơ bộ, đủ vững để làm việc tiếp
+      differential  - một trong nhiều khả năng, cần phân định thêm
+      unconfirmed   - chưa đủ căn cứ
+
+    `confirmed` chỉ sinh ra khi có `clinician_confirmed=True`, tức đã có thao tác
+    duyệt của bác sĩ.
+    """
+    if clinician_confirmed:
         return "confirmed"
-    if confidence >= CONFIDENCE_POLICY["provisional"]:
+    if confidence >= CONFIDENCE_POLICY["auto_confirm"]:
         return "provisional"
+    if confidence >= CONFIDENCE_POLICY["provisional"]:
+        return "differential"
     return "unconfirmed"

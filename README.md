@@ -143,10 +143,15 @@ NCKH/
 │   ├── test_nlp.py                 # Kiểm thử chức năng + chặn hồi quy
 │   ├── my_medical_nlp_model/       # SBERT đã fine-tune (540 MB, không đưa vào git)
 │   └── data/
-│       ├── icd10_db.json           # Danh mục ICD-10 (12.219 mã)
+│       ├── icd10_db.json           # Danh mục ICD-10 (12.137 mã)
+│       ├── icd10_supplement.json   # Mã bổ sung thủ công, bắt buộc ghi nguồn
 │       ├── eval_set.json           # Tập phát triển (110 ca)
 │       ├── eval_holdout.json       # Tập kiểm tra độc lập (51 ca)
 │       └── embeddings_*.npy        # Cache embedding, sinh tự động
+├── docs/
+│   ├── luong-xu-ly-chan-doan.md    # Truy vết luồng xử lý một câu chẩn đoán
+│   ├── thaydoi.md                  # Nhật ký thay đổi, kèm số đo trước/sau
+│   └── T0.md                       # Việc củng cố an ninh trục EMR
 ├── frontend/                       # Giao diện Gateway (cổng 8000)
 ├── hospital_his/                   # HIS mô phỏng (cổng 8085)
 ├── docker-compose.yml              # EMR Cloud - HAPI FHIR (cổng 8090)
