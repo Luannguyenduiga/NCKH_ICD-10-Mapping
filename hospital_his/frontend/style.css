@@ -304,6 +304,36 @@ body {
     box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
 }
 
+.btn-diagnose {
+    background: linear-gradient(135deg, #6366f1, #4338ca);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.1);
+}
+
+.btn-diagnose:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* Sửa chẩn đoán đã ghi nhận: hành động chỉnh sửa, không phải hành động phá hủy,
+   nên để tông hổ phách - tách khỏi màu đỏ của nút Xóa ngay bên cạnh. */
+.btn-edit {
+    background: linear-gradient(135deg, #f59e0b, #b45309);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.1);
+}
+
+.btn-edit:hover:not(:disabled) {
+    filter: brightness(1.1);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
 .btn-delete {
     background: linear-gradient(135deg, var(--status-failed), #b91c1c);
     color: white;
@@ -319,6 +349,9 @@ body {
     display: flex;
     gap: 8px;
     justify-content: center;
+    /* Bốn thao tác trên một dòng sẽ tràn ở màn hình hẹp; cho xuống dòng thay vì
+       đẩy cột Thao tác nở ra và bóp mất cột chẩn đoán. */
+    flex-wrap: wrap;
 }
 
 /* Grid Layout */
@@ -713,8 +746,24 @@ code {
     color: var(--text-primary);
 }
 
+/* Hộp thoại nhiều nội dung (danh sách chẩn đoán) cần rộng hơn form nhập liệu và
+   phải cuộn được trong khung, nếu không hồ sơ nhiều bệnh sẽ tràn khỏi màn hình. */
+.modal-content.modal-wide {
+    width: 760px;
+    max-width: 94vw;
+    display: flex;
+    flex-direction: column;
+    max-height: 88vh;
+}
+
+.modal-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+}
+
 /* Form Styles */
-#add-patient-form {
+#add-patient-form,
+#diagnose-form {
     padding: 24px;
 }
 
@@ -723,6 +772,19 @@ code {
     grid-template-columns: 1fr 1fr;
     gap: 16px;
     margin-bottom: 16px;
+}
+
+/* Ghi chú giải thích đặt ngay dưới nhóm ô nhập liên quan. */
+.form-hint {
+    margin: -6px 0 16px;
+    padding: 10px 12px;
+    border-left: 3px solid var(--accent-blue);
+    background: rgba(14, 165, 233, 0.08);
+    border-radius: 4px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    /* Nền tối nên chữ phải sáng: màu #4a5568 trước đây gần như chìm hẳn. */
+    color: var(--text-muted);
 }
 
 .form-group {
@@ -758,6 +820,181 @@ code {
     justify-content: flex-end;
     gap: 12px;
     margin-top: 24px;
+}
+
+/* Chân hộp thoại nằm ngoài <form> thì không thừa hưởng padding của form. */
+.modal-footer-pad {
+    margin-top: 0;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color);
+    background: rgba(0, 0, 0, 0.15);
+}
+
+/* --- Màn hình sửa chẩn đoán đã ghi nhận ------------------------------------ */
+.cond-patient {
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.cond-patient strong {
+    font-size: 1.05rem;
+}
+
+.cond-note {
+    margin-top: 6px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.cond-empty {
+    padding: 24px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+}
+
+.cond-card {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* Thẻ đang mở phần sửa được viền sáng để bác sĩ không nhầm sang chẩn đoán khác
+   khi hồ sơ có nhiều bệnh. */
+.cond-card.editing {
+    border-color: rgba(245, 158, 11, 0.45);
+    background: rgba(245, 158, 11, 0.04);
+}
+
+.cond-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.cond-ids {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.cond-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.cond-name {
+    margin: 8px 0 6px;
+    font-weight: 500;
+}
+
+.cond-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.cond-fragment {
+    font-style: italic;
+}
+
+.cond-time {
+    margin-left: auto;
+    font-family: monospace;
+}
+
+.clinical-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 100px;
+    font-size: 0.68rem;
+    font-weight: 600;
+}
+
+.clinical-badge.on {
+    background: rgba(20, 184, 166, 0.14);
+    color: var(--accent-teal);
+}
+
+/* Bệnh đã khỏi / không còn hoạt động: để nhạt hẳn so với bệnh đang mắc. */
+.clinical-badge.off {
+    background: rgba(148, 163, 184, 0.16);
+    color: var(--text-muted);
+}
+
+.facility-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: 100px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    background: rgba(99, 102, 241, 0.15);
+    color: #a5b4fc;
+}
+
+.cond-editor {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border-color);
+}
+
+.cond-editor .form-row {
+    margin-bottom: 0;
+}
+
+.cond-editor-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.e-candidates {
+    margin: 10px 0 14px;
+}
+
+/* Mã do mô hình gợi ý: bấm là điền vào ô mã, nên phải trông bấm được. */
+.cand-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cand-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.cand-item.selected {
+    border-color: var(--accent-blue);
+    background: rgba(14, 165, 233, 0.1);
+}
+
+.cand-name {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.cand-empty {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    padding: 6px 2px;
 }
 
 /* Scrollbar Customization */
