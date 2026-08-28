@@ -735,9 +735,9 @@ def read_synced_condition(condition_id: str):
 
 
 @app.delete("/api/fhir/condition/{condition_id}")
-def delete_synced_condition(condition_id: str):
+def delete_synced_condition(condition_id: str, facility: Optional[str] = None):
     """
-    Gỡ MỘT Condition khỏi EMR Cloud.
+    Gỡ MỘT Condition khỏi EMR Cloud, chỉ khi nó do chính cơ sở đang gọi lập ra.
 
     Dùng cho luồng bác sĩ sửa lại chẩn đoán đã liên thông. Mã ICD-10 nằm trong
     khóa nghiệp vụ, nên sửa mã sẽ sinh ra một tài nguyên khác chứ không đè lên
@@ -746,14 +746,70 @@ def delete_synced_condition(condition_id: str):
 
     Khác `DELETE /api/fhir/sync` ở chỗ đó xóa hàng loạt bản ghi mới nhất, không
     dùng được để sửa đúng một chẩn đoán.
+
+    **Chốt cơ sở.** Bản trước nhận thẳng `condition_id` rồi xóa, không hỏi bản
+    ghi đó của ai. Ghép với `GET /api/fhir/sync` - vốn cố ý trả chẩn đoán của
+    MỌI cơ sở kèm `id`, vì thấy được hồ sơ nơi khác lập chính là điều cần trình
+    bày - thì thành một đường xóa chéo: đọc danh sách, lấy id của bệnh viện B,
+    gọi xóa. Đúng kiểu trộn dữ liệu mà mã cơ sở trong khóa nghiệp vụ sinh ra để
+    chặn ở đường GHI, chỉ khác là nó nằm ở đường XÓA.
+
+    Nay đường xóa một bản ghi theo đúng một chính sách với đường xóa hàng loạt:
+    `facility` đi qua `resolve_facility`, nên khai mã khác chỉ được chấp nhận khi
+    Gateway bật cờ nhiều cơ sở, không thì 403.
     """
+    facility_code, _ = resolve_facility(facility)
+    resource_id = to_fhir_id(condition_id)
+    url = f"{FHIR_SERVER_URL}/Condition/{resource_id}"
+
+    # Đọc trước khi xóa để biết bản ghi thuộc về ai. Tốn thêm một vòng gọi, nhưng
+    # không có cách nào rẻ hơn: FHIR không có "xóa kèm điều kiện theo thẻ".
     try:
-        response = requests.delete(
-            f"{FHIR_SERVER_URL}/Condition/{to_fhir_id(condition_id)}",
-            headers=_fhir_headers(), timeout=FHIR_TIMEOUT,
+        read = requests.get(url, headers=_fhir_headers(), timeout=FHIR_TIMEOUT)
+    except requests.RequestException as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"EMR Cloud không đọc được Condition '{condition_id}': {exc}",
+        ) from exc
+
+    # Bản ghi đã không còn trên trục thì mục tiêu coi như đã đạt: thao tác gỡ phải
+    # lặp lại được mà không báo lỗi, vì HIS có thể gọi lại sau khi mất mạng.
+    if read.status_code in (404, 410):
+        return {
+            "status": "success",
+            "condition_id": condition_id,
+            "facility_code": facility_code,
+            "message": f"Condition {condition_id} vốn đã không còn trên EMR Cloud.",
+        }
+
+    try:
+        read.raise_for_status()
+        condition = read.json()
+    except (requests.RequestException, ValueError) as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"EMR Cloud không đọc được Condition '{condition_id}': {exc}",
+        ) from exc
+
+    chu_so_huu = facility_of(condition)
+    if chu_so_huu and chu_so_huu["code"] != facility_code:
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                f"Condition '{condition_id}' do cơ sở '{chu_so_huu['code']}' "
+                f"({chu_so_huu['name']}) lập, cơ sở '{facility_code}' không được gỡ. "
+                f"Mỗi cơ sở chỉ sửa hoặc gỡ chẩn đoán của chính mình."
+            ),
         )
-        # Bản ghi đã không còn trên trục thì mục tiêu coi như đã đạt: thao tác gỡ
-        # phải lặp lại được mà không báo lỗi, vì HIS có thể gọi lại sau khi mất mạng.
+
+    # Bản ghi không mang thẻ cơ sở là dữ liệu có từ trước khi Gateway gắn thẻ.
+    # Cho xóa, vì không quy được về cơ sở nào thì cũng không có ai để bảo vệ, và
+    # từ chối thì những bản ghi này kẹt lại trên trục vĩnh viễn không dọn được.
+    # Đổi lại, chúng KHÔNG được chốt cơ sở - đây là lý do nên dọn sạch dữ liệu cũ
+    # thay vì để lẫn với dữ liệu đã có thẻ.
+
+    try:
+        response = requests.delete(url, headers=_fhir_headers(), timeout=FHIR_TIMEOUT)
         if response.status_code not in (404, 410):
             response.raise_for_status()
     except requests.RequestException as exc:
@@ -765,6 +821,7 @@ def delete_synced_condition(condition_id: str):
     return {
         "status": "success",
         "condition_id": condition_id,
+        "facility_code": facility_code,
         "message": f"Đã gỡ Condition {condition_id} khỏi EMR Cloud.",
     }
 
