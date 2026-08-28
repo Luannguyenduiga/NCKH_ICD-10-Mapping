@@ -36,6 +36,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnCancelDiagnose = document.getElementById("btn-cancel-diagnose");
     const addPatientForm = document.getElementById("add-patient-form");
     const conditionsModal = document.getElementById("conditions-modal");
+    const historyModal = document.getElementById("history-modal");
+    const historyPatient = document.getElementById("h-patient");
+    const historySummary = document.getElementById("history-summary");
+    const historyBody = document.getElementById("history-body");
+    const closeHistoryBtn = document.getElementById("close-history-btn");
+    const btnCloseHistory = document.getElementById("btn-close-history");
     const conditionsList = document.getElementById("conditions-list");
     const conditionsPatient = document.getElementById("c-patient");
     const closeConditionsBtn = document.getElementById("close-conditions-btn");
@@ -261,6 +267,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             <button class="btn btn-sm btn-diagnose" data-action="diagnose" title="Chẩn đoán thêm bệnh mới, giữ nguyên các chẩn đoán cũ">
                                 <i class="fa-solid fa-notes-medical"></i> Chẩn đoán thêm
                             </button>
+                            <button class="btn btn-sm btn-history" data-action="history" title="Xem toàn bộ bệnh sử: khám tại đây và ở các tuyến khác trên trục dữ liệu">
+                                <i class="fa-solid fa-clock-rotate-left"></i> Xem bệnh sử
+                            </button>
                             <button class="btn btn-sm btn-edit" data-action="edit-conditions" title="Sửa hoặc gỡ các chẩn đoán đã ghi nhận, kể cả của lần khám trước">
                                 <i class="fa-solid fa-pen-to-square"></i> Sửa chẩn đoán
                             </button>
@@ -287,6 +296,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (button.dataset.action === "sync") syncPatientRecord(patientId, button);
         if (button.dataset.action === "diagnose") openDiagnoseModal(patientId, button);
+        if (button.dataset.action === "history") openHistoryModal(patientId);
         if (button.dataset.action === "edit-conditions") openConditionsModal(patientId);
         if (button.dataset.action === "delete") deletePatientRecord(patientId);
     });
@@ -446,6 +456,128 @@ document.addEventListener("DOMContentLoaded", () => {
         closeConditionsModal();
         if (btn) openDiagnoseModal(patientId, btn);
     });
+
+    // --- Benh su toan tuyen -------------------------------------------------
+
+    /**
+     * Mở bệnh sử đầy đủ của một hồ sơ: nội viện cộng mọi tuyến khác trên trục.
+     *
+     * Khác modal "Sửa chẩn đoán" ở chỗ đó chỉ đọc bệnh án CỤC BỘ, nên chẩn đoán
+     * do tuyến khác lập không bao giờ hiện ra ở đó. Đây là màn chỉ đọc, cố ý
+     * không có nút sửa: bệnh viện này không sửa bản ghi của cơ sở khác.
+     */
+    async function openHistoryModal(patientId) {
+        historyModal.classList.add("active");
+        historyPatient.innerHTML = `<strong>${esc(patientId)}</strong>`;
+        historySummary.innerHTML = "";
+        historyBody.innerHTML = `<p class="cond-empty">Đang đọc bệnh sử trên trục dữ liệu...</p>`;
+
+        let data;
+        try {
+            const res = await fetch(`/api/patients/${encodeURIComponent(patientId)}/history`);
+            if (!res.ok) {
+                const loi = await res.json().catch(() => ({}));
+                throw new Error(loi.detail || `HTTP ${res.status}`);
+            }
+            data = await res.json();
+        } catch (err) {
+            historyBody.innerHTML =
+                `<p class="cond-empty">Không đọc được bệnh sử: ${esc(err.message)}</p>`;
+            return;
+        }
+        renderHistory(data);
+    }
+
+    function closeHistoryModal() {
+        historyModal.classList.remove("active");
+    }
+
+    function renderHistory(data) {
+        const p = data.patient || {};
+        const dinhDanh = [
+            p.citizen_id ? `CCCD ${esc(p.citizen_id)}` : null,
+            p.insurance_card ? `BHYT ${esc(p.insurance_card)}` : null,
+        ].filter(Boolean).join(" · ");
+
+        historyPatient.innerHTML =
+            `<strong>${esc(p.name || "")}</strong> <span class="mrn-text">${esc(p.id || "")}</span>`
+            + `<div class="cond-note">${esc(p.gender || "")} · ${esc(p.birth_date || "")}`
+            + (dinhDanh ? ` · ${dinhDanh}` : "") + `</div>`;
+
+        // Nói rõ bệnh sử này quét được tới đâu. "Không có dữ liệu" mà không kèm lý
+        // do thì bác sĩ không biết nên bổ sung CCCD, bật lại trục, hay tin là
+        // bệnh nhân thật sự chưa từng khám ở đâu.
+        const nguon = data.tra_cuu_bang
+            ? { cccd: "số CCCD", bhyt: "thẻ BHYT", mrn: "mã bệnh án" }[data.tra_cuu_bang]
+            : null;
+        historySummary.innerHTML =
+            `<div class="history-summary">
+                <span><strong>${data.tong_tren_truc || 0}</strong> chẩn đoán trên trục</span>
+                <span><strong>${data.so_co_so || 0}</strong> cơ sở đã ghi nhận</span>
+                ${data.so_co_so_ngoai_vien
+                    ? `<span class="facility-badge"><i class="fa-solid fa-hospital"></i>
+                         ${data.so_co_so_ngoai_vien} tuyến khác</span>` : ""}
+                ${nguon ? `<span class="history-src">Quy chiếu theo ${nguon}</span>` : ""}
+             </div>`
+            + (data.canh_bao ? `<p class="form-hint">${esc(data.canh_bao)}</p>` : "");
+
+        const khoi = [];
+
+        for (const nhom of data.theo_co_so || []) {
+            const nhan = nhom.la_ngoai_vien
+                ? `<span class="facility-badge"><i class="fa-solid fa-hospital"></i> Tuyến khác</span>`
+                : `<span class="clinical-badge on">Tại bệnh viện này</span>`;
+            khoi.push(`
+                <div class="history-group ${nhom.la_ngoai_vien ? "ngoai-vien" : ""}">
+                    <div class="history-group-head">
+                        <strong>${esc(nhom.facility_name)}</strong>
+                        <span class="mrn-text">${esc(nhom.facility_code)}</span>
+                        ${nhan}
+                        <span class="history-count">${nhom.so_chan_doan} chẩn đoán</span>
+                    </div>
+                    ${nhom.chan_doan.map(historyItem).join("")}
+                </div>`);
+        }
+
+        // Chưa liên thông thì tuyến khác CHƯA đọc được. Để riêng một khối chứ
+        // không xếp vào cơ sở nào, vì xếp lẫn là nói rằng nơi khác đã thấy.
+        if ((data.chua_lien_thong || []).length) {
+            khoi.push(`
+                <div class="history-group chua-lien-thong">
+                    <div class="history-group-head">
+                        <strong>Chưa liên thông</strong>
+                        <span class="history-count">${data.chua_lien_thong.length} chẩn đoán</span>
+                    </div>
+                    <p class="form-hint">Các chẩn đoán này mới nằm trong bệnh án của bệnh viện
+                       này, chưa đẩy lên trục nên tuyến khác chưa đọc được.</p>
+                    ${data.chua_lien_thong.map(historyItem).join("")}
+                </div>`);
+        }
+
+        historyBody.innerHTML = khoi.length ? khoi.join("") : `
+            <p class="cond-empty">Chưa ghi nhận chẩn đoán nào cho hồ sơ này, ở bệnh viện
+               này lẫn trên trục dữ liệu.</p>`;
+    }
+
+    function historyItem(c) {
+        const ngay = c.recorded_date ? String(c.recorded_date).slice(0, 10) : "";
+        return `
+            <div class="history-item">
+                <div class="cond-ids">
+                    <span class="icd-code-badge">${esc(c.icd10_code || "")}</span>
+                    <span class="icd-code-nodot">${esc(noDotCode(c.icd10_code || ""))}</span>
+                    ${clinicalBadge(c.clinical_status)}
+                    ${confidenceTag(c.confidence_score)}
+                    ${ngay ? `<span class="cond-time">${esc(ngay)}</span>` : ""}
+                </div>
+                <div class="cond-name">${esc(c.icd10_display || "")}</div>
+                ${c.fragment ? `<div class="cond-meta">
+                    <span class="cond-fragment">← "${esc(c.fragment)}"</span></div>` : ""}
+            </div>`;
+    }
+
+    closeHistoryBtn.addEventListener("click", closeHistoryModal);
+    btnCloseHistory.addEventListener("click", closeHistoryModal);
 
     function renderConditionsModal() {
         const patient = currentConditionsPatient();
