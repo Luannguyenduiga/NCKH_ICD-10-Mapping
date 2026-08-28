@@ -411,6 +411,33 @@ DIRECT_ALIASES = {
     "loãng xương": ["M81.9"],
     "đau thần kinh tọa": ["M54.3"],
     "đau lưng": ["M54.5"],
+
+    # Chấn thương dây chằng khớp gối.
+    #
+    # Danh mục ICD-10 gọi cả nhóm này là "bong gân và căng cơ ... tổn thương dây
+    # chằng", không có chữ "đứt" hay "rách" - đúng hai từ mà bác sĩ luôn dùng.
+    # Thiếu cầu nối thì cosine kéo về S53.3 "Chấn thương đứt dây chằng hai bên
+    # xương trụ" (KHUỶU TAY) chỉ vì mã đó trùng nguyên cụm "đứt dây chằng", tức
+    # sai hẳn chi thể. Đây là lệch từ vựng giữa danh mục và lời khai, không phải
+    # thiếu mã: S83.4/S83.5 vẫn nằm sẵn trong danh mục.
+    "đứt dây chằng chéo trước": ["S83.5"],
+    "rách dây chằng chéo trước": ["S83.5"],
+    "đứt dây chằng chéo sau": ["S83.5"],
+    "rách dây chằng chéo sau": ["S83.5"],
+    "đứt dây chằng chéo": ["S83.5"],
+    "tổn thương dây chằng chéo": ["S83.5"],
+    "đứt dcct": ["S83.5"],
+    "đứt dccs": ["S83.5"],
+    "đứt acl": ["S83.5"],
+    "đứt pcl": ["S83.5"],
+    # Dây chằng BÊN (chày/mác) là mã khác với dây chằng CHÉO - gộp chung là mất
+    # đúng phần thông tin mà bác sĩ đã nêu rõ.
+    "đứt dây chằng bên trong": ["S83.4"],
+    "đứt dây chằng bên ngoài": ["S83.4"],
+    "đứt dây chằng bên chày": ["S83.4"],
+    "đứt dây chằng bên mác": ["S83.4"],
+    "tổn thương dây chằng bên": ["S83.4"],
+    "mất vững khớp gối": ["M23.5"],
     "động kinh": ["G40.9"],
     "đau nửa đầu": ["G43.9"],
     "mất ngủ": ["G47.0"],

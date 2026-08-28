@@ -77,6 +77,47 @@ def test_core_clinical_cases(engine, query, accepted, description):
     )
 
 
+# --- Dây chằng khớp gối: lệch từ vựng giữa danh mục và lời khai ------------
+# Danh mục ICD-10 gọi cả nhóm là "bong gân và căng cơ ... tổn thương dây chằng",
+# trong khi bác sĩ luôn ghi "đứt" hoặc "rách". Không có từ nào chung ở phần mang
+# nghĩa phân biệt, nên cosine thuần kéo về S53.3 "Chấn thương đứt dây chằng hai
+# bên xương trụ" - KHUỶU TAY, sai hẳn chi thể - chỉ vì mã đó trùng nguyên cụm
+# "đứt dây chằng". Đây là thiếu CÁCH NÓI chứ không thiếu mã: S83.4 và S83.5 vẫn
+# nằm sẵn trong danh mục, nên chữa bằng alias chứ không phải train lại.
+LIGAMENT_CASES = [
+    ("đứt dây chằng chéo trước", {"S83.5"}, "Dây chằng chéo trước (ACL)"),
+    ("rách dây chằng chéo sau", {"S83.5"}, "Dây chằng chéo sau (PCL)"),
+    ("dut day chang cheo truoc", {"S83.5"}, "Biến thể gõ không dấu"),
+    ("đứt DCCT", {"S83.5"}, "Viết tắt bác sĩ hay dùng khi ghi nhanh"),
+    ("bệnh nhân đứt dây chằng bên trong gối phải", {"S83.4"},
+     "Dây chằng BÊN (S83.4) là mã khác dây chằng CHÉO (S83.5)"),
+    ("mất vững khớp gối", {"M23.5"}, "Hậu quả mạn tính, không phải chấn thương cấp"),
+]
+
+
+@pytest.mark.parametrize("query,accepted,description", LIGAMENT_CASES)
+def test_knee_ligament_vocabulary_bridge(engine, query, accepted, description):
+    results = engine.query(query)
+    assert results, f"Không trả về kết quả nào cho '{query}'"
+
+    top = sanitize_icd10_code(results[0]["code"])
+    accepted_clean = {sanitize_icd10_code(c) for c in accepted}
+    assert top in accepted_clean, (
+        f"{description}\n  Truy vấn : {query}\n"
+        f"  Kỳ vọng  : {sorted(accepted_clean)}\n"
+        f"  Nhận được: {top} - {results[0]['name_vi']} ({results[0]['confidence']}%)"
+    )
+
+
+def test_ligament_alias_khong_lan_sang_ma_khac(engine):
+    """
+    Chốt chiều ngược lại: alias mới không được kéo mọi câu có chữ "dây chằng" về
+    nhóm khớp gối. Bổ sung alias mà làm hỏng ca vốn đang đúng thì lợi bất cập hại.
+    """
+    assert sanitize_icd10_code(engine.query("bệnh dây chằng")[0]["code"]) == "M24.2"
+    assert sanitize_icd10_code(engine.query("đau thần kinh tọa")[0]["code"]) == "M54.3"
+
+
 def test_dagger_stripped_from_codes(engine):
     """Mã trả ra không được chứa ký hiệu dao găm - máy chủ FHIR sẽ từ chối."""
     results = engine.query("đái tháo đường tuýp 2 có biến chứng thận", top_k=5)
