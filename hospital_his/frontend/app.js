@@ -296,7 +296,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (button.dataset.action === "sync") syncPatientRecord(patientId, button);
         if (button.dataset.action === "diagnose") openDiagnoseModal(patientId, button);
-        if (button.dataset.action === "history") openHistoryModal(patientId);
+        if (button.dataset.action === "history") {
+            // Hồ sơ đọc từ trục chưa có mã bệnh án tại viện này, và mã của viện
+            // khác thì KHÔNG tra được - "BN0002" ở hai nơi là hai người. Dùng
+            // định danh toàn quốc làm khóa tra, đó là thứ duy nhất quy đúng người.
+            const p = patientsData.find(x => String(x.id) === String(patientId));
+            const khoa = (p && p.is_local === false)
+                ? (p.citizen_id || p.insurance_card || patientId)
+                : patientId;
+            openHistoryModal(khoa);
+        }
         if (button.dataset.action === "edit-conditions") openConditionsModal(patientId);
         if (button.dataset.action === "delete") deletePatientRecord(patientId);
     });
@@ -499,10 +508,26 @@ document.addEventListener("DOMContentLoaded", () => {
             p.insurance_card ? `BHYT ${esc(p.insurance_card)}` : null,
         ].filter(Boolean).join(" · ");
 
+        // Mã bệnh án nơi khác LUÔN kèm tên cơ sở: "BN0002" của viện này và viện
+        // kia là hai người khác nhau, hiện trần mã là mời người đọc nhầm.
+        const maNoiKhac = (p.ma_benh_an_noi_khac || [])
+            .map(m => `<span class="mrn-text" title="Mã bệnh án tại cơ sở khác">
+                         ${esc(m.value)} @ ${esc(m.facility_code)}</span>`).join(" ");
+
         historyPatient.innerHTML =
             `<strong>${esc(p.name || "")}</strong> <span class="mrn-text">${esc(p.id || "")}</span>`
             + `<div class="cond-note">${esc(p.gender || "")} · ${esc(p.birth_date || "")}`
-            + (dinhDanh ? ` · ${dinhDanh}` : "") + `</div>`;
+            + (dinhDanh ? ` · ${dinhDanh}` : "") + `</div>`
+            + (maNoiKhac ? `<div class="cond-note">Mã bệnh án nơi khác: ${maNoiKhac}</div>` : "")
+            // Chưa tiếp nhận thì bác sĩ phải biết ngay, nếu không sẽ tưởng đây là
+            // bệnh nhân của mình và đi tìm bệnh án nội viện không có thật.
+            + (data.co_ho_so_cuc_bo === false
+                ? `<p class="form-hint">Bệnh nhân <strong>chưa có bệnh án tại bệnh viện
+                     này</strong>. Toàn bộ bệnh sử dưới đây đọc từ trục dữ liệu và chỉ
+                     xem được. Muốn khám tại đây thì tiếp nhận bằng
+                     <em>Thêm Bệnh nhân mới</em>, nhập đúng CCCD/BHYT để trục quy về
+                     cùng một người.</p>`
+                : "");
 
         // Nói rõ bệnh sử này quét được tới đâu. "Không có dữ liệu" mà không kèm lý
         // do thì bác sĩ không biết nên bổ sung CCCD, bật lại trục, hay tin là

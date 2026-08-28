@@ -204,6 +204,97 @@ def test_uu_tien_cccd_hon_ma_benh_an(his, monkeypatch):
     assert "identifier/cccd" in emr.da_hoi[0], f"Hỏi sai thứ tự: {emr.da_hoi}"
 
 
-def test_khong_co_ho_so_cuc_bo_thi_404(his):
+# --- Ho so CHUA tiep nhan tai day ------------------------------------------
+# Doi bat buoc phai co benh an cuc bo thi dung ca can nhat - benh nhan vua
+# chuyen tuyen toi, chua kip tiep nhan - lai la ca duy nhat khong xem duoc benh
+# su. Ho chua tung kham o day nen vien nay khong co ma benh an cho ho.
+
+MRN_KHAC = "https://smig.nckh.vn/fhir/identifier/mrn/BV-B-002"
+
+
+@pytest.fixture
+def his_trong(make_his):
+    """HIS chua tiep nhan bat ky ai."""
+    return make_his(facility_code="BV-A-001", facility_name="Bệnh viện Đa khoa A")
+
+
+@pytest.fixture
+def truc_co_benh_nhan():
+    """Trục có sẵn một bệnh nhân của bệnh viện B, mang CCCD và thẻ BHYT."""
+    return EmrGia(
+        patients={
+            f"https://smig.nckh.vn/fhir/identifier/cccd|{CCCD}": {
+                "id": "p-9",
+                "name": [{"text": "Lê Văn Cường"}],
+                "gender": "male",
+                "birthDate": "1975-03-02",
+                "identifier": [
+                    {"system": "https://smig.nckh.vn/fhir/identifier/cccd", "value": CCCD},
+                    {"system": MRN_KHAC, "value": "BN-B-77"},
+                ],
+            },
+        },
+        conditions=[
+            condition("c-9", "N18.9", "Bệnh thận mạn", "BV-B-002", "Bệnh viện Đa khoa B"),
+        ])
+
+
+def test_doc_duoc_benh_su_ngoai_vien_khi_chua_tiep_nhan(
+        his_trong, truc_co_benh_nhan, monkeypatch):
+    """Ca chuyển tuyến: chưa có bệnh án ở đây nhưng phải đọc được bệnh sử."""
+    monkeypatch.setattr(his_trong.requests, "get", truc_co_benh_nhan.get)
+
     from fastapi.testclient import TestClient
-    assert TestClient(his.app).get("/api/patients/KHONG-CO/history").status_code == 404
+    res = TestClient(his_trong.app).get(f"/api/patients/{CCCD}/history")
+
+    assert res.status_code == 200, res.text
+    kq = res.json()
+    assert kq["co_ho_so_cuc_bo"] is False
+    assert kq["tra_cuu_bang"] == "cccd"
+    assert kq["so_co_so_ngoai_vien"] == 1
+    assert kq["theo_co_so"][0]["facility_name"] == "Bệnh viện Đa khoa B"
+    assert [c["icd10_code"] for c in kq["theo_co_so"][0]["chan_doan"]] == ["N18.9"]
+    # Thông tin hành chính lấy từ trục, vì không có bản cục bộ nào để ưu tiên.
+    assert kq["patient"]["name"] == "Lê Văn Cường"
+    assert kq["patient"]["gender"] == "Nam"
+
+
+def test_hien_ma_benh_an_noi_khac_kem_ten_co_so(
+        his_trong, truc_co_benh_nhan, monkeypatch):
+    """
+    Mã bệnh án nơi khác phải LUÔN đi kèm cơ sở đã cấp.
+
+    Hiện trần mã thì vô nghĩa và còn nguy hiểm: "BN-B-77" của viện này và viện kia
+    là hai người khác nhau. Kèm cơ sở thì bác sĩ gọi sang nơi đó hỏi được bệnh án
+    gốc theo đúng mã họ đang giữ.
+    """
+    monkeypatch.setattr(his_trong.requests, "get", truc_co_benh_nhan.get)
+
+    from fastapi.testclient import TestClient
+    kq = TestClient(his_trong.app).get(f"/api/patients/{CCCD}/history").json()
+
+    assert kq["patient"]["ma_benh_an_noi_khac"] == [
+        {"facility_code": "BV-B-002", "value": "BN-B-77"}]
+
+
+def test_ma_benh_an_cua_vien_khac_khong_tra_ra(his_trong, truc_co_benh_nhan, monkeypatch):
+    """
+    Tra bằng mã bệnh án của viện KHÁC phải trượt, và đó là hành vi đúng.
+
+    Mã bệnh án chỉ có nghĩa trong nội bộ nơi cấp nó. Quét mã trần qua mọi cơ sở
+    chính là lỗi trộn hồ sơ mà cả thiết kế này sinh ra để chặn - "BN-B-77" ở hai
+    viện là hai người. Thông báo phải chỉ đường sang CCCD/BHYT.
+    """
+    monkeypatch.setattr(his_trong.requests, "get", truc_co_benh_nhan.get)
+
+    from fastapi.testclient import TestClient
+    res = TestClient(his_trong.app).get("/api/patients/BN-B-77/history")
+
+    assert res.status_code == 404
+    assert "cccd" in res.json()["detail"].lower()
+
+
+def test_khong_co_o_dau_ca_thi_404(his_trong, monkeypatch):
+    monkeypatch.setattr(his_trong.requests, "get", EmrGia(patients={}).get)
+    from fastapi.testclient import TestClient
+    assert TestClient(his_trong.app).get("/api/patients/KHONG-CO/history").status_code == 404

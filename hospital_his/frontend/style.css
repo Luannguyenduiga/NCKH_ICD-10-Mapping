@@ -759,6 +759,7 @@ code {
 .modal-body {
     padding: 20px 24px;
     overflow-y: auto;
+    background-color: #080d16;
 }
 
 /* Form Styles */
@@ -1042,6 +1043,7 @@ code {
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     font-size: 0.88rem;
+    background-color: #080d16;
 }
 
 .history-src {
@@ -1062,6 +1064,7 @@ code {
 .history-group.ngoai-vien {
     border-left-color: #8b5cf6;
     background: #faf5ff;
+    background-color: #080d16;
 }
 
 .history-group.chua-lien-thong {
