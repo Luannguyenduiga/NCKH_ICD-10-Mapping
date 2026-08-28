@@ -192,7 +192,11 @@ class FHIRConvertRequest(BaseModel):
     patient_name: str = Field(..., min_length=1)
     raw_clinical_note: str = Field(..., min_length=1)
     icd10_code: str = Field(..., min_length=1)
-    icd10_display: str = Field(..., min_length=1)
+    # Bỏ trống thì Gateway tự tra tên trong danh mục ICD-10. Bắt buộc bên gọi
+    # phải có tên là ép mỗi HIS tự mang theo một bản danh mục, và bản nào cũng
+    # nghèo hơn bản 12.137 mã ở đây - hậu quả thấy được là chẩn đoán lên trục
+    # mang tên chỗ điền tạm thay vì tên bệnh, bác sĩ tuyến sau đọc không ra bệnh.
+    icd10_display: Optional[str] = None
     confidence_score: float = Field(..., ge=0, le=100)
     clinical_status: Optional[str] = "active"
     # Bỏ trống để Gateway tự suy ra từ độ tin cậy theo CONFIDENCE_POLICY.
@@ -457,6 +461,83 @@ def standardize_diagnosis(request: StandardizeRequest):
     }
 
 
+# Chỗ điền tạm mà HIS hay gửi lên thay cho tên bệnh. Chúng KHÔNG phải tên bệnh:
+# "Chẩn đoán kèm theo" nói rằng đây là bệnh phụ, không nói đó là bệnh gì, nên bác
+# sĩ tuyến sau đọc bệnh án về vẫn không biết phải điều trị gì. Gặp mấy chuỗi này
+# thì bỏ qua và tra tên thật trong danh mục.
+NHAN_KHONG_PHAI_TEN_BENH = {
+    "chẩn đoán kèm theo", "chan doan kem theo",
+    "chẩn đoán phụ", "chan doan phu",
+    "chẩn đoán liên thông", "chan doan lien thong",
+    "không rõ", "khong ro", "n/a", "-", "--",
+}
+
+
+def ten_benh_theo_ma(clean_code: str, ten_ben_goi: Optional[str] = None) -> Optional[str]:
+    """
+    Chốt tên bệnh cho một mã: danh mục trước, tên bên gọi gửi lên sau.
+
+    Ưu tiên danh mục vì đây là bản chính thức của Bộ Y tế và Gateway là nơi duy
+    nhất chắc chắn có đủ nó. HIS thường chỉ mang theo một bảng nhỏ, hoặc điền một
+    nhãn chung khi không tra ra - và nhãn ấy đi thẳng lên trục thành tên bệnh.
+
+    Tên bên gọi chỉ dùng khi mã không có trong danh mục, tức phần mở rộng mà bản
+    danh mục hiện tại còn thiếu; lúc đó có tên còn hơn không.
+    """
+    if nlp_engine is not None and hasattr(nlp_engine, "db_index"):
+        muc = tim_muc_danh_muc(nlp_engine, clean_code)
+        if muc and muc.get("name_vi"):
+            return muc["name_vi"]
+
+    ten = (ten_ben_goi or "").strip()
+    if ten and ten.lower() not in NHAN_KHONG_PHAI_TEN_BENH:
+        return ten
+    return None
+
+
+def tim_muc_danh_muc(engine, code: str) -> Optional[dict]:
+    """
+    Tra một mục trong danh mục, chấp nhận cả mã CÓ và KHÔNG có dấu chấm.
+
+    Danh mục khóa theo mã có chấm ("I21.9"), nhưng HIS thường cầm dạng viết liền
+    ("I219") vì đó là dạng nhiều hệ thống cũ lưu - `code_no_dot` là trường hạng
+    nhất trong danh mục chính vì vậy. Chỉ nhận một dạng thì nửa số lần tra trượt
+    và HIS lại quay về điền nhãn chung, tức đúng lỗi này quay lại.
+    """
+    clean = sanitize_icd10_code(code)
+    muc = engine.db_index.get(clean)
+    if muc:
+        return muc
+    # "I219" -> "I21.9": dấu chấm trong ICD-10 luôn đứng sau ký tự thứ ba.
+    if "." not in clean and len(clean) > 3:
+        return engine.db_index.get(f"{clean[:3]}.{clean[3:]}")
+    return None
+
+
+@app.get("/api/icd10/{code}")
+def tra_ten_icd10(code: str):
+    """
+    Tra tên bệnh theo mã ICD-10.
+
+    Để HIS hiện đúng tên bệnh trên màn hình của chính nó mà không phải ôm theo
+    một bản danh mục riêng. Cùng một nguồn với phần dựng Condition, nên tên bác
+    sĩ thấy lúc chọn mã và tên nằm trên trục là một.
+    """
+    engine = _require_engine()
+    muc = tim_muc_danh_muc(engine, code)
+    if not muc:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Mã '{code}' không có trong danh mục ICD-10 ({len(engine.db)} mã).",
+        )
+    return {
+        "code": muc["code"],
+        "code_no_dot": muc.get("code_no_dot") or clean.replace(".", ""),
+        "name_vi": muc.get("name_vi"),
+        "name_en": muc.get("name_en"),
+    }
+
+
 @app.post("/api/fhir/condition")
 def convert_to_fhir(request: FHIRConvertRequest):
     clean_code = sanitize_icd10_code(request.icd10_code)
@@ -475,6 +556,17 @@ def convert_to_fhir(request: FHIRConvertRequest):
             ),
         )
 
+    ten_benh = ten_benh_theo_ma(clean_code, request.icd10_display)
+    if not ten_benh:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                f"Mã '{clean_code}' không có trong danh mục ICD-10 và bên gọi cũng "
+                f"không gửi kèm tên bệnh. Không dựng Condition thiếu tên: chẩn đoán "
+                f"không có tên bệnh thì bác sĩ tuyến sau đọc về không biết bệnh gì."
+            ),
+        )
+
     verification = request.verification_status or verification_status_for(request.confidence_score)
     facility_code, facility_name = resolve_facility(
         request.facility_code, request.facility_name)
@@ -489,7 +581,7 @@ def convert_to_fhir(request: FHIRConvertRequest):
             patient_name=request.patient_name,
             raw_clinical_note=request.raw_clinical_note,
             icd10_code=clean_code,
-            icd10_display=request.icd10_display,
+            icd10_display=ten_benh,
             confidence_score=request.confidence_score,
             clinical_status=request.clinical_status or "active",
             verification_status=verification,

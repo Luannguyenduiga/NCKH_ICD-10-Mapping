@@ -171,7 +171,11 @@ public class GatewayService {
             condReq.put("patient_name", patient.getName());
             condReq.put("raw_clinical_note", clinicalNote);
             condReq.put("icd10_code", icdCode);
-            condReq.put("icd10_display", icdDisplay);
+            // Bỏ trống khi HIS không có tên bệnh thật: Gateway tra trong danh mục
+            // 12.137 mã của Bộ Y tế, chuẩn hơn bất kỳ bảng nào HIS mang theo. Điền
+            // một nhãn chung cho có thì nhãn ấy đi thẳng lên trục thành tên bệnh,
+            // và bác sĩ tuyến sau đọc bệnh án về không biết bệnh gì để điều trị.
+            putIfPresent(condReq, "icd10_display", icdDisplay);
             condReq.put("confidence_score", confidence);
             condReq.put("clinical_status", "active");
             condReq.put("gender", "Nam".equals(patient.getGender()) ? "male" : "female");
