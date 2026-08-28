@@ -759,6 +759,7 @@ code {
 .modal-body {
     padding: 20px 24px;
     overflow-y: auto;
+    background-color: #080d16;
 }
 
 /* Form Styles */
@@ -1014,4 +1015,100 @@ code {
 
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.2);
+}
+
+
+/* --- Benh su toan tuyen ------------------------------------------------- */
+/* Mau tim, tach han khoi nut Sua (cam) va Dong bo: day la mau CHI DOC, bam
+   vao khong doi gi ca. Cung mau voi nut la vien trai cua khoi tuyen khac. */
+.btn-history {
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.1);
+}
+
+.btn-history:hover:not(:disabled) {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+
+.history-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    background-color: #080d16;
+}
+
+.history-src {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+}
+
+.history-group {
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #22c55e;   /* vien vien minh */
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+}
+
+/* Tuyen khac phai NHIN RA NGAY la khong phai cua minh: bac si doc benh su ma
+   khong biet ai ghi thi khong danh gia duoc do tin cay cua thong tin. */
+.history-group.ngoai-vien {
+    border-left-color: #8b5cf6;
+    background: #faf5ff;
+    background-color: #080d16;
+}
+
+.history-group.chua-lien-thong {
+    border-left-color: #f59e0b;
+    background: #fffbeb;
+}
+
+.history-group-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.history-count {
+    margin-left: auto;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.history-item {
+    padding: 10px 0;
+    border-top: 1px dashed #e2e8f0;
+}
+
+.history-item:first-of-type {
+    border-top: none;
+}
+
+/* Dong chan doan do tuyen khac lap: phai nhin ra ngay trong bang, khong phai
+   mo modal moi biet. Vien trai tim dong bo voi khoi tuyen khac o modal benh su. */
+.icd-line.ngoai-vien {
+    border-left: 3px solid #8b5cf6;
+    padding-left: 6px;
+}
+
+.pending-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    margin-left: 4px;
+    border-radius: 4px;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 0.68rem;
+    font-weight: 600;
 }

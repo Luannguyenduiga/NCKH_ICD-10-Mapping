@@ -280,7 +280,13 @@ public class HisController {
             if (secondaryCodes != null && !secondaryCodes.isEmpty()) {
                 for (String code : secondaryCodes.split(",")) {
                     if (!code.trim().isEmpty()) {
-                        gatewayService.syncToFhir(patient, record.getClinicalNote(), code.trim(), "Chẩn đoán kèm theo", 90.0);
+                        // KHÔNG đặt tên thay cho bệnh. Màn khám chỉ lưu MÃ của
+                        // chẩn đoán kèm theo, tên bệnh không đi cùng - nên để
+                        // trống cho Gateway tra trong danh mục. Trước đây điền
+                        // "Chẩn đoán kèm theo" làm tên, khiến chẩn đoán trên trục
+                        // mang đúng chữ đó thay vì tên bệnh: bác sĩ tuyến sau đọc
+                        // về chỉ thấy "chẩn đoán kèm theo", không biết bệnh gì.
+                        gatewayService.syncToFhir(patient, record.getClinicalNote(), code.trim(), null, 90.0);
                     }
                 }
             }

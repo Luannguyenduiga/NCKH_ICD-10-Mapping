@@ -11,11 +11,11 @@ import re
 import sqlite3
 from contextlib import asynccontextmanager, contextmanager
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 import requests
 import uvicorn
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -72,6 +72,7 @@ def _to_fhir_id(value: str) -> str:
 
 
 FHIR_MRN_SYSTEM = f"https://smig.nckh.vn/fhir/identifier/mrn/{_to_fhir_id(FACILITY_CODE)}"
+FHIR_NS = "https://smig.nckh.vn/fhir"
 FHIR_CCCD_SYSTEM = "https://smig.nckh.vn/fhir/identifier/cccd"
 FHIR_BHYT_SYSTEM = "https://smig.nckh.vn/fhir/identifier/bhyt"
 FHIR_FACILITY_SYSTEM = "https://smig.nckh.vn/fhir/identifier/co-so-kcb"
@@ -242,7 +243,7 @@ def get_config():
 
 
 @app.get("/api/patients")
-def get_patients(search_id: str = None):
+def get_patients(search_id: str = None, response: Response = None):
     try:
         # If search_id is specified, we query locally or pull from EMR Cloud
         if search_id:
@@ -381,7 +382,14 @@ def get_patients(search_id: str = None):
                 
             return []
 
-        # If search_id is NOT specified, return local SQLite patients ONLY
+        # Không có search_id: danh sách bệnh án của viện này, NHƯNG mỗi hồ sơ
+        # được bồi thêm chẩn đoán mà tuyến khác đã ghi cho cùng người đó.
+        #
+        # Trước đây nhánh này cố ý chỉ trả bệnh án cục bộ, và đó là chỗ hỏng: một
+        # hệ thống liên thông mà màn hình chính vẫn chỉ thấy phần của mình thì
+        # phần liên thông chỉ tồn tại trong các màn phụ. Bác sĩ mở bệnh án ra phải
+        # thấy ngay bệnh nhân đã khám gì ở đâu, kèm tên nơi khám - không thấy thì
+        # không dùng được, mà thấy nhưng không rõ ai ghi thì càng nguy hiểm hơn.
         with db_cursor() as cursor:
             cursor.execute("SELECT * FROM patients ORDER BY id")
             patients = [dict(row) for row in cursor.fetchall()]
@@ -391,14 +399,161 @@ def get_patients(search_id: str = None):
             for row in cursor.fetchall():
                 condition = dict(row)
                 by_patient.setdefault(condition["patient_id"], []).append(condition)
+
         for patient in patients:
             patient["conditions"] = by_patient.get(patient["id"], [])
             patient["is_local"] = True
+
+        theo_dinh_danh, chan_doan_theo_ho_so, truc_online = _ban_do_tren_truc()
+        if response is not None:
+            # Danh sách trả về là mảng nên không nhét được cờ trạng thái vào thân.
+            # Đưa qua header để giao diện nói được "đang thiếu phần tuyến khác",
+            # thay vì hiện một bệnh án trông có vẻ đầy đủ mà thật ra không phải.
+            response.headers["X-EMR-Online"] = "true" if truc_online else "false"
+        if truc_online:
+            for patient in patients:
+                _boi_chan_doan_tuyen_khac(patient, theo_dinh_danh, chan_doan_theo_ho_so)
         return patients
     except sqlite3.Error as exc:
         raise HTTPException(status_code=500, detail=f"Lỗi cơ sở dữ liệu: {exc}") from exc
     except sqlite3.Error as exc:
         raise HTTPException(status_code=500, detail=f"Lỗi cơ sở dữ liệu: {exc}") from exc
+
+
+# --- Ghep du lieu tuyen khac vao benh an cuc bo ----------------------------
+
+def _ban_do_tren_truc():
+    """
+    Đọc toàn bộ trục trong ĐÚNG HAI lần gọi, bất kể có bao nhiêu bệnh nhân.
+
+    Hỏi trục một lần cho mỗi bệnh nhân thì màn hình danh sách phát sinh N+1 lượt
+    gọi mạng và chậm dần theo số hồ sơ - kiểu chậm chỉ lộ ra khi dữ liệu đã nhiều,
+    tức đúng lúc không sửa được nữa.
+
+    Trả về ``(theo_dinh_danh, chan_doan_theo_ho_so, online)``:
+
+    * ``theo_dinh_danh`` - ``{(hệ, giá trị): id hồ sơ trên EMR}``
+    * ``chan_doan_theo_ho_so`` - ``{id hồ sơ trên EMR: [chẩn đoán]}``
+    * ``online`` - đọc được trục hay không. Không đọc được thì phía gọi giữ
+      nguyên bệnh án cục bộ chứ không báo lỗi: trục hỏng không được làm hỏng
+      luôn màn hình bệnh án của chính viện mình.
+    """
+    theo_dinh_danh, chan_doan_theo_ho_so = {}, {}
+    try:
+        r_bn = requests.get(f"{FHIR_SERVER_URL}/Patient",
+                            params={"_count": 200}, timeout=REQUEST_TIMEOUT)
+        r_cd = requests.get(f"{FHIR_SERVER_URL}/Condition",
+                            params={"_count": 500}, timeout=REQUEST_TIMEOUT)
+        r_bn.raise_for_status()
+        r_cd.raise_for_status()
+    except requests.RequestException:
+        return theo_dinh_danh, chan_doan_theo_ho_so, False
+
+    for entry in r_bn.json().get("entry", []):
+        res = entry.get("resource") or {}
+        ho_so_id = res.get("id")
+        for ident in res.get("identifier", []) or []:
+            he, gt = ident.get("system"), ident.get("value")
+            if he and gt and ho_so_id:
+                theo_dinh_danh[(he, gt)] = ho_so_id
+
+    for entry in r_cd.json().get("entry", []):
+        res = entry.get("resource") or {}
+        subject = res.get("subject") or {}
+        # Ưu tiên `reference`: cùng một người có thể được ghi dưới hai định danh
+        # khác nhau ở hai lần khám (lần đầu chỉ có mã bệnh án, lần sau mới có
+        # CCCD). Gom theo `identifier` sẽ tách người đó thành hai hồ sơ.
+        ref = (subject.get("reference") or "").rsplit("/", 1)[-1]
+        if not ref:
+            ident = subject.get("identifier") or {}
+            ref = theo_dinh_danh.get((ident.get("system"), ident.get("value")))
+        if ref:
+            chan_doan_theo_ho_so.setdefault(ref, []).append(res)
+
+    return theo_dinh_danh, chan_doan_theo_ho_so, True
+
+
+def _boi_chan_doan_tuyen_khac(patient: dict, theo_dinh_danh: dict,
+                              chan_doan_theo_ho_so: dict) -> None:
+    """
+    Bồi vào một hồ sơ những chẩn đoán mà tuyến khác đã ghi cho cùng người đó.
+
+    Sửa `patient` tại chỗ. Mọi chẩn đoán - kể cả của chính viện này - đều được
+    gắn `facility_code`/`facility_name`/`la_ngoai_vien`, để giao diện không bao
+    giờ phải đoán ai ghi bản nào. Nói ra nguồn là phần bắt buộc của liên thông:
+    một chẩn đoán không rõ nơi lập thì bác sĩ không đánh giá được độ tin cậy.
+    """
+    ho_so_id = None
+    for he, gia_tri in ((FHIR_CCCD_SYSTEM, patient.get("citizen_id")),
+                        (FHIR_BHYT_SYSTEM, patient.get("insurance_card")),
+                        (FHIR_MRN_SYSTEM, patient.get("id"))):
+        if gia_tri and (he, gia_tri) in theo_dinh_danh:
+            ho_so_id = theo_dinh_danh[(he, gia_tri)]
+            break
+
+    # Chẩn đoán của chính viện này: đánh dấu nguồn để hiển thị đồng nhất với
+    # phần tuyến khác, và cờ `chua_lien_thong` cho bản chưa đẩy lên trục.
+    for c in patient["conditions"]:
+        c.setdefault("facility_code", FACILITY_CODE)
+        c.setdefault("facility_name", FACILITY_NAME)
+        c.setdefault("la_ngoai_vien", False)
+        c["chua_lien_thong"] = not c.get("fhir_condition_id")
+
+    if not ho_so_id:
+        # Không quy được về hồ sơ nào trên trục. Với bệnh nhân chưa có CCCD/BHYT
+        # thì đây là chuyện bình thường, không phải lỗi.
+        patient["truc_quy_chieu"] = None
+        patient["so_chan_doan_ngoai_vien"] = 0
+        return
+
+    patient["truc_quy_chieu"] = ho_so_id
+    da_co = {c.get("fhir_condition_id") for c in patient["conditions"]
+             if c.get("fhir_condition_id")}
+    # Mã bệnh mà viện này đã có bản cục bộ. Với chẩn đoán do CHÍNH viện này lập,
+    # bệnh án cục bộ là bản gốc còn trục chỉ là bản sao - nên bản trục bị bỏ qua,
+    # nếu không thì cùng một bệnh hiện hai dòng: một "chưa liên thông" và một
+    # "chỉ đọc", hai điều không thể cùng đúng. Chỉ áp dụng trong phạm vi viện
+    # mình; chẩn đoán của tuyến khác thì luôn hiện, vì ta không có bản gốc nào.
+    ma_cuc_bo = {c.get("icd10_code") for c in patient["conditions"]}
+
+    ngoai = 0
+    for res in chan_doan_theo_ho_so.get(ho_so_id, []):
+        if res.get("id") in da_co:
+            continue  # bản này đã nằm trong bệnh án cục bộ, không đếm hai lần
+        coding = ((res.get("code") or {}).get("coding") or [{}])
+        notes = res.get("note") or []
+        nguon = next((t for t in (res.get("meta") or {}).get("tag", [])
+                      if t.get("system") == FHIR_FACILITY_SYSTEM), {})
+        ma_cs = nguon.get("code")
+        la_ngoai = bool(ma_cs) and ma_cs != FACILITY_CODE
+        if not la_ngoai and coding[0].get("code") in ma_cuc_bo:
+            continue
+        lam_sang = ((res.get("clinicalStatus") or {}).get("coding") or [{}])[0].get("code")
+        if la_ngoai:
+            ngoai += 1
+        patient["conditions"].append({
+            "patient_id": patient["id"],
+            "icd10_code": coding[0].get("code", ""),
+            "icd10_display": coding[0].get("display", ""),
+            "fragment": (notes[0].get("text") if notes else "") or "Chẩn đoán liên thông",
+            # Bản trên trục KHÔNG mang điểm của mô hình: điểm ấy là của lần chẩn
+            # đoán tại nơi lập, không phải thứ viện này chấm. Để trống còn hơn
+            # bịa ra một con số trông như đã kiểm chứng.
+            "confidence_score": None,
+            "verification_status": None,
+            "fhir_condition_id": res.get("id"),
+            "status": "Synced",
+            "clinical_status": lam_sang or "active",
+            "recorded_date": res.get("recordedDate") or res.get("onsetDateTime"),
+            "facility_code": ma_cs,
+            "facility_name": nguon.get("display") or ma_cs or "Không rõ cơ sở",
+            "la_ngoai_vien": la_ngoai,
+            "chua_lien_thong": False,
+            # Không có bản cục bộ nên không sửa được. Giao diện dựa vào cờ này để
+            # khóa nút Sửa/Gỡ thay vì để bác sĩ bấm rồi nhận 404.
+            "chi_doc": True,
+        })
+    patient["so_chan_doan_ngoai_vien"] = ngoai
 
 
 @app.post("/api/patients")
@@ -782,6 +937,260 @@ def _sync_patient_record(patient_id: str, clinical_note: Optional[str] = None,
 def sync_patient(patient_id: str):
     """Liên thông lại toàn bộ hồ sơ theo dòng bệnh án đang lưu."""
     return _sync_patient_record(patient_id)
+
+
+@app.get("/api/patients/{patient_id}/history")
+def get_patient_history(patient_id: str):
+    """
+    Bệnh sử ĐẦY ĐỦ của một bệnh nhân: nội viện cộng với mọi tuyến khác trên trục.
+
+    Vì sao cần riêng một đường này: `GET /api/patients` cố ý chỉ trả bệnh án cục
+    bộ, nên bác sĩ nhìn hồ sơ một bệnh nhân đã tiếp nhận tại đây thì **chỉ thấy
+    phần viện mình ghi**. Chẩn đoán do tuyến dưới hay tuyến trên lập vẫn nằm trên
+    trục nhưng không hiện ra ở đâu cả - đúng thứ mà cả hệ thống liên thông sinh ra
+    để cho xem.
+
+    **Không đòi hỏi hồ sơ cục bộ.** `patient_id` nhận cả mã bệnh án nội viện lẫn
+    CCCD, thẻ BHYT, hay mã bệnh án của viện khác. Bắt buộc phải có bệnh án tại đây
+    thì đúng ca cần nhất - bệnh nhân vừa chuyển tuyến tới, chưa kịp tiếp nhận - lại
+    là ca duy nhất không xem được bệnh sử. Người bệnh chưa từng khám ở đây thì viện
+    này không có mã bệnh án cho họ, nên thứ bác sĩ cầm trong tay chỉ có giấy tờ
+    tùy thân.
+
+    Cách tìm trên trục: thử lần lượt **CCCD → BHYT → mã bệnh án**. Ngược thứ tự
+    với `get_patients` là có chủ ý - ở đó chuỗi tra là thứ người dùng gõ nên phải
+    thử mã bệnh án trước, còn ở đây ta cần định danh quét rộng nhất. Mã bệnh án
+    chỉ quy được hồ sơ trong phạm vi một viện, dùng nó trước là tự giới hạn kết
+    quả vào đúng phần vốn đã thấy.
+
+    EMR Cloud không chạy thì trả phần cục bộ kèm `emr_online: false`, không ném
+    lỗi: xem bệnh sử là thao tác đọc, hỏng phần liên thông không được làm hỏng
+    luôn phần bệnh án của chính viện mình.
+    """
+    with db_cursor() as cursor:
+        cursor.execute("SELECT * FROM patients WHERE id = ?", (patient_id,))
+        row = cursor.fetchone()
+        benh_nhan = dict(row) if row else None
+        cuc_bo = []
+        if benh_nhan:
+            cursor.execute(
+                "SELECT * FROM patient_conditions WHERE patient_id = ? ORDER BY rowid",
+                (patient_id,))
+            cuc_bo = [dict(r) for r in cursor.fetchall()]
+
+    ket_qua = {
+        "facility_code": FACILITY_CODE,
+        "facility_name": FACILITY_NAME,
+        # Có bệnh án tại viện này hay không. Giao diện dựa vào cờ này để biết bệnh
+        # sử đang xem là của người đã tiếp nhận, hay của người mới chỉ tra trên trục.
+        "co_ho_so_cuc_bo": benh_nhan is not None,
+        "emr_online": False,
+        "tra_cuu_bang": None,
+        "theo_co_so": [],
+        "chua_lien_thong": [],
+        "canh_bao": None,
+    }
+
+    # Ứng viên định danh để hỏi trục. Có bệnh án thì lấy từ hồ sơ; không có thì
+    # chính chuỗi người dùng đưa vào là định danh - chưa biết nó thuộc loại nào
+    # nên thử cả ba hệ.
+    if benh_nhan:
+        ung_vien = [
+            ("cccd", FHIR_CCCD_SYSTEM, (benh_nhan.get("citizen_id") or "").strip()),
+            ("bhyt", FHIR_BHYT_SYSTEM, (benh_nhan.get("insurance_card") or "").strip()),
+            ("mrn", FHIR_MRN_SYSTEM, (benh_nhan.get("id") or "").strip()),
+        ]
+        if not any(gt for _, _, gt in ung_vien[:2]):
+            ket_qua["canh_bao"] = (
+                "Hồ sơ chưa có CCCD hoặc thẻ BHYT nên chỉ tra được trong phạm vi bệnh "
+                "viện này. Bổ sung định danh toàn quốc để thấy bệnh sử ở tuyến khác.")
+    else:
+        q = patient_id.strip()
+        ung_vien = [("cccd", FHIR_CCCD_SYSTEM, q),
+                    ("bhyt", FHIR_BHYT_SYSTEM, q),
+                    ("mrn", FHIR_MRN_SYSTEM, q)]
+
+    ho_so_truc = _tim_ho_so_tren_truc(ung_vien, ket_qua)
+    tren_truc = _doc_chan_doan_tren_truc(ho_so_truc, ket_qua) if ho_so_truc else []
+
+    # Không có ở đâu cả mới là 404. Chỉ cần một trong hai nơi có là còn thứ để đọc.
+    if benh_nhan is None and ho_so_truc is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(f"Không tìm thấy '{patient_id}' ở bệnh viện này lẫn trên EMR Cloud. "
+                    f"Thử tra bằng số CCCD hoặc thẻ BHYT."))
+
+    ket_qua["patient"] = _thong_tin_benh_nhan(benh_nhan, ho_so_truc, patient_id)
+
+    # Ghép hai nguồn theo id tài nguyên trên EMR. Không khử trùng thì mỗi chẩn
+    # đoán đã liên thông hiện hai lần - một từ bệnh án cục bộ, một từ trục - và
+    # bác sĩ đọc thành bệnh nhân mắc bệnh đó hai lần.
+    id_tren_truc = {c["fhir_condition_id"] for c in tren_truc if c.get("fhir_condition_id")}
+    theo_co_so = {}
+    for c in tren_truc:
+        theo_co_so.setdefault(c.get("facility_code") or "(không rõ)", []).append(c)
+
+    for c in cuc_bo:
+        # Chẩn đoán đã có trên trục thì bản của trục đã tính rồi. Chỉ bổ sung cờ
+        # cho biết bản ghi này CÒN nằm trong bệnh án cục bộ, nhờ đó giao diện biết
+        # chẩn đoán nào sửa được.
+        if c.get("fhir_condition_id") and c["fhir_condition_id"] in id_tren_truc:
+            for muc in theo_co_so.get(FACILITY_CODE, []):
+                if muc.get("fhir_condition_id") == c["fhir_condition_id"]:
+                    muc["co_ban_cuc_bo"] = True
+                    muc["fragment"] = muc.get("fragment") or c.get("fragment")
+                    muc["confidence_score"] = c.get("confidence_score")
+                    muc["clinical_status"] = c.get("clinical_status") or muc.get("clinical_status")
+            continue
+        # Chưa lên trục: tách riêng chứ không xếp vào cơ sở nào. Xếp lẫn vào phần
+        # của viện mình là nói rằng tuyến khác đọc được, trong khi thực tế chưa.
+        ket_qua["chua_lien_thong"].append({
+            "icd10_code": c.get("icd10_code"),
+            "icd10_display": c.get("icd10_display"),
+            "fragment": c.get("fragment"),
+            "confidence_score": c.get("confidence_score"),
+            "clinical_status": c.get("clinical_status") or "active",
+            "status": c.get("status"),
+            "sync_time": c.get("sync_time"),
+            "co_ban_cuc_bo": True,
+        })
+
+    # Viện mình lên trước, các tuyến khác xếp sau theo mã cơ sở cho ổn định thứ tự.
+    for ma_cs in sorted(theo_co_so, key=lambda m: (m != FACILITY_CODE, m)):
+        muc = theo_co_so[ma_cs]
+        ket_qua["theo_co_so"].append({
+            "facility_code": ma_cs,
+            "facility_name": muc[0].get("facility_name") or ma_cs,
+            "la_ngoai_vien": ma_cs != FACILITY_CODE,
+            "so_chan_doan": len(muc),
+            "chan_doan": sorted(
+                muc, key=lambda c: c.get("recorded_date") or "", reverse=True),
+        })
+
+    ket_qua["tong_tren_truc"] = sum(len(v) for v in theo_co_so.values())
+    ket_qua["so_co_so"] = len(theo_co_so)
+    ket_qua["so_co_so_ngoai_vien"] = sum(1 for m in theo_co_so if m != FACILITY_CODE)
+    return ket_qua
+
+
+def _thong_tin_benh_nhan(benh_nhan, ho_so_truc, patient_id: str) -> dict:
+    """
+    Khối thông tin hành chính, ưu tiên bệnh án cục bộ rồi mới tới trục.
+
+    Bệnh án của chính viện mình là bản người tiếp đón vừa nhập và chịu trách nhiệm,
+    nên nó đúng hơn bản trên trục vốn có thể do nơi khác ghi từ lâu.
+    """
+    if benh_nhan:
+        return {
+            "id": benh_nhan["id"],
+            "name": benh_nhan["name"],
+            "gender": benh_nhan["gender"],
+            "birth_date": benh_nhan["birth_date"],
+            "citizen_id": benh_nhan.get("citizen_id"),
+            "insurance_card": benh_nhan.get("insurance_card"),
+        }
+
+    idents = {i.get("system"): i.get("value")
+              for i in (ho_so_truc or {}).get("identifier", []) if isinstance(i, dict)}
+    ten = ""
+    for muc in (ho_so_truc or {}).get("name", []):
+        ten = muc.get("text") or (" ".join(muc.get("given", []))
+                                  + " " + muc.get("family", "")).strip()
+        if ten:
+            break
+    gioi = (ho_so_truc or {}).get("gender")
+    return {
+        # Không có mã bệnh án tại viện này là chuyện bình thường với người chưa
+        # từng khám ở đây; lùi về chính chuỗi đã tra để giao diện còn thứ hiển thị.
+        "id": idents.get(FHIR_MRN_SYSTEM) or patient_id,
+        "name": ten or "Bệnh nhân trên trục",
+        "gender": "Nam" if gioi == "male" else ("Nữ" if gioi == "female" else "Khác"),
+        "birth_date": (ho_so_truc or {}).get("birthDate", "---"),
+        "citizen_id": idents.get(FHIR_CCCD_SYSTEM),
+        "insurance_card": idents.get(FHIR_BHYT_SYSTEM),
+        # Mã bệnh án tại các viện khác, LUÔN kèm tên cơ sở đã cấp. Hiện trần mã
+        # không thì vô nghĩa và còn nguy hiểm: "BN0002" của viện này và của viện
+        # kia là hai người khác nhau. Kèm cơ sở thì nó thành thông tin dùng được -
+        # bác sĩ gọi sang nơi đó hỏi bệnh án gốc theo đúng mã họ đang giữ.
+        "ma_benh_an_noi_khac": [
+            {"facility_code": he.rsplit("/", 1)[-1], "value": gt}
+            for he, gt in idents.items()
+            if he.startswith(f"{FHIR_NS}/identifier/mrn/") and he != FHIR_MRN_SYSTEM
+        ],
+    }
+
+
+def _tim_ho_so_tren_truc(ung_vien: List[tuple], ket_qua: dict) -> Optional[dict]:
+    """
+    Tìm tài nguyên Patient trên EMR Cloud theo danh sách định danh ứng viên.
+
+    Ghi thẳng trạng thái tra cứu vào `ket_qua` (`emr_online`, `tra_cuu_bang`,
+    `canh_bao`) để giao diện nói được vì sao danh sách rỗng: trục không chạy, hay
+    bệnh nhân chưa có định danh toàn quốc, hay đúng là chưa ai ghi gì. Ba lý do
+    này dẫn tới ba hành động khác nhau của bác sĩ, gộp thành "không có dữ liệu" là
+    bỏ mất thông tin cần nhất.
+    """
+    for ten, he, gia_tri in ung_vien:
+        if not gia_tri:
+            continue
+        try:
+            resp = requests.get(
+                f"{FHIR_SERVER_URL}/Patient",
+                params={"identifier": f"{he}|{gia_tri}"},
+                timeout=REQUEST_TIMEOUT,
+            )
+        except requests.RequestException:
+            ket_qua["canh_bao"] = (
+                "Không kết nối được EMR Cloud nên chỉ hiển thị phần bệnh án của "
+                "bệnh viện này. Bệnh sử ở tuyến khác có thể còn thiếu.")
+            return None
+        ket_qua["emr_online"] = True
+        if resp.status_code != 200:
+            continue
+        entries = resp.json().get("entry", [])
+        if entries:
+            ket_qua["tra_cuu_bang"] = ten
+            return entries[0].get("resource") or {}
+    return None
+
+
+def _doc_chan_doan_tren_truc(ho_so_truc: dict, ket_qua: dict) -> List[dict]:
+    """Đọc mọi Condition gắn với một hồ sơ trên trục, kèm cơ sở đã lập ra chúng."""
+    emr_id = (ho_so_truc or {}).get("id")
+    if not emr_id:
+        return []
+    try:
+        resp = requests.get(
+            f"{FHIR_SERVER_URL}/Condition",
+            params={"subject": f"Patient/{emr_id}"},
+            timeout=REQUEST_TIMEOUT,
+        )
+        resp.raise_for_status()
+    except requests.RequestException:
+        ket_qua["canh_bao"] = "Đọc được hồ sơ trên trục nhưng không lấy được danh sách chẩn đoán."
+        return []
+
+    ds = []
+    for entry in resp.json().get("entry", []):
+        res = entry.get("resource") or {}
+        coding = ((res.get("code") or {}).get("coding") or [{}])
+        notes = res.get("note") or []
+        nguon = next(
+            (t for t in (res.get("meta") or {}).get("tag", [])
+             if t.get("system") == FHIR_FACILITY_SYSTEM), {})
+        lam_sang = ((res.get("clinicalStatus") or {}).get("coding") or [{}])[0].get("code")
+        ds.append({
+            "fhir_condition_id": res.get("id"),
+            "icd10_code": coding[0].get("code", ""),
+            "icd10_display": coding[0].get("display", ""),
+            "fragment": notes[0].get("text") if notes else "",
+            "clinical_status": lam_sang or "active",
+            "recorded_date": res.get("recordedDate") or res.get("onsetDateTime"),
+            "facility_code": nguon.get("code"),
+            "facility_name": nguon.get("display") or nguon.get("code"),
+            "co_ban_cuc_bo": False,
+        })
+    return ds
 
 
 @app.post("/api/patients/{patient_id}/diagnosis")

@@ -12,6 +12,7 @@ import tempfile
 from urllib.parse import parse_qsl, unquote, urlparse
 
 import pytest
+import requests
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT not in sys.path:
@@ -203,6 +204,14 @@ def make_his(monkeypatch):
 
         if emr_client is not None:
             monkeypatch.setattr(server.requests, "get", emr_client.get)
+        else:
+            # Mặc định coi như trục không đọc được, thay vì để bài test gọi mạng
+            # thật. `GET /api/patients` nay có bồi dữ liệu tuyến khác, nên không
+            # chặn ở đây thì kết quả phụ thuộc vào máy chạy test có bật Docker
+            # hay không - và bài test hết còn nói lên điều gì.
+            def _khong_co_truc(*a, **kw):
+                raise requests.ConnectionError("Bài test không gọi trục thật")
+            monkeypatch.setattr(server.requests, "get", _khong_co_truc)
         if gateway_post is not None:
             monkeypatch.setattr(server.requests, "post", gateway_post)
         return server
