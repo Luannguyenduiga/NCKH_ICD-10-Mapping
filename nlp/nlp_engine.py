@@ -80,7 +80,7 @@ COVERAGE_FLOOR_CONF = 0.88
 # --- Chẩn đoán kép (dao găm/sao) -------------------------------------------
 # Tên mã trong danh mục ghi kèm mã đối tác: "(G55.1*)" hoặc dải "(M50-M51†)".
 _CODE_REF_RE = re.compile(
-    r"\(\s*([A-Z]\d{2}(?:\.\d+)?)\s*(?:-\s*([A-Z]\d{2}(?:\.\d+)?)\s*)?[†*]\s*\)"
+    r"\(\s*([A-Z]\d{2}(?:\.\d+)?)\s*(?:-\s*([A-Z]\d{2}(?:\.\d+)?)\s*)?([†*])\s*\)"
 )
 # Ranh giới giữa các vế lâm sàng trong một dòng chẩn đoán. KHÔNG tách theo "và":
 # "rễ và đám rối thần kinh" là một cụm, tách ra sẽ vỡ nghĩa.
@@ -540,9 +540,41 @@ class NLPEngine:
             if "*" in raw_code:
                 self._marked_asterisk.add(code)
 
+            # Nguồn đánh dấu CHÍNH: phụ lục A1 của Bộ Y tế, đã nạp sẵn vào
+            # `meta.asterisk_codes` (374 mã bệnh nguyên).
+            #
+            # Không thể dựa vào ký tự † trong mã nữa: danh mục nay gỡ sạch † và *
+            # vì máy chủ FHIR từ chối mã mang chúng. Sau lần gỡ đó, hai tập trên
+            # RỖNG và mọi nhánh ghép cặp †/* thành code chết - hệ thống lặng lẽ
+            # thôi nhận ra chẩn đoán kép, trong khi bảng liên kết vẫn đúng.
+            for ma_sao in (entry.get("meta") or {}).get("asterisk_codes") or ():
+                sach = sanitize_icd10_code(ma_sao)
+                if sach in self.db_index:
+                    self._marked_dagger.add(code)
+                    self._marked_asterisk.add(sach)
+
             surface = f"{entry['name_vi']} {entry.get('name_en') or ''}"
             for match in _CODE_REF_RE.finditer(surface):
-                start, end = match.group(1), match.group(2)
+                start, end, dau = match.group(1), match.group(2), match.group(3)
+
+                # Ký tự đánh dấu trong tên nói rõ ai là bệnh nguyên, ai là biểu
+                # hiện, nên không phải đoán theo chiều tham chiếu:
+                #
+                #   M51.1 "... tổn thương của rễ tủy sống (G55.1*)"  -> G55.1 là *
+                #   G55.1 "... trong bệnh đĩa đệm (M50-M51†)"        -> G55.1 là *
+                #
+                # Phụ lục A1 tuy chuẩn nhưng THIẾU: nó không có cặp M51.1/G55.1
+                # trong khi tên hai mã tham chiếu nhau rõ ràng. Lấy cả hai nguồn
+                # thì phủ được nhiều cặp hơn mà không nguồn nào phải đoán.
+                if dau == "*":
+                    self._marked_dagger.add(code)
+                    if not end and sanitize_icd10_code(start) in self.db_index:
+                        self._marked_asterisk.add(sanitize_icd10_code(start))
+                else:
+                    self._marked_asterisk.add(code)
+                    if not end and sanitize_icd10_code(start) in self.db_index:
+                        self._marked_dagger.add(sanitize_icd10_code(start))
+
                 if end:
                     lo, hi = self._block_key(self._block_of(start)), self._block_key(self._block_of(end))
                     if lo and hi:
