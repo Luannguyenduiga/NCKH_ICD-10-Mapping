@@ -1094,3 +1094,21 @@ code {
 .history-item:first-of-type {
     border-top: none;
 }
+
+/* Dong chan doan do tuyen khac lap: phai nhin ra ngay trong bang, khong phai
+   mo modal moi biet. Vien trai tim dong bo voi khoi tuyen khac o modal benh su. */
+.icd-line.ngoai-vien {
+    border-left: 3px solid #8b5cf6;
+    padding-left: 6px;
+}
+
+.pending-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    margin-left: 4px;
+    border-radius: 4px;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 0.68rem;
+    font-weight: 600;
+}

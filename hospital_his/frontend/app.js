@@ -231,8 +231,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     // hiện khi khác đi, để bệnh đã khỏi không bị đọc nhầm.
                     const lamSang = c.clinical_status && c.clinical_status !== "active"
                         ? ` ${clinicalBadge(c.clinical_status)}` : "";
-                    return `<div class="icd-line"><span class="icd-code-badge">${esc(c.icd10_code)}</span>`
-                        + `${confidenceTag(c.confidence_score)}${pending}${lamSang}${desc}</div>`;
+                    // Nơi lập chẩn đoán. Đây là phần bắt buộc của liên thông:
+                    // một chẩn đoán không rõ ai ghi thì bác sĩ không đánh giá
+                    // được độ tin cậy, mà lại dễ tưởng là của viện mình.
+                    const noiKham = c.la_ngoai_vien
+                        ? `<span class="facility-badge" title="Chẩn đoán do cơ sở khác lập, chỉ đọc">
+                             <i class="fa-solid fa-hospital"></i> ${esc(c.facility_name || "Tuyến khác")}</span>`
+                        : (c.chua_lien_thong
+                            ? `<span class="pending-badge" title="Chưa đẩy lên trục - tuyến khác chưa đọc được">chưa liên thông</span>`
+                            : "");
+                    return `<div class="icd-line ${c.la_ngoai_vien ? "ngoai-vien" : ""}">`
+                        + `<span class="icd-code-badge">${esc(c.icd10_code)}</span>`
+                        + `${confidenceTag(c.confidence_score)}${pending}${lamSang}${noiKham}${desc}</div>`;
                 }).join("")
                 : empty;
             const icdNoDotStr = conditions.length
@@ -634,7 +644,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 ? `<span class="facility-badge" title="Chẩn đoán do cơ sở khác ghi nhận">
                      <i class="fa-solid fa-hospital"></i> ${esc(c.facility_name || "Ngoại viện")}</span>`
                 : "";
-            const khoaSua = chiDoc || c.la_ngoai_vien;
+            const khoaSua = chiDoc || c.la_ngoai_vien || c.chi_doc;
             return `
                 <div class="cond-card" data-code="${esc(c.icd10_code)}">
                     <div class="cond-head">
