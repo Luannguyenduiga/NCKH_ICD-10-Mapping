@@ -21,6 +21,11 @@ function App() {
   // Form states
   const [patientForm, setPatientForm] = useState({ id: '', name: '', gender: 'Nam', birthDate: '', citizenId: '', insuranceCard: '', address: '' });
   const [searchPatientQuery, setSearchPatientQuery] = useState('');
+  // Hồ sơ đọc được từ EMR Cloud. Giữ RIÊNG khỏi `patients` vì đây là bản chỉ đọc
+  // của bệnh viện khác - trộn vào danh sách nội viện là bác sĩ tưởng đã tiếp nhận
+  // và bấm "Khám bệnh" trên một hồ sơ chưa có ở viện mình.
+  const [emrResult, setEmrResult] = useState(null);
+  const [emrSearching, setEmrSearching] = useState(false);
   
   // Queue ticket registration state
   const [queueReg, setQueueReg] = useState({ patientId: '', clinicRoom: 'Phòng khám Nội 1' });
@@ -97,6 +102,64 @@ function App() {
   const showNotification = (message, type = 'success') => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 5000);
+  };
+
+  /**
+   * Bỏ dấu tiếng Việt để so khớp.
+   *
+   * Người tiếp đón gõ nhanh thường không bỏ dấu ("nguyen van a"). Không chuẩn hóa
+   * thì tìm đúng tên bệnh nhân vẫn ra rỗng, và đó là kiểu lỗi khiến người dùng
+   * tưởng hệ thống mất dữ liệu.
+   */
+  const boDau = (str) => (str || '')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+    .toLowerCase().trim();
+
+  // Lọc theo Tên / Mã BN / CCCD / BHYT. Lọc cả định danh toàn quốc chứ không chỉ
+  // mã bệnh án: bệnh nhân chuyển tuyến tới thì bác sĩ cầm CCCD trong tay.
+  const patientsHienThi = (() => {
+    const q = boDau(searchPatientQuery);
+    if (!q) return patients;
+    return patients.filter(p =>
+      boDau(p.id).includes(q) ||
+      boDau(p.name).includes(q) ||
+      boDau(p.citizenId).includes(q) ||
+      boDau(p.insuranceCard).includes(q)
+    );
+  })();
+
+  /**
+   * Tra một định danh trên EMR Cloud khi nội viện không có.
+   *
+   * Backend tự hỏi nội viện trước rồi mới hỏi trục, nên hàm này không cần đoán
+   * trước - cứ gửi đi và đọc `source` trong phản hồi để biết hồ sơ từ đâu về.
+   */
+  const handleLookupEmr = async () => {
+    const q = searchPatientQuery.trim();
+    if (!q) {
+      showNotification('Nhập mã bệnh án, CCCD hoặc thẻ BHYT để tra cứu.', 'error');
+      return;
+    }
+    setEmrSearching(true);
+    setEmrResult(null);
+    try {
+      const res = await fetch(`/api/patients/lookup?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      if (data.found) {
+        setEmrResult(data);
+        showNotification(
+          data.source === 'EMR'
+            ? `Đã đọc hồ sơ "${data.patient.name}" từ EMR Cloud.`
+            : `Bệnh nhân "${data.patient.name}" đã có hồ sơ tại bệnh viện này.`);
+      } else {
+        showNotification(data.message || `Không tìm thấy "${q}".`, 'error');
+      }
+    } catch (e) {
+      showNotification('Không kết nối được EMR Cloud. Kiểm tra docker compose.', 'error');
+    } finally {
+      setEmrSearching(false);
+    }
   };
 
   const fetchPatients = async () => {
@@ -739,6 +802,96 @@ function App() {
               {/* Master Patient Table */}
               <div className="card">
                 <div className="card-title">Danh sách Bệnh nhân đăng ký tại Hệ thống</div>
+
+                {/* Tim kiem: loc noi vien truoc, khong thay thi tra tren truc */}
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+                  <input
+                    type="text"
+                    className="form-control"
+                    style={{ flex: 1 }}
+                    placeholder="Tìm theo Tên, Mã BN, CCCD hoặc thẻ BHYT — nhấn Enter để tra trên EMR Cloud..."
+                    value={searchPatientQuery}
+                    onChange={(e) => { setSearchPatientQuery(e.target.value); setEmrResult(null); }}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleLookupEmr(); } }}
+                  />
+                  <button className="btn btn-secondary" onClick={handleLookupEmr} disabled={emrSearching}>
+                    {emrSearching ? 'Đang tra...' : 'Tra trên EMR Cloud'}
+                  </button>
+                  {searchPatientQuery && (
+                    <button className="btn btn-secondary" onClick={() => { setSearchPatientQuery(''); setEmrResult(null); }}>
+                      Xóa lọc
+                    </button>
+                  )}
+                </div>
+
+                {searchPatientQuery && (
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
+                    Nội viện: <strong>{patientsHienThi.length}</strong> / {patients.length} hồ sơ khớp.
+                    {patientsHienThi.length === 0 &&
+                      ' Không có ở bệnh viện này — nhấn "Tra trên EMR Cloud" để tìm hồ sơ do nơi khác lập.'}
+                  </p>
+                )}
+
+                {/* Ho so doc tu truc du lieu: CHI DOC, tach han khoi bang noi vien */}
+                {emrResult && emrResult.found && emrResult.source === 'EMR' && (
+                  <div style={{
+                    border: '1px solid #f59e0b', background: '#fffbeb',
+                    borderRadius: '8px', padding: '14px', marginBottom: '15px'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                      <strong style={{ color: '#b45309' }}>
+                        Hồ sơ đọc từ EMR Cloud — chưa tiếp nhận tại bệnh viện này
+                      </strong>
+                      <button className="btn btn-secondary" style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+                              onClick={() => setEmrResult(null)}>Đóng</button>
+                    </div>
+                    <div style={{ fontSize: '0.9rem', marginBottom: '10px' }}>
+                      <strong>{emrResult.patient.name}</strong>
+                      {' · '}{emrResult.patient.gender}
+                      {' · '}{emrResult.patient.birthDate}
+                      {' · Mã BN: '}{emrResult.patient.id}
+                      {emrResult.patient.citizenId && <> · CCCD: {emrResult.patient.citizenId}</>}
+                      {emrResult.patient.insuranceCard && <> · BHYT: {emrResult.patient.insuranceCard}</>}
+                    </div>
+
+                    {emrResult.patient.conditions && emrResult.patient.conditions.length > 0 ? (
+                      <table className="table">
+                        <thead>
+                          <tr>
+                            <th>Mã ICD-10</th>
+                            <th>Tên bệnh</th>
+                            <th>Nơi lập chẩn đoán</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {emrResult.patient.conditions.map((c, i) => (
+                            <tr key={c.conditionId || i}>
+                              <td><strong>{c.icd10Code}</strong></td>
+                              <td>{c.icd10Display}</td>
+                              <td>
+                                {c.facilityName || '---'}
+                                {c.laNgoaiVien && (
+                                  <span className="badge badge-waiting" style={{ marginLeft: '6px' }}>Ngoại viện</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    ) : (
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>
+                        Hồ sơ có trên trục nhưng chưa có chẩn đoán nào được liên thông.
+                      </p>
+                    )}
+
+                    <p style={{ fontSize: '0.8rem', color: '#92400e', marginTop: '10px', marginBottom: 0 }}>
+                      Bệnh sử này do bệnh viện khác lập nên chỉ đọc. Muốn khám tại đây thì
+                      đăng ký hồ sơ mới ở form bên trên, nhập đúng CCCD/BHYT để trục quy về
+                      cùng một người.
+                    </p>
+                  </div>
+                )}
+
                 <div className="table-container">
                   <table className="table">
                     <thead>
@@ -754,7 +907,7 @@ function App() {
                       </tr>
                     </thead>
                     <tbody>
-                      {patients.map(p => (
+                      {patientsHienThi.map(p => (
                         <tr key={p.id}>
                           <td><strong>{p.id}</strong></td>
                           <td><strong>{p.name}</strong></td>

@@ -2,6 +2,7 @@ package com.vnpt.his.backend.controller;
 
 import com.vnpt.his.backend.model.*;
 import com.vnpt.his.backend.repository.*;
+import com.vnpt.his.backend.service.EmrLookupService;
 import com.vnpt.his.backend.service.GatewayService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -37,11 +38,69 @@ public class HisController {
     @Autowired
     private GatewayService gatewayService;
 
+    @Autowired
+    private EmrLookupService emrLookupService;
+
     // --- RECEPTION & PATIENTS ---
 
     @GetMapping("/patients")
     public List<Patient> getAllPatients() {
         return patientRepository.findAll();
+    }
+
+    /**
+     * Tra cứu bệnh nhân theo mã bệnh án, CCCD hoặc thẻ BHYT.
+     *
+     * Hai tầng, đúng thứ tự đó:
+     *
+     * <ol>
+     *   <li><b>Nội viện trước.</b> Hồ sơ của chính bệnh viện này thì bác sĩ sửa
+     *       được, nên phải ưu tiên - hỏi trục trước rồi trả về bản chỉ đọc là lấy
+     *       mất quyền sửa một hồ sơ vốn có thể sửa.</li>
+     *   <li><b>EMR Cloud sau.</b> Không có nội viện nghĩa là bệnh nhân chưa từng
+     *       khám ở đây - đúng ca chuyển tuyến, và là lúc cần bệnh sử nhất.</li>
+     * </ol>
+     *
+     * Không tìm thấy ở cả hai nơi vẫn trả 200 kèm {@code found=false}, không trả
+     * 404: "không có hồ sơ" là một câu trả lời hợp lệ của nghiệp vụ tiếp đón, còn
+     * 404 sẽ lẫn với lỗi sai đường dẫn và giao diện không phân biệt được.
+     */
+    @GetMapping("/patients/lookup")
+    public ResponseEntity<?> lookupPatient(@RequestParam("q") String q) {
+        String query = q == null ? "" : q.trim();
+        if (query.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "found", false,
+                    "message", "Chưa nhập định danh cần tra."));
+        }
+
+        List<Patient> noiVien = patientRepository.timTheoDinhDanh(query);
+        if (!noiVien.isEmpty()) {
+            Patient p = noiVien.get(0);
+            Map<String, Object> hoSo = new LinkedHashMap<>();
+            hoSo.put("id", p.getId());
+            hoSo.put("name", p.getName());
+            hoSo.put("gender", p.getGender());
+            hoSo.put("birthDate", p.getBirthDate());
+            hoSo.put("citizenId", p.getCitizenId());
+            hoSo.put("insuranceCard", p.getInsuranceCard());
+            hoSo.put("address", p.getAddress());
+            hoSo.put("isLocal", true);
+            hoSo.put("conditions", List.of());
+            return ResponseEntity.ok(Map.of(
+                    "found", true, "source", "LOCAL", "patient", hoSo));
+        }
+
+        Map<String, Object> tuTruc = emrLookupService.timBenhNhan(query);
+        if (tuTruc != null) {
+            return ResponseEntity.ok(Map.of(
+                    "found", true, "source", "EMR", "patient", tuTruc));
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "found", false,
+                "message", "Không tìm thấy '" + query
+                        + "' ở nội viện lẫn trên EMR Cloud."));
     }
 
     @PostMapping("/patients")
