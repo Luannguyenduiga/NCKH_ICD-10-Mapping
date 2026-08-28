@@ -452,7 +452,9 @@ function renderSyncedHistory(records) {
 
 // 6. Clear synced records on EMR Cloud
 async function clearSyncedHistory() {
-    if (!confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử bệnh án đã liên thông trên EMR Cloud không?')) return;
+    // Chỉ xóa phần của chính cơ sở này - chẩn đoán do nơi khác lập vẫn còn nguyên
+    // trên trục. Nói "toàn bộ" là mô tả sai việc sắp xảy ra.
+    if (!confirm('Xóa các bệnh án do cơ sở này đã liên thông lên EMR Cloud?\n\nChẩn đoán do cơ sở khác lập sẽ được giữ nguyên.')) return;
 
     try {
         const response = await fetch(`${API_BASE}/api/fhir/sync`, { method: 'DELETE' });

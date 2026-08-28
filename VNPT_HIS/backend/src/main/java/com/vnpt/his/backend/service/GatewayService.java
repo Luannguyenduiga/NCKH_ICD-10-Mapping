@@ -2,8 +2,10 @@ package com.vnpt.his.backend.service;
 
 import com.vnpt.his.backend.model.Patient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import java.time.Duration;
 import java.util.*;
 
 @Service
@@ -12,7 +14,42 @@ public class GatewayService {
     @Value("${smig.gateway.url:http://127.0.0.1:8000}")
     private String gatewayUrl;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    /**
+     * Cơ sở khám chữa bệnh mà bản HIS này phục vụ.
+     *
+     * Gửi kèm mỗi yêu cầu sinh Condition để MỘT bản Gateway phục vụ được nhiều
+     * bệnh viện - mô hình NLP chiếm vài GB RAM nên chạy hai bản trên một máy thử
+     * nghiệm là quá nặng. Thiếu trường này thì Gateway lấy mã trong cấu hình của
+     * chính nó, và mọi chẩn đoán của hai bệnh viện đều mang tên cùng một cơ sở.
+     */
+    @Value("${smig.facility.code:BV-VNPT-02}")
+    private String facilityCode;
+
+    @Value("${smig.facility.name:Benh vien VNPT}")
+    private String facilityName;
+
+    private final RestTemplate restTemplate = buildRestTemplate();
+
+    /**
+     * RestTemplate có thời gian chờ tường minh.
+     *
+     * Mặc định của {@code new RestTemplate()} là chờ VÔ HẠN. Gateway nạp mô hình
+     * NLP nên lần gọi đầu sau khi khởi động có thể chậm; không đặt thời gian chờ
+     * thì luồng khám bệnh của HIS treo theo mà không có cách nào thoát.
+     */
+    private static RestTemplate buildRestTemplate() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(Duration.ofSeconds(5));
+        factory.setReadTimeout(Duration.ofSeconds(60));
+        return new RestTemplate(factory);
+    }
+
+    /** Chỉ đưa vào thân yêu cầu khi có giá trị thật, tránh gửi chuỗi rỗng. */
+    private static void putIfPresent(Map<String, Object> target, String key, String value) {
+        if (value != null && !value.trim().isEmpty()) {
+            target.put(key, value.trim());
+        }
+    }
 
     // A lightweight local fallback dictionary for basic ICD-10 mapping if SMIG Gateway is offline
     private static final Map<String, String> FALLBACK_ICD_DICT = new LinkedHashMap<>();
@@ -83,8 +120,15 @@ public class GatewayService {
                 Map<String, Object> pred = new HashMap<>();
                 pred.put("code", code);
                 pred.put("name_vi", name);
-                pred.put("confidence", 90.0); // High confidence for exact keyword matches
-                pred.put("suggested_verification_status", "confirmed");
+                // Đây là kết quả tra bảng cứng 10 mã, KHÔNG phải kết quả của mô
+                // hình NLP trên 48.391 mục từ. Không được để nó mang vẻ chắc
+                // chắn ngang nhau: bác sĩ phải biết mình đang nhìn phương án dự
+                // phòng thì mới đánh giá đúng.
+                pred.put("confidence", 50.0);
+                pred.put("suggested_verification_status", "unconfirmed");
+                pred.put("requires_review", true);
+                pred.put("source", "fallback");
+                pred.put("source_note", "Gateway không phản hồi - tra từ điển cục bộ, cần bác sĩ xác nhận");
                 predictions.add(pred);
             }
         }
@@ -98,8 +142,11 @@ public class GatewayService {
                 Map<String, Object> pred = new HashMap<>();
                 pred.put("code", entry.getKey());
                 pred.put("name_vi", entry.getValue());
-                pred.put("confidence", 50.0); // Low confidence as it's generic suggestion
+                pred.put("confidence", 30.0); // Gợi ý chung chung, độ tin cậy thấp hơn nữa
                 pred.put("suggested_verification_status", "unconfirmed");
+                pred.put("requires_review", true);
+                pred.put("source", "fallback");
+                pred.put("source_note", "Gateway không phản hồi - gợi ý chung, KHÔNG dựa trên nội dung bệnh án");
                 predictions.add(pred);
             }
         }
@@ -107,6 +154,7 @@ public class GatewayService {
         Map<String, Object> diagnosisGroup = new HashMap<>();
         diagnosisGroup.put("fragment", query);
         diagnosisGroup.put("predictions", predictions);
+        diagnosisGroup.put("source", "fallback");
         return Collections.singletonList(diagnosisGroup);
     }
 
@@ -128,6 +176,15 @@ public class GatewayService {
             condReq.put("clinical_status", "active");
             condReq.put("gender", "Nam".equals(patient.getGender()) ? "male" : "female");
             condReq.put("birth_date", patient.getBirthDate());
+            // Định danh cấp quốc gia. Thiếu hai trường này thì trục chỉ quy được
+            // hồ sơ trong phạm vi bệnh viện, và cùng một người khám ở nơi khác sẽ
+            // thành một bệnh nhân riêng.
+            putIfPresent(condReq, "citizen_id", patient.getCitizenId());
+            putIfPresent(condReq, "insurance_card", patient.getInsuranceCard());
+            // Bệnh viện đang ghi hồ sơ. Nhờ nó một bản Gateway phục vụ được cả
+            // HIS này lẫn HIS khác mà chẩn đoán trên trục vẫn ghi đúng nơi ghi.
+            putIfPresent(condReq, "facility_code", facilityCode);
+            putIfPresent(condReq, "facility_name", facilityName);
 
             Map<String, Object> fhirCondition = restTemplate.postForObject(conditionUrl, condReq, Map.class);
             if (fhirCondition == null) {
@@ -144,6 +201,10 @@ public class GatewayService {
             patientMap.put("name", patient.getName());
             patientMap.put("gender", "Nam".equals(patient.getGender()) ? "male" : "female");
             patientMap.put("birth_date", patient.getBirthDate());
+            // Phải khớp với khối gửi ở bước 1: Gateway đối chiếu hai bên và trả
+            // 422 nếu định danh mâu thuẫn, thay vì âm thầm chọn một trong hai.
+            putIfPresent(patientMap, "citizen_id", patient.getCitizenId());
+            putIfPresent(patientMap, "insurance_card", patient.getInsuranceCard());
             syncReq.put("patient", patientMap);
 
             Map<String, Object> syncResp = restTemplate.postForObject(syncUrl, syncReq, Map.class);

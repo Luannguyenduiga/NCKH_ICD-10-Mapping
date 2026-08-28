@@ -50,7 +50,7 @@
             <header class="top-header">
                 <div class="header-search">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="patient-search" placeholder="Tìm kiếm bệnh nhân bằng Tên hoặc Mã số (MRN)...">
+                    <input type="text" id="patient-search" placeholder="Tìm theo Tên, Mã bệnh án (MRN), CCCD hoặc thẻ BHYT — nhấn Enter để tra trên EMR Cloud...">
                 </div>
                 <div class="header-actions">
                     <button class="btn btn-secondary" id="btn-reset-db">
@@ -142,8 +142,8 @@
             <form id="add-patient-form">
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="p-id">Mã số Bệnh nhân (MRN/CCCD)</label>
-                        <input type="text" id="p-id" required placeholder="Ví dụ: MRN-2026-007 hoặc số CCCD">
+                        <label for="p-id">Mã bệnh án nội viện (MRN)</label>
+                        <input type="text" id="p-id" required placeholder="Ví dụ: MRN-2026-007">
                     </div>
                     <div class="form-group">
                         <label for="p-name">Họ và Tên bệnh nhân</label>
@@ -164,6 +164,21 @@
                         <input type="date" id="p-dob" required>
                     </div>
                 </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="p-cccd">Số CCCD <small>(không bắt buộc)</small></label>
+                        <input type="text" id="p-cccd" placeholder="Ví dụ: 079095010245">
+                    </div>
+                    <div class="form-group">
+                        <label for="p-bhyt">Thẻ BHYT <small>(không bắt buộc)</small></label>
+                        <input type="text" id="p-bhyt" placeholder="Ví dụ: DN4790120154321">
+                    </div>
+                </div>
+                <p class="form-hint">
+                    Mã bệnh án chỉ có giá trị trong nội bộ bệnh viện này. Nhập CCCD hoặc
+                    thẻ BHYT thì trục dữ liệu mới nhận ra đây là cùng một người khi bệnh
+                    nhân từng khám ở bệnh viện khác.
+                </p>
                 <div class="form-group">
                     <label for="p-clinical">Chẩn đoán lâm sàng thô (Sử dụng viết tắt tiếng Việt tự do để test NLP)</label>
                     <textarea id="p-clinical" rows="3" required placeholder="Ví dụ: Bệnh nhân bị đtđ tuýp 2 kèm cao huyết áp nhẹ và trào ngược dạ dày thực quản..."></textarea>
@@ -173,6 +188,55 @@
                     <button type="submit" class="btn btn-primary">Lưu Bệnh án</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Chan doan them cho benh nhan da co ho so (tai kham / phat hien them benh) -->
+    <div class="modal" id="diagnose-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-notes-medical"></i> Chẩn đoán thêm</h3>
+                <span class="close-modal" id="close-diagnose-btn">&times;</span>
+            </div>
+            <form id="diagnose-form">
+                <div class="form-group">
+                    <label>Bệnh nhân</label>
+                    <input type="text" id="d-patient" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="d-clinical">Chẩn đoán lâm sàng mới</label>
+                    <textarea id="d-clinical" rows="3" required
+                        placeholder="Ví dụ: tăng huyết áp vô căn"></textarea>
+                </div>
+                <p class="form-hint">
+                    Các chẩn đoán trước đó được <strong>giữ nguyên</strong>. Trên EMR Cloud,
+                    chẩn đoán mới là một Condition riêng nên không đè lên chẩn đoán cũ.
+                </p>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btn-cancel-diagnose">Hủy bỏ</button>
+                    <button type="submit" class="btn btn-primary">Chẩn đoán và liên thông</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sua cac chan doan da ghi nhan (bao gom ca chan doan cua lan kham truoc) -->
+    <div class="modal" id="conditions-modal">
+        <div class="modal-content modal-wide">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-pen-to-square"></i> Sửa chẩn đoán đã ghi nhận</h3>
+                <span class="close-modal" id="close-conditions-btn">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="cond-patient" id="c-patient"></div>
+                <div id="conditions-list"></div>
+            </div>
+            <div class="modal-footer modal-footer-pad">
+                <button type="button" class="btn btn-secondary" id="btn-close-conditions">Đóng</button>
+                <button type="button" class="btn btn-diagnose" id="btn-add-from-conditions">
+                    <i class="fa-solid fa-plus"></i> Chẩn đoán thêm bệnh mới
+                </button>
+            </div>
         </div>
     </div>
     <script src="app.js"></script>
