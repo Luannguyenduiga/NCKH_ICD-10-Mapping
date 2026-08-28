@@ -107,6 +107,19 @@ class FakeEmr:
 
     def get(self, url, params=None, headers=None, timeout=None):
         query = self._truy_van(url, params)
+
+        # Đọc thẳng một tài nguyên theo id: GET /{Type}/{id}. Khác hẳn tìm kiếm -
+        # trả về chính tài nguyên chứ không phải Bundle, và 404 khi không có.
+        # Thiếu nhánh này thì mọi lệnh đọc theo id rơi xuống nhánh tìm kiếm bên
+        # dưới và nhận về danh sách bản ghi mới nhất, tức bài test tưởng đọc bản
+        # A mà thực ra đang nhìn bản B.
+        rtype, _, rid = urlparse(url).path.split("/fhir/")[-1].partition("/")
+        if rid and rtype in self.store:
+            resource = self.store[rtype].get(rid)
+            if resource is None:
+                return FakeResponse({"resourceType": "OperationOutcome"}, 404)
+            return FakeResponse(resource)
+
         if "/Patient" in url:
             can_tim = self._cap_dinh_danh(query["identifier"])
             hits = [r for r in self.store["Patient"].values()

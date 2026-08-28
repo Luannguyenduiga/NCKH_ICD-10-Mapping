@@ -474,8 +474,13 @@ def _retire_on_emr(condition_id: str) -> Optional[str]:
     vào đó lỗi được trả ngược lên giao diện để bác sĩ biết còn bản ghi thừa.
     """
     try:
+        # Khai mã cơ sở để Gateway biết ai đang gỡ. Gateway chỉ cho gỡ chẩn đoán
+        # do chính cơ sở này lập; thiếu tham số thì nó lấy mã cấu hình của chính
+        # nó, và ở chế độ một Gateway phục vụ nhiều bệnh viện, HIS sẽ bị 403 khi
+        # gỡ đúng bản ghi của mình.
         resp = requests.delete(
-            f"{GATEWAY_URL}/api/fhir/condition/{condition_id}", timeout=REQUEST_TIMEOUT)
+            f"{GATEWAY_URL}/api/fhir/condition/{condition_id}",
+            params={"facility": FACILITY_CODE}, timeout=REQUEST_TIMEOUT)
         resp.raise_for_status()
         return None
     except requests.RequestException as exc:

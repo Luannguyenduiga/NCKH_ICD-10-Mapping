@@ -35,8 +35,10 @@ class GatewayGia:
         self._seq += 1
         return FakeResponse({"condition_id": f"cond-{self._seq}"})
 
-    def delete(self, url, timeout=None):
-        self.da_goi.append(("DELETE", url, None))
+    def delete(self, url, params=None, timeout=None):
+        # Ghi lại `params` chứ không bỏ đi: mã cơ sở đi trong tham số truy vấn,
+        # và Gateway dựa vào nó để biết ai đang gỡ.
+        self.da_goi.append(("DELETE", url, params))
         return FakeResponse({"status": "success"})
 
 
@@ -165,3 +167,24 @@ def test_sua_giu_nguyen_vi_tri_trong_danh_sach(his):
         "clinical_status": "active"})
     _, chan_doan = _ho_so(client)
     assert [c["icd10_code"] for c in chan_doan] == ["E10.9", "I10"]
+
+
+def test_go_ban_ghi_cu_co_khai_ma_co_so(his):
+    """
+    HIS phải tự khai mình là ai khi nhờ Gateway gỡ bản ghi.
+
+    Gateway chỉ cho gỡ chẩn đoán do chính cơ sở đó lập. Thiếu tham số này thì ở
+    chế độ một Gateway phục vụ nhiều bệnh viện, HIS bị 403 khi gỡ đúng bản ghi
+    của mình - và lỗi hiện ra dưới dạng bản ghi thừa còn sót trên trục, rất khó
+    lần ra nguyên nhân.
+    """
+    client, gw, server = his
+    res = client.put("/api/patients/MRN-1/conditions/E11.9", json={
+        "icd10_code": "I10", "icd10_display": "Tăng huyết áp vô căn",
+        "clinical_status": "active", "fragment": "tăng huyết áp vô căn"})
+    assert res.status_code == 200, res.text
+
+    goi_xoa = [p for kieu, _, p in gw.da_goi if kieu == "DELETE"]
+    assert goi_xoa, "Sửa mã phải kéo theo một lệnh gỡ bản ghi cũ"
+    assert all(p and p.get("facility") == server.FACILITY_CODE for p in goi_xoa), (
+        f"Lệnh gỡ thiếu mã cơ sở: {goi_xoa}")
