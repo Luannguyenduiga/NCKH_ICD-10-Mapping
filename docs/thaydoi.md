@@ -1,3 +1,359 @@
+# Nhật ký thay đổi — 28/08/2026
+
+Phiên này chuyển trọng tâm từ **NLP** sang **liên thông**. Việc lớn nhất: một mã
+bệnh án chỉ có nghĩa trong nội bộ nơi cấp nó, nên trước phiên này hai bệnh viện
+dùng trùng mã bệnh án là ghi đè hồ sơ của nhau trên trục dữ liệu.
+
+Khác phiên 14/08, phần lớn thay đổi ở đây **không đo được bằng độ chính xác** —
+chúng sửa mô hình dữ liệu chứ không sửa mô hình học máy. Bằng chứng vì vậy nằm ở bộ
+kiểm thử (mục 7), không ở bảng chỉ số. Riêng phần NLP có đo lại, kết quả ở mục 6.
+
+Toàn bộ đã commit và merge vào `main` tại `656d7fe`.
+
+---
+
+## 1. Phạm vi phiên làm việc
+
+Sáu nhánh, mỗi nhánh một vấn đề, đều đã merge vào `main`:
+
+| Nhánh | Nội dung | Quy mô |
+| --- | --- | ---: |
+| `feat/dinh-danh-da-co-so-va-lien-thong` | Định danh bệnh nhân đa cơ sở | 19 file, +3.061 |
+| `fix/chot-co-so-khi-go-mot-chan-doan` | Chốt cơ sở ở đường xóa | 5 file, +241 |
+| `fix/nlp-alias-day-chang-khop-goi` | Alias dây chằng khớp gối | 2 file, +68 |
+| `chore/fhir-postgres-va-siet-cau-hinh` | EMR Cloud lưu trữ bền vững | 1 file, +38 |
+| `docs/tai-lieu-ky-thuat-va-readme` | Tài liệu kỹ thuật | 4 file, +2.279 |
+| `chore/xoa-icd10-db-json-trung-lap` | Dọn bản danh mục trùng ở gốc | −244.382 |
+
+---
+
+## 2. Định danh bệnh nhân đa cơ sở
+
+### 2.1 Vấn đề
+
+Mã bệnh án (MRN) do từng bệnh viện tự cấp và **chỉ có nghĩa trong nội bộ nơi đó**.
+Bản trước lấy thẳng mã bệnh án làm khóa trên trục, nên hỏng hai kiểu cùng lúc:
+
+| Hỏng | Cơ chế |
+| --- | --- |
+| Trộn hồ sơ hai người | Bệnh viện A và B cùng cấp mã `BN-001` cho hai bệnh nhân khác nhau → trên trục thành một người |
+| Mất lịch sử điều trị | Cùng người mắc lại cùng bệnh ở lần khám sau đè lên chẩn đoán lần trước |
+
+### 2.2 Khóa nghiệp vụ bốn thành phần
+
+[`stable_condition_key`](../backend/main.py) sinh khóa gồm bốn phần, mỗi phần chặn
+một kiểu trộn:
+
+```
+{mã cơ sở} - {mã bệnh án} - {mã ICD} - {ngày khám}
+```
+
+Hai quyết định thiết kế đáng ghi lại vì đều phản trực giác:
+
+**Không dùng CCCD/BHYT trong khóa này**, dù chúng "toàn quốc" hơn. Hồ sơ đầy dần
+theo thời gian: lần khám đầu HIS chỉ có mã bệnh án, lần sau mới bổ sung CCCD. Khóa
+bám theo định danh ưu tiên cao nhất hiện có sẽ **đổi** giữa hai lần, và cùng một
+chẩn đoán thành hai bản ghi. Mã bệnh án là thứ duy nhất chắc chắn có mặt và không
+đổi. Việc đồng nhất một người giữa nhiều viện do `Patient.identifier` đảm nhiệm.
+
+**Ngày khám nằm trong khóa**, nên tái khám cùng bệnh là một `Condition` mới chứ
+không phải bản cập nhật — giữ được lịch sử điều trị.
+
+### 2.3 Chốt mã cơ sở
+
+Mã cơ sở là **danh tính của bên ghi hồ sơ**, phải do phía máy chủ xác lập:
+
+| Cấu hình | Hành vi |
+| --- | --- |
+| Mặc định | Mã lấy từ `SMIG_FACILITY_CODE` của Gateway. Mỗi bệnh viện chạy một bản Gateway riêng |
+| `SMIG_ALLOW_CLIENT_FACILITY=1` | HIS tự khai mã trong từng yêu cầu — **chỉ để thử nghiệm cục bộ** |
+
+Cờ này tồn tại vì một lý do rất thực tế: mô hình NLP chiếm vài GB RAM nên chạy hai
+bản Gateway trên một máy demo là quá nặng, trong khi vẫn cần hai bệnh viện phân biệt
+được nhau để trình diễn kịch bản chuyển tuyến.
+
+Khi cờ tắt mà bên gọi khai mã lạ thì [`resolve_facility`](../backend/main.py) trả
+**403**, cố ý không âm thầm lùi về mã của Gateway: sai cấu hình mà vẫn chạy thì hồ
+sơ của bệnh viện B nằm trên trục dưới tên bệnh viện A, và không ai phát hiện ra.
+
+Trạng thái cờ được phơi ra `GET /health` (`allow_client_facility`) để nhìn là biết
+Gateway đang ở chế độ thử nghiệm.
+
+### 2.4 Định danh cấp quốc gia
+
+Thêm `citizen_id` và `insurance_card`, kiểm ngay tại tầng nhận yêu cầu bằng
+`field_validator` nên sai định dạng là **422 trước khi bất kỳ tài nguyên nào được
+dựng**:
+
+| Trường | Luật | Bỏ trống |
+| --- | --- | --- |
+| `citizen_id` | 12 chữ số (hoặc 9 nếu là CMND cũ) | Hợp lệ |
+| `insurance_card` | 2 chữ cái + 13 chữ số | Hợp lệ |
+
+Bỏ trống là hợp lệ vì không phải bệnh nhân nào cũng có giấy tờ lúc tiếp nhận, và
+luồng đã có phương án lùi về mã bệnh án. Cái không được phép là giá trị **có mà
+sai** — nó tạo ra một danh tính toàn quốc giả.
+
+### 2.5 Conditional update thay cho PUT theo id
+
+Cả `Patient` lẫn `Condition` nay ghi bằng `PUT /{Type}?identifier=system|value`.
+Idempotent mà không cần client tự đặt id: không khớp bản nào thì máy chủ tạo mới và
+tự cấp id, khớp đúng một bản thì cập nhật bản đó, khớp nhiều bản thì trả 412 và
+không sửa gì. Nhờ vậy HAPI mới bật được `client_id_strategy=NOT_ALLOWED` (mục 5).
+
+### 2.6 Lan sang các thành phần khác
+
+| Thành phần | Thay đổi |
+| --- | --- |
+| [`run.ps1`](../run.ps1) | Tham số `-Port`, `-FacilityCode`, `-FacilityName`, `-AllowClientFacility` |
+| [`hospital_his/`](../hospital_his/) | Nhập CCCD/BHYT, tra cứu trên EMR Cloud, chẩn đoán thêm cho hồ sơ đã có |
+| [`VNPT_HIS/`](../VNPT_HIS/) | Gửi kèm mã cơ sở và định danh quốc gia |
+| [`frontend/app.js`](../frontend/app.js) | Sửa lời cảnh báo xóa — chỉ xóa phần của chính cơ sở này |
+
+Hai sửa nhỏ trong `VNPT_HIS` đáng ghi riêng:
+
+- `RestTemplate` có thời gian chờ tường minh (5 giây kết nối, 60 giây đọc). Mặc định
+  của `new RestTemplate()` là chờ **vô hạn**; Gateway nạp mô hình NLP nên lần gọi đầu
+  có thể chậm, và luồng khám bệnh của HIS treo theo mà không có cách nào thoát.
+- Từ điển dự phòng khi Gateway offline hạ độ tin cậy **90 → 50** (khớp từ khóa) và
+  **50 → 30** (gợi ý chung), kèm `requires_review` và `source: "fallback"`. Đây là
+  kết quả tra bảng cứng 10 mã, không được để nó mang vẻ chắc chắn ngang kết quả của
+  mô hình trên 48.407 vector.
+
+---
+
+## 3. Chốt cơ sở ở đường xóa
+
+`DELETE /api/fhir/condition/{id}` nhận thẳng id rồi xóa, **không hỏi bản ghi đó của
+ai** — khác hẳn `DELETE /api/fhir/sync` ngay dưới nó, vốn có lọc theo cơ sở.
+
+Ghép với `GET /api/fhir/sync`, vốn **cố ý** trả chẩn đoán của mọi cơ sở kèm `id` vì
+nhìn thấy hồ sơ nơi khác lập chính là điều cần trình bày, thì thành một đường xóa
+chéo: đọc danh sách → lấy id của bệnh viện B → gọi gỡ.
+
+Đúng kiểu trộn dữ liệu mà mã cơ sở trong khóa nghiệp vụ sinh ra để chặn ở đường
+**ghi**, chỉ khác là nó nằm ở đường **xóa** — và hậu quả nặng hơn, vì không phục hồi
+được.
+
+**Cách vá.** Thêm tham số `facility` đi qua `resolve_facility` nên cùng một chính
+sách với đường ghi. Đọc `Condition` trước khi xóa, đối chiếu thẻ cơ sở trong
+`meta.tag` bằng `facility_of`, lệch thì 403. Tốn thêm một vòng gọi, nhưng FHIR không
+có "xóa kèm điều kiện theo thẻ".
+
+Hai hành vi giữ nguyên có chủ ý:
+
+| Trường hợp | Xử lý | Vì sao |
+| --- | --- | --- |
+| Bản ghi đã mất | Vẫn báo thành công | `_retire_on_emr` của HIS gọi lại sau khi mất mạng; một lỗi giả ở đây hiện lên giao diện bác sĩ như bản ghi thừa còn sót trên trục |
+| Bản ghi không mang thẻ cơ sở | Vẫn cho gỡ | Dữ liệu có từ trước khi Gateway gắn thẻ; không quy được về ai thì cũng không có ai để bảo vệ, mà từ chối thì chúng kẹt trên trục vĩnh viễn |
+
+Trường hợp thứ hai là **đánh đổi**, đã ghi rõ lý do trong mã và chốt bằng một test
+riêng, để ai đổi hành vi này phải đọc được vì sao.
+
+**Kiểm chứng ngược.** Lùi `backend/main.py` về bản chưa vá rồi chạy lại bộ test mới:
+**5/6 ca fail**, ca chính fail đúng lý do `DID NOT RAISE HTTPException` — xác nhận
+bản cũ xóa im lặng thật, và bộ test không phải viết cho vừa với mã nguồn.
+
+`hospital_his/server.py` kèm theo phải khai mã cơ sở khi gọi gỡ; thiếu nó thì ở chế
+độ một Gateway phục vụ nhiều bệnh viện, HIS bị 403 khi gỡ đúng bản ghi của mình.
+
+---
+
+## 4. Alias dây chằng khớp gối
+
+Danh mục ICD-10 gọi cả nhóm này là *"bong gân và căng cơ… tổn thương dây chằng"* —
+không có chữ **"đứt"** hay **"rách"**, đúng hai từ mà bác sĩ luôn dùng. Thiếu cầu
+nối từ vựng thì cosine kéo về **S53.3** *"Chấn thương đứt dây chằng hai bên xương
+trụ"* — **khuỷu tay**, sai hẳn chi thể — chỉ vì mã đó trùng nguyên cụm "đứt dây
+chằng".
+
+Đây là lệch từ vựng giữa danh mục và lời khai, **không phải thiếu mã**: S83.4 và
+S83.5 vẫn nằm sẵn trong danh mục. Nên chữa bằng alias, không train lại.
+
+Thêm **16 alias**: 10 cho S83.5 (dây chằng chéo, gồm các viết tắt DCCT/DCCS/ACL/PCL),
+5 cho S83.4 (dây chằng bên), 1 cho M23.5 (mất vững khớp gối). Dây chằng **chéo** và
+dây chằng **bên** giữ riêng — gộp chung là mất đúng phần thông tin bác sĩ đã nêu rõ.
+
+[`nlp/test_nlp.py`](../nlp/test_nlp.py) chốt cả hai chiều: sáu ca dây chằng phải ra
+đúng mã, **và** alias mới không được kéo `"bệnh dây chằng"` (M24.2) hay `"đau thần
+kinh tọa"` (M54.3) về nhóm khớp gối.
+
+---
+
+## 5. EMR Cloud: lưu trữ bền vững và siết cấu hình
+
+[`docker-compose.yml`](../docker-compose.yml):
+
+| Thay đổi | Vì sao |
+| --- | --- |
+| Thêm `postgres:16` + volume `hapi-pgdata` | Thay H2 in-memory — `docker compose restart` không còn xóa sạch dữ liệu đã liên thông |
+| `client_id_strategy` → `NOT_ALLOWED` | Id đoán được cộng với PUT theo id là một lỗ ghi đè. Tính idempotent nay do conditional update đảm nhiệm (mục 2.5) |
+| `enforce_referential_integrity_on_write` → `true` | Chặn `Condition` trỏ tới `Patient` không tồn tại. Gateway luôn đồng bộ Patient trước nên luồng bình thường không đổi |
+| Cả hai cổng chỉ nghe `127.0.0.1` | Cụm này giữ toàn bộ dữ liệu bệnh án mà **chưa có xác thực**; mở ra LAN là trao quyền đọc/ghi/xóa cho mọi máy cùng mạng |
+
+PostgreSQL dùng cổng **5433** vì 5432 thường đã có bản cài sẵn chiếm chỗ. Mật khẩu
+`hapi/hapi` chỉ dành cho demo cục bộ.
+
+---
+
+## 6. Đo lại NLP sau phiên
+
+Đo ngày 28/08/2026 bằng [`nlp/evaluate.py`](../nlp/evaluate.py), cùng cách với phiên
+14/08. Cột "14/08" chính là cột *Sau* của nhật ký bên dưới.
+
+### Tập kiểm tra độc lập — `eval_holdout.json`, 51 ca
+
+| Chỉ số | 14/08 | 28/08 | Chênh |
+| --- | ---: | ---: | ---: |
+| Top-1 accuracy | 72,5% | 72,5% | 0 |
+| Top-3 / Top-5 accuracy | 86,3% | 86,3% | 0 |
+| MRR | 0,7876 | 0,7876 | 0 |
+| Số ca mức cao | 27 | 27 | 0 |
+| Chính xác trong mức cao | 92,6% | 92,6% | 0 |
+
+### Tập phát triển — `eval_set.json`, 110 ca
+
+| Chỉ số | 14/08 | 28/08 |
+| --- | ---: | ---: |
+| Top-1 accuracy | 99,1% | 99,1% |
+| Top-3 accuracy | 100% | 100% |
+| MRR | 0,9955 | 0,9955 |
+| Số ca mức cao | 105 | 105 |
+
+### Danh mục
+
+| | 14/08 | 28/08 |
+| --- | ---: | ---: |
+| Vector tham chiếu | 48.391 | **48.407** |
+| Số mã ICD-10 | 12.137 | 12.137 |
+
+Chênh **đúng +16**, khớp chính xác số alias thêm ở mục 4.
+
+### Đọc bảng này thế nào
+
+Mọi chỉ số **đứng yên tuyệt đối**. Đây không phải thất bại của thay đổi ở mục 4 — mà
+là bằng chứng cho mục 8.2: **tập holdout 51 ca không chứa ca chấn thương dây chằng
+nào**, nên một lỗi có thật, tái lập được, sai hẳn chi thể lại **hoàn toàn vô hình**
+với bộ đo.
+
+Điều rút ra: ở quy mô hiện tại, bảng chỉ số **không đủ để phát hiện lỗi, cũng không
+đủ để xác nhận đã sửa**. Chỗ bắt được lỗi này là `nlp/test_nlp.py`. Hai công cụ có
+vai trò khác nhau và không thay thế nhau được.
+
+---
+
+## 7. Bộ kiểm thử liên thông
+
+Thư mục [`tests/`](../tests/) — **53 ca**, không cần Docker và không nạp mô hình NLP,
+chạy hết trong khoảng 10 giây:
+
+| File | Ca | Chốt điều gì |
+| --- | ---: | --- |
+| `test_kiem_dinh_danh.py` | 14 | Kiểm CCCD/BHYT, chuẩn hóa, mâu thuẫn định danh |
+| `test_sua_chan_doan.py` | 9 | Bác sĩ sửa lại chẩn đoán đã liên thông |
+| `test_nhieu_co_so.py` | 7 | Hai bệnh viện không ghi đè hồ sơ nhau |
+| `test_go_mot_chan_doan.py` | 6 | Gỡ một chẩn đoán phải dừng trong phạm vi cơ sở |
+| `test_chuyen_tuyen.py` | 5 | Kịch bản chuyển tuyến A → B |
+| `test_luong_nlp_khong_doi.py` | 5 | Thay đổi liên thông không đụng vào luồng NLP |
+| `test_dinh_danh_bo_sung_sau.py` | 4 | Hồ sơ đầy dần: lần đầu chỉ có MRN, lần sau thêm CCCD |
+| `test_xoa_theo_co_so.py` | 3 | Xóa hàng loạt dừng trong phạm vi cơ sở |
+
+`test_chuyen_tuyen.py` là chỗ trình diễn giá trị của cả nửa liên thông: bệnh viện A
+chẩn đoán đái tháo đường rồi chuyển tuyến, B khám ra thêm bệnh thận mạn, và ba câu
+hỏi phải trả lời được là B thêm bệnh mà không đè lên A, hai nơi quy về cùng một
+người nhờ CCCD, và bác sĩ ở B tra được bệnh sử bằng CCCD.
+
+---
+
+## 8. Việc còn lại
+
+### 8.1 Chuyển tiếp từ phiên 14/08
+
+| Mục | Trạng thái |
+| --- | --- |
+| 4.1 Hai ca sai lọt cổng tự động | **Chưa làm** — đo lại 28/08 vẫn còn nguyên |
+| 4.2 Tập holdout quá nhỏ | **Chưa làm** — và mục 6 vừa cho thêm một bằng chứng nữa |
+| 4.3 Thiếu script huấn luyện | **Chưa làm** — vẫn là chương phương pháp bắt buộc phải có |
+| 4.4 Bốn trường ràng buộc lâm sàng chưa dùng | **Chưa làm** |
+| 4.5 Danh mục thiếu tên cho 4.652 mã | **Chưa làm** |
+
+### 8.2 Tập holdout: thêm một lý do nữa
+
+Mục 6 cho thấy bộ đo hiện tại **mù** với cả một nhóm lỗi. 51 ca đã cho khoảng tin
+cậy 95% trải từ 60,2% đến 84,8%; nay biết thêm rằng nó còn không phủ nổi những nhóm
+chẩn đoán thường gặp. Nâng lên 150–200 ca vẫn là việc đáng làm nhất của nửa NLP, và
+là việc duy nhất phụ thuộc người khác nên phải khởi động sớm nhất.
+
+### 8.3 Nửa liên thông chưa có bằng chứng định lượng
+
+Nửa NLP có bảng chỉ số; nửa liên thông mới chỉ có "test pass". Ba thứ đo được, đều rẻ:
+
+- Gọi `$validate` của HAPI trên tài nguyên sinh ra → tỷ lệ hợp lệ theo profile R4.
+  Khác hẳn "máy chủ chịu nhận".
+- Round-trip: đẩy N bệnh án lên rồi đọc về, đối chiếu có mất trường nào không.
+- Nâng `test_chuyen_tuyen.py` từ test đúng/sai thành **kịch bản đánh giá có số liệu**.
+
+### 8.4 `Provenance` — chỗ nối hai nửa
+
+Hiện chỉ dựng `Condition`, `Patient`, `Organization`. Độ tin cậy của mô hình sống
+trong bộ nhớ lúc chạy rồi mất. Ghi nó vào `Provenance` thì con số hiệu chuẩn ở mục 6
+**đi vào tài nguyên FHIR** và sống tiếp trên trục — hai nửa của đề tài thành một mạch
+thay vì hai chương rời.
+
+### 8.5 Độ trễ: số đo chưa ổn định
+
+Hai lần chạy trong cùng một ngày cho kết quả lệch xa: `eval_holdout` báo trung bình
+**22 ms** (p50 20, p95 30) trong khi `eval_set` báo **66 ms** (p50 61, p95 93) — con
+số thứ hai khớp với phiên 14/08, con số thứ nhất thì không. **Chưa cô lập được
+nguyên nhân** (khác nội dung truy vấn? trạng thái GPU?). Không đưa con số độ trễ nào
+vào báo cáo trước khi có phép đo có kiểm soát.
+
+### 8.6 Nằm ngoài phạm vi — nhưng phải khai trong báo cáo
+
+Gateway **chưa có bất kỳ lớp xác thực nào**: không API key, không token. CORS chỉ
+chặn trình duyệt, không chặn `curl`. Nghĩa là chốt mã cơ sở ở mục 2.3 và mục 3 mới
+kiểm **mã được khai**, chưa kiểm **bên khai là ai**.
+
+Đề tài khoanh vào chất lượng ánh xạ ICD-10 và tính đúng đắn của mô hình liên thông,
+nên đây là giới hạn có chủ ý — nhưng phải **khai ra** trong phần giới hạn đề tài,
+với chuẩn tham chiếu cho hướng phát triển là **SMART on FHIR** (OAuth2
+`client_credentials`), chứ không im lặng bỏ qua.
+
+---
+
+## 9. Danh sách file đã sửa
+
+| File | Loại thay đổi |
+| --- | --- |
+| [`backend/main.py`](../backend/main.py) | Mã cơ sở, khóa nghiệp vụ 4 thành phần, conditional update, chốt cơ sở khi xóa |
+| [`backend/fhir_helper.py`](../backend/fhir_helper.py) | Chuẩn hóa CCCD/BHYT, dựng `Organization`, khóa đối chiếu bệnh nhân |
+| [`hospital_his/`](../hospital_his/) | CCCD/BHYT, tra cứu EMR Cloud, chẩn đoán thêm |
+| [`VNPT_HIS/`](../VNPT_HIS/) | Mã cơ sở, timeout tường minh, hạ tin cậy từ điển dự phòng |
+| [`frontend/app.js`](../frontend/app.js) | Lời cảnh báo xóa theo đúng phạm vi |
+| [`run.ps1`](../run.ps1) | Tham số cổng và mã cơ sở |
+| [`docker-compose.yml`](../docker-compose.yml) | PostgreSQL, siết cấu hình HAPI |
+| [`nlp/clinical_rules.py`](../nlp/clinical_rules.py) | 16 alias dây chằng khớp gối |
+| [`nlp/test_nlp.py`](../nlp/test_nlp.py) | 6 ca dây chằng + 1 ca chốt không lan sang mã khác |
+| [`tests/`](../tests/) | Bộ kiểm thử liên thông, 53 ca — **thư mục mới** |
+| `icd10_db.json` (thư mục gốc) | **Đã xóa** — bản thật là `nlp/data/icd10_db.json` |
+
+---
+
+## 10. Cách kiểm chứng
+
+```powershell
+.venv\Scripts\python -m pytest tests\ -q                                   # 53 ca, ~10 giay
+.venv\Scripts\python -m pytest nlp\test_nlp.py -q                          # can nap mo hinh
+.venv\Scripts\python -m nlp.evaluate                                       # eval_set, 110 ca
+.venv\Scripts\python -m nlp.evaluate --dataset nlp\data\eval_holdout.json  # holdout, 51 ca
+```
+
+Bộ `tests/` không cần Docker và không nạp mô hình nên chạy được trong mọi hoàn cảnh.
+Kiểm chất lượng nhận diện mã thì phải qua `nlp/`.
+
+---
+---
+
 # Nhật ký thay đổi — 14/08/2026
 
 Phiên làm việc tập trung vào ba việc: dựng lại bộ nạp danh mục ICD-10, hiệu chỉnh
@@ -300,8 +656,9 @@ Cần tra tên thật từ QĐ 4469/QĐ-BYT rồi bổ sung qua
 | [`nlp/data/icd10_supplement.json`](../nlp/data/icd10_supplement.json) | File mới |
 | [`Cong_thuc_toan_hoc_NLP_ICD10.docx`](../Cong_thuc_toan_hoc_NLP_ICD10.docx) | Cập nhật công thức 1, 5, 11, 12, 16 |
 
-Toàn bộ nằm trong working tree, chưa commit. Hoàn tác bằng
-`git checkout <file>`; cache embedding cũ vẫn còn trên đĩa nên lùi lại là tức thì.
+Toàn bộ đã commit tại `36d1be3` *(cập nhật 28/08: khi viết nhật ký này thì
+chúng còn nằm trong working tree)*. Cache embedding cũ vẫn còn trên đĩa nên lùi
+lại là tức thì.
 
 ---
 
