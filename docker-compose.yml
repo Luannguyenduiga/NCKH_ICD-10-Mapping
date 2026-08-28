@@ -4,13 +4,48 @@ services:
   hapi-fhir:
     image: hapiproject/hapi:latest
     container_name: hapi-fhir-server
+    # Chỉ nghe trên máy chạy demo. Cụm này giữ toàn bộ dữ liệu bệnh án mà chưa có
+    # xác thực, nên mở ra LAN là trao quyền đọc/ghi/xóa cho mọi máy cùng mạng.
     ports:
       - '127.0.0.1:8090:8080'
     environment:
       # Set FHIR version to R4 (consistent with fhir_helper.py)
       - hapi.fhir.fhir_version=R4
-      # Disable strict validation checks for easier development/testing
-      - hapi.fhir.enforce_referential_integrity_on_write=false
+      # Chặn Condition trỏ tới Patient không tồn tại. Gateway luôn đồng bộ Patient
+      # trước Condition nên luồng bình thường không bị ảnh hưởng.
+      - hapi.fhir.enforce_referential_integrity_on_write=true
       - hapi.fhir.allow_external_references=true
-      - hapi.fhir.client_id_strategy=ANY
+      # Client KHÔNG được tự đặt id tài nguyên: id đoán được cộng với PUT theo id
+      # là một lỗ ghi đè. Tính idempotent do conditional update theo `identifier`
+      # đảm nhiệm (xem backend/main.py::sync_fhir_record).
+      - hapi.fhir.client_id_strategy=NOT_ALLOWED
+      # Lưu trữ bền vững thay cho H2 in-memory: `docker compose restart` không
+      # còn xóa sạch dữ liệu đã liên thông.
+      - spring.datasource.url=jdbc:postgresql://db:5432/hapi
+      - spring.datasource.username=hapi
+      - spring.datasource.password=hapi
+      - spring.datasource.driverClassName=org.postgresql.Driver
+      - spring.jpa.properties.hibernate.dialect=ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgresDialect
+    depends_on:
+      - db
     restart: unless-stopped
+
+  db:
+    image: postgres:16
+    container_name: hapi-fhir-db
+    # Mở ra host để xem bằng pgAdmin/psql. Chỉ nghe trên 127.0.0.1 nên máy khác
+    # trong LAN không nối tới được. Dùng 5433 vì 5432 thường đã có PostgreSQL cài
+    # sẵn trên máy chiếm chỗ.
+    ports:
+      - '127.0.0.1:5433:5432'
+    # Mật khẩu hapi/hapi CHỈ dùng cho demo cục bộ, không phải cấu hình triển khai thật.
+    environment:
+      - POSTGRES_DB=hapi
+      - POSTGRES_USER=hapi
+      - POSTGRES_PASSWORD=hapi
+    volumes:
+      - hapi-pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  hapi-pgdata:
