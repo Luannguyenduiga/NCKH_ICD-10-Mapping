@@ -22,6 +22,11 @@ Ba cơ chế được định nghĩa ở đây:
                     thay cho các "synonym" chỉ là bản sao lowercase của tên bệnh).
 """
 
+import re 
+from datetime import date
+from typing import Optional
+
+
 # ---------------------------------------------------------------------------
 # 1. Viết tắt
 # ---------------------------------------------------------------------------
@@ -527,3 +532,176 @@ def verification_status_for(confidence: float, *, clinician_confirmed: bool = Fa
     if confidence >= CONFIDENCE_POLICY["provisional"]:
         return "differential"
     return "unconfirmed"
+
+
+# ---------------------------------------------------------------------------
+# 8. Ràng buộc lâm sàng theo phụ lục A2/A3/A4 của Bộ Y tế
+# ---------------------------------------------------------------------------
+# Danh mục mang sẵn bốn trường trong `meta` mà engine trước đây không đọc dòng
+# nào: `sex_constraint` (869 mã), `age_constraint` (1.640 mã), `can_be_primary`
+# (853 mã), `asterisk_codes` (374 mã). Chúng cho phép loại ứng viên sai về mặt
+# LÂM SÀNG - việc mà độ tương đồng văn bản không bao giờ làm được, vì "viêm tinh
+# hoàn" và "viêm buồng trứng" giống nhau về mặt chữ hơn là về mặt người bệnh.
+#
+# Dùng HẠ ĐIỂM chứ không loại thẳng khỏi danh sách. Hai lý do:
+#
+#   * Phụ lục A3 là quy tắc KIỂM TRA của Bộ Y tế, không phải điều bất khả. A3.8
+#     ghi bệnh sản phụ khoa hợp lệ 9-60 tuổi, nhưng phụ nữ 65 tuổi vẫn mắc bệnh
+#     phụ khoa. Loại thẳng là biến một cảnh báo thành một lệnh cấm.
+#   * Bản thân dữ liệu ràng buộc từng sai: 515 mã đã mang khoảng tuổi của phụ lục
+#     khác do hai phụ lục nằm chung một sheet Excel. Kiến trúc phải chịu được
+#     việc dữ liệu ràng buộc sai mà không giấu mất mã đúng.
+#
+# Hạ điểm đủ mạnh để mã vi phạm không thắng được, nhưng vẫn thấy được ở hạng dưới
+# kèm lời giải thích - bác sĩ nhìn ra và tự quyết.
+SEX_CONFLICT_PENALTY = 0.35   # giới tính gần như bất biến -> phạt nặng nhất
+AGE_CONFLICT_PENALTY = 0.12   # khoảng tuổi là quy tắc kiểm tra -> phạt vừa
+NON_PRIMARY_PENALTY = 0.10    # mã không được làm bệnh chính
+
+NGAY_MOI_NAM = 365
+
+# Mười dạng chuỗi khoảng tuổi có thật trong danh mục. Viết thành mẫu thay vì tra
+# bảng cứng để phụ lục sửa tên là vẫn đọc được.
+_RE_TUOI = [
+    # "0 - 365 ngày"
+    (re.compile(r"^(\d+)\s*-\s*(\d+)\s*ngày$", re.I),
+     lambda m: (int(m.group(1)), int(m.group(2)))),
+    # "9 - 60 tuổi", "8 - 19 tuổi"
+    (re.compile(r"^(\d+)\s*-\s*(\d+)\s*tuổi$", re.I),
+     lambda m: (int(m.group(1)) * NGAY_MOI_NAM,
+                (int(m.group(2)) + 1) * NGAY_MOI_NAM - 1)),
+    # "0 ngày - 2 tuổi"
+    (re.compile(r"^(\d+)\s*ngày\s*-\s*(\d+)\s*tuổi$", re.I),
+     lambda m: (int(m.group(1)), (int(m.group(2)) + 1) * NGAY_MOI_NAM - 1)),
+    # "trên 27 ngày tuổi"
+    (re.compile(r"^trên\s*(\d+)\s*ngày", re.I),
+     lambda m: (int(m.group(1)) + 1, None)),
+    # "trên 15 tuổi", "trên 30 tuổi"
+    (re.compile(r"^trên\s*(\d+)\s*tuổi$", re.I),
+     lambda m: (int(m.group(1)) * NGAY_MOI_NAM, None)),
+    # "1 tuổi trở lên"
+    (re.compile(r"^(\d+)\s*tuổi\s*trở\s*lên$", re.I),
+     lambda m: (int(m.group(1)) * NGAY_MOI_NAM, None)),
+]
+
+
+def phan_tich_khoang_tuoi(nhan: str):
+    """
+    Đổi nhãn tuổi trong danh mục thành ``(số ngày tối thiểu, số ngày tối đa)``.
+
+    ``None`` ở vế nào nghĩa là vế đó không giới hạn. Trả ``None`` nếu không nhận
+    ra dạng - phía gọi coi như không có ràng buộc, vì đoán bừa một khoảng tuổi
+    nguy hiểm hơn hẳn việc bỏ qua nó.
+
+    Quy ước biên: "60 tuổi" tính trọn năm thứ 60, nên biên trên là ngày cuối của
+    năm đó chứ không phải đúng mốc sinh nhật - người 60 tuổi rưỡi vẫn hợp lệ.
+    "trên 15 tuổi" lấy mốc tròn 15 chứ không phải 16: nới rộng thì cùng lắm là bỏ
+    sót một lần hạ điểm, siết chặt thì phạt oan mã đúng.
+    """
+    text = re.sub(r"\s+", " ", (nhan or "")).strip().replace("–", "-").replace("—", "-")
+    if not text:
+        return None
+    for mau, doi in _RE_TUOI:
+        khop = mau.match(text)
+        if khop:
+            return doi(khop)
+    return None
+
+
+def tuoi_theo_ngay(birth_date: Optional[str], moc: Optional[date] = None) -> Optional[int]:
+    """
+    Đổi ngày sinh ``YYYY-MM-DD`` thành số ngày tuổi. ``None`` nếu không đọc được.
+
+    Nhận cả chuỗi có phần giờ (FHIR ``dateTime``) bằng cách chỉ lấy 10 ký tự đầu.
+    """
+    if not birth_date:
+        return None
+    try:
+        ngay_sinh = date.fromisoformat(str(birth_date).strip()[:10])
+    except ValueError:
+        return None
+    songay = ((moc or date.today()) - ngay_sinh).days
+    return songay if songay >= 0 else None
+
+
+def rang_buoc_lam_sang(meta: dict, sex: Optional[str] = None,
+                       age_days: Optional[int] = None,
+                       for_primary: bool = True):
+    """
+    Chấm mức vi phạm ràng buộc lâm sàng của một mã -> ``(điểm trừ, ghi chú)``.
+
+    Thiếu thông tin bệnh nhân thì KHÔNG phạt: bỏ trống giới tính hay ngày sinh là
+    chuyện thường ở khâu tiếp đón, và phạt dựa trên thứ mình không biết là bịa.
+    Nhờ vậy mọi đường gọi cũ giữ nguyên hành vi.
+    """
+    phat = 0.0
+    ghi_chu = []
+    meta = meta or {}
+
+    yeu_cau = (meta.get("sex_constraint") or "").strip().lower()
+    gioi = (sex or "").strip().lower()
+    if yeu_cau in ("male", "female") and gioi in ("male", "female") and gioi != yeu_cau:
+        phat += SEX_CONFLICT_PENALTY
+        ten = "nữ" if yeu_cau == "female" else "nam"
+        ghi_chu.append(f"mã chỉ dùng cho giới {ten}")
+
+    khoang = phan_tich_khoang_tuoi(meta.get("age_constraint"))
+    if khoang and age_days is not None:
+        thap, cao = khoang
+        if (thap is not None and age_days < thap) or (cao is not None and age_days > cao):
+            phat += AGE_CONFLICT_PENALTY
+            ghi_chu.append(
+                f"tuổi bệnh nhân ngoài khoảng hợp lệ của mã ({meta['age_constraint']})")
+
+    if for_primary and meta.get("can_be_primary") is False:
+        phat += NON_PRIMARY_PENALTY
+        ghi_chu.append("mã không được dùng làm bệnh chính (phụ lục A2)")
+
+    return -phat, ghi_chu
+
+
+# ---------------------------------------------------------------------------
+# 9. Thống nhất vị trí dấu thanh trên nguyên âm đôi
+# ---------------------------------------------------------------------------
+# Tiếng Việt có HAI lối đặt dấu đều đúng chính tả trên các nguyên âm đôi oa/oe/uy:
+#
+#     "hòa"  ~ "hoà"        "khỏe" ~ "khoẻ"        "thủy" ~ "thuỳ"
+#
+# Danh mục Bộ Y tế dùng lối đặt dấu vào nguyên âm SAU ở 2.475/12.137 mục (20%),
+# trong khi bộ gõ phổ biến mặc định lối kia. Với Unicode đó là hai chuỗi khác
+# nhau, nên token không khớp và điểm khớp trọn cụm mất trắng.
+#
+# Hậu quả đo được, cùng một mã, chỉ khác lối gõ:
+#
+#     "nhiễm mucor lan tỏa"    -> B46.4  79,0%
+#     "nhiễm mucor lan toả"    -> B46.4  99,4%
+#     "bệnh tích lũy glycogen" -> E74.0  79,4%
+#     "bệnh tích luỹ glycogen" -> E74.0  98,6%
+#
+# Chênh 20 điểm là đủ để rơi khỏi ngưỡng tự động liên thông 85%: bác sĩ gõ đúng
+# tên bệnh vẫn bị bắt duyệt tay, chỉ vì bộ gõ của họ đặt dấu khác danh mục.
+#
+# Quy về MỘT lối (dấu trên nguyên âm trước) chỉ để SO KHỚP. Tên bệnh hiển thị
+# vẫn giữ nguyên như danh mục - đây là chuẩn hóa để tra, không phải sửa chính tả.
+_TONE_PAIRS = [
+    ("oà", "òa"), ("oá", "óa"), ("oả", "ỏa"), ("oã", "õa"), ("oạ", "ọa"),
+    ("oè", "òe"), ("oé", "óe"), ("oẻ", "ỏe"), ("oẽ", "õe"), ("oẹ", "ọe"),
+    ("uỳ", "ùy"), ("uý", "úy"), ("uỷ", "ủy"), ("uỹ", "ũy"), ("uỵ", "ụy"),
+]
+
+# Nhóm "uy" phải chừa chữ QU: trong "quý", "đột quỵ", "quỳ" thì `u` thuộc digraph
+# `qu` chứ không phải nguyên âm đôi. Đổi bừa sẽ ra "qúy", "đột qụy" - sai chính
+# tả, và tệ hơn là đẩy các mã đó ra khỏi tầm khớp thay vì kéo chúng lại gần.
+_RE_TONE = [
+    (re.compile((r"(?<!q)" if cu.startswith("u") else "") + cu), moi)
+    for cu, moi in _TONE_PAIRS
+]
+
+
+def thong_nhat_dau_thanh(text: str) -> str:
+    """Quy hai lối đặt dấu trên oa/oe/uy về một, chỉ dùng để so khớp."""
+    if not text:
+        return text
+    for mau, moi in _RE_TONE:
+        text = mau.sub(moi, text)
+    return text

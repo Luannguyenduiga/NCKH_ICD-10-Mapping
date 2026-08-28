@@ -53,7 +53,9 @@ SHEETS_CODES = [
     "A2 Mã ICD10 ko mã bệnh chính",
 ]
 
-# Sheet ràng buộc tuổi -> nhãn gắn vào meta.age_constraint
+# Các sheet phụ lục A3. Nhãn khoảng tuổi KHÔNG lấy ở đây mà đọc từ chính dòng
+# tiêu đề "Phụ lục ..." bên trong sheet - xem `doc_rang_buoc_tuoi`. Giá trị trong
+# dict chỉ còn là nhãn dự phòng để tra cứu khi đọc hỏng.
 SHEETS_AGE = {
     "A3.1": "0-365 ngày",
     "A3.2-A3.3-A3.4": "0 ngày - 2 tuổi",
@@ -371,6 +373,69 @@ def merge_code_sheets(entries: "OrderedDict[str, dict]", stats: dict) -> None:
         stats["sheet_report"].append((sheet, seen, added, aliased, noname))
 
 
+# --- Rang buoc tuoi: doc nhan tu chinh dong tieu de phu luc -----------------
+
+# Mot sheet co the chua NHIEU phu luc voi khoang tuoi KHAC HAN nhau:
+#
+#   'A3.7 - A3.8'      A3.7 Benh cua tuoi day thi      8 - 19 tuoi   (3 ma)
+#                      A3.8 Benh san phu khoa          9 - 60 tuoi   (518 ma)
+#   'A3.2-A3.3-A3.4'   A3.2 Benh tre nho               0 ngay - 2 tuoi
+#                      A3.3 Benh o tre lon             0 ngay - 10 tuoi
+#                      A3.4 Benh o thanh thieu nien    0 ngay - 19 tuoi
+#
+# Ban truoc gan MOT nhan cho ca sheet, lay theo phu luc dau tien. Hau qua: 518 ma
+# san phu khoa mang khoang "8-19 tuoi". Neu dem rang buoc nay ra loc ung vien thi
+# san phu 30 tuoi bi loai het ma chuong O - dung kieu hong ma rang buoc lam sang
+# sinh ra de chan, chi khac la no chan nham nguoi.
+#
+# Nay doc thang khoang tuoi trong dong "Phu luc ..." va ap cho dung nhung ma nam
+# duoi dong do. Them phu luc moi cung khong phai sua bang tay nua.
+RE_PHU_LUC = re.compile(r"Phụ\s*lục\s*(A3\.\d+)", re.IGNORECASE)
+RE_KHOANG_TUOI = re.compile(
+    r"(?:tuổi\s*hợp\s*lệ|phù\s*hợp\s*tuổi)\s*[:：]?\s*([^)]+)", re.IGNORECASE)
+
+
+def chuan_hoa_nhan_tuoi(raw: str) -> str:
+    """Gọn lại chuỗi khoảng tuổi đọc từ tiêu đề, giữ nguyên nghĩa."""
+    nhan = re.sub(r"\s+", " ", (raw or "")).strip(" .:-–—)")
+    # Excel dùng cả gạch ngang thường lẫn gạch dài; thống nhất một dạng để giá trị
+    # so sánh được và bộ phân tích chỉ phải xử một ký tự.
+    return nhan.replace("–", "-").replace("—", "-").strip()
+
+
+def doc_rang_buoc_tuoi(sheet: str):
+    """
+    Đọc một sheet phụ lục A3 thành ``[(mã, nhãn tuổi)]``.
+
+    Trả danh sách rỗng nếu không đọc được sheet - phía gọi ghi vào báo cáo chứ
+    không dừng cả lần dựng danh mục vì một phụ lục.
+    """
+    try:
+        frame = pd.read_excel(EXCEL_PATH, sheet_name=sheet, header=None)
+    except Exception:
+        return []
+
+    ket_qua = []
+    nhan_hien_tai = None
+    for _, row in frame.iterrows():
+        o_dau = row.iloc[0]
+        if pd.isna(o_dau):
+            continue
+        text = nfc(str(o_dau)).strip()
+
+        if RE_PHU_LUC.search(text):
+            khoang = RE_KHOANG_TUOI.search(text)
+            # Tiêu đề không nêu khoảng tuổi thì bỏ nhãn cũ đi thay vì dùng tiếp:
+            # gán nhầm khoảng của phụ lục trước chính là lỗi đang sửa.
+            nhan_hien_tai = chuan_hoa_nhan_tuoi(khoang.group(1)) if khoang else None
+            continue
+
+        if nhan_hien_tai and is_valid_code(to_dotted(text)):
+            ket_qua.append((to_dotted(text), nhan_hien_tai))
+
+    return ket_qua
+
+
 def apply_constraints(entries: "OrderedDict[str, dict]", stats: dict) -> None:
     """
     Gắn ràng buộc lâm sàng vào từng mã.
@@ -393,8 +458,20 @@ def apply_constraints(entries: "OrderedDict[str, dict]", stats: dict) -> None:
                 hits += 1
         stats["constraint_report"].append((sheet, f"{field}={value}", hits, "ok"))
 
-    for sheet, label in SHEETS_AGE.items():
-        mark(sheet, "age_constraint", label)
+    for sheet in SHEETS_AGE:
+        cap = doc_rang_buoc_tuoi(sheet)
+        if not cap:
+            stats["constraint_report"].append((sheet, "age_constraint", 0, "KHÔNG ĐỌC ĐƯỢC"))
+            continue
+        theo_nhan = {}
+        hits = 0
+        for code, nhan in cap:
+            if code in entries:
+                entries[code]["meta"]["age_constraint"] = nhan
+                theo_nhan[nhan] = theo_nhan.get(nhan, 0) + 1
+                hits += 1
+        mo_ta = ", ".join(f"{n}={c}" for n, c in sorted(theo_nhan.items()))
+        stats["constraint_report"].append((sheet, f"age_constraint [{mo_ta}]", hits, "ok"))
     for sheet, label in SHEETS_SEX.items():
         mark(sheet, "sex_constraint", label)
 

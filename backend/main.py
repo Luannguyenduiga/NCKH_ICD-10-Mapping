@@ -119,6 +119,27 @@ app.add_middleware(
 class StandardizeRequest(BaseModel):
     query: str = Field(..., min_length=1, max_length=2000)
     top_k: int = Field(4, ge=1, le=10)
+    # Bối cảnh bệnh nhân, TÙY CHỌN. Có thì ứng viên sai về mặt lâm sàng bị hạ bậc
+    # theo phụ lục A2/A3/A4 của Bộ Y tế - bệnh nhân nam không nhận mã sản khoa,
+    # người 60 tuổi không nhận mã sơ sinh. Không có thì kết quả y hệt trước đây,
+    # nên HIS chưa cập nhật vẫn chạy nguyên như cũ.
+    patient_sex: Optional[str] = None
+    patient_birth_date: Optional[str] = None
+
+    @field_validator("patient_sex")
+    @classmethod
+    def _kiem_gioi(cls, value: Optional[str]) -> Optional[str]:
+        gioi = (value or "").strip().lower()
+        if not gioi:
+            return None
+        # Nhận cả cách gọi tiếng Việt mà HIS hay gửi, để phía gọi không phải tự
+        # quy đổi - quy đổi ở hai nơi là hai chỗ có thể lệch nhau.
+        bang = {"nam": "male", "male": "male", "m": "male",
+                "nữ": "female", "nu": "female", "female": "female", "f": "female"}
+        if gioi not in bang:
+            raise ValueError(
+                f"Giới tính '{value}' không hợp lệ. Dùng male/female (hoặc Nam/Nữ).")
+        return bang[gioi]
 
 
 class EntityModel(BaseModel):
@@ -431,7 +452,10 @@ def standardize_diagnosis(request: StandardizeRequest):
     try:
         normalized_query = engine.expand_query(request.query)
         entities = engine.extract_entities_regex(request.query)
-        composite = engine.query_composite(request.query, top_k=request.top_k)
+        composite = engine.query_composite(
+            request.query, top_k=request.top_k,
+            patient_sex=request.patient_sex,
+            patient_birth_date=request.patient_birth_date)
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=500, detail=f"Lỗi khi xử lý NLP: {exc}") from exc
 

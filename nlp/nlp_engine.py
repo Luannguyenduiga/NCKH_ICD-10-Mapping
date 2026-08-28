@@ -42,6 +42,9 @@ from nlp.clinical_rules import (
     UNSPECIFIED_MARKERS,
     UNSPECIFIED_PENALTY,
     confidence_band,
+    rang_buoc_lam_sang,
+    thong_nhat_dau_thanh,
+    tuoi_theo_ngay,
 )
 
 # --- Trọng số tái xếp hạng -------------------------------------------------
@@ -77,7 +80,7 @@ COVERAGE_FLOOR_CONF = 0.88
 # --- Chẩn đoán kép (dao găm/sao) -------------------------------------------
 # Tên mã trong danh mục ghi kèm mã đối tác: "(G55.1*)" hoặc dải "(M50-M51†)".
 _CODE_REF_RE = re.compile(
-    r"\(\s*([A-Z]\d{2}(?:\.\d+)?)\s*(?:-\s*([A-Z]\d{2}(?:\.\d+)?)\s*)?[†*]\s*\)"
+    r"\(\s*([A-Z]\d{2}(?:\.\d+)?)\s*(?:-\s*([A-Z]\d{2}(?:\.\d+)?)\s*)?([†*])\s*\)"
 )
 # Ranh giới giữa các vế lâm sàng trong một dòng chẩn đoán. KHÔNG tách theo "và":
 # "rễ và đám rối thần kinh" là một cụm, tách ra sẽ vỡ nghĩa.
@@ -464,6 +467,7 @@ class NLPEngine:
         # bệnh án không dấu ("hen phe quan cap").
         self._term_index_ascii: Dict[str, dict] = {}
         # Từ điển khôi phục dấu: "hen phe quan" -> "hen phế quản".
+        self._entry_norm_tone: List[str] = []
         self._ascii_to_norm: Dict[str, str] = {}
         _restore_priority: Dict[str, int] = {}
         _TYPE_RANK = {"clinical_alias": 3, "official_vi": 2, "synonym": 1, "official_en": 0}
@@ -471,6 +475,11 @@ class NLPEngine:
         for entry in self.reference_entries:
             norm = self.normalize_text(entry["text"])
             self._entry_norm.append(norm)
+            # Tính sẵn bản đã thống nhất dấu. Làm trong vòng chấm điểm thì 15 mẫu
+            # regex chạy lại cho cả 400 ứng viên mỗi truy vấn - đo được độ trễ
+            # trung bình 22 ms -> 93 ms, tức trả bằng hiệu năng cho một phép biến
+            # đổi không bao giờ đổi kết quả.
+            self._entry_norm_tone.append(thong_nhat_dau_thanh(norm))
             self._entry_tokens.append(frozenset(self._content_tokens(norm)))
             if len(norm) >= 4 and len(norm.split()) <= _MAX_NER_NGRAM:
                 # Ưu tiên thuật ngữ chính thức khi nhiều mã cùng một cụm chữ.
@@ -531,9 +540,41 @@ class NLPEngine:
             if "*" in raw_code:
                 self._marked_asterisk.add(code)
 
+            # Nguồn đánh dấu CHÍNH: phụ lục A1 của Bộ Y tế, đã nạp sẵn vào
+            # `meta.asterisk_codes` (374 mã bệnh nguyên).
+            #
+            # Không thể dựa vào ký tự † trong mã nữa: danh mục nay gỡ sạch † và *
+            # vì máy chủ FHIR từ chối mã mang chúng. Sau lần gỡ đó, hai tập trên
+            # RỖNG và mọi nhánh ghép cặp †/* thành code chết - hệ thống lặng lẽ
+            # thôi nhận ra chẩn đoán kép, trong khi bảng liên kết vẫn đúng.
+            for ma_sao in (entry.get("meta") or {}).get("asterisk_codes") or ():
+                sach = sanitize_icd10_code(ma_sao)
+                if sach in self.db_index:
+                    self._marked_dagger.add(code)
+                    self._marked_asterisk.add(sach)
+
             surface = f"{entry['name_vi']} {entry.get('name_en') or ''}"
             for match in _CODE_REF_RE.finditer(surface):
-                start, end = match.group(1), match.group(2)
+                start, end, dau = match.group(1), match.group(2), match.group(3)
+
+                # Ký tự đánh dấu trong tên nói rõ ai là bệnh nguyên, ai là biểu
+                # hiện, nên không phải đoán theo chiều tham chiếu:
+                #
+                #   M51.1 "... tổn thương của rễ tủy sống (G55.1*)"  -> G55.1 là *
+                #   G55.1 "... trong bệnh đĩa đệm (M50-M51†)"        -> G55.1 là *
+                #
+                # Phụ lục A1 tuy chuẩn nhưng THIẾU: nó không có cặp M51.1/G55.1
+                # trong khi tên hai mã tham chiếu nhau rõ ràng. Lấy cả hai nguồn
+                # thì phủ được nhiều cặp hơn mà không nguồn nào phải đoán.
+                if dau == "*":
+                    self._marked_dagger.add(code)
+                    if not end and sanitize_icd10_code(start) in self.db_index:
+                        self._marked_asterisk.add(sanitize_icd10_code(start))
+                else:
+                    self._marked_asterisk.add(code)
+                    if not end and sanitize_icd10_code(start) in self.db_index:
+                        self._marked_dagger.add(sanitize_icd10_code(start))
+
                 if end:
                     lo, hi = self._block_key(self._block_of(start)), self._block_key(self._block_of(end))
                     if lo and hi:
@@ -654,6 +695,20 @@ class NLPEngine:
 
     @staticmethod
     def _content_tokens(text: str) -> List[str]:
+        """
+        Tách token nội dung, quy hai lối đặt dấu trên oa/oe/uy về một.
+
+        Thống nhất dấu ở ĐÂY chứ không ở `normalize_text`: hàm kia nuôi cả văn
+        bản sinh embedding, mà mô hình được fine-tune trên dạng chữ của danh mục
+        gốc. Đổi chuẩn hóa ở đó là đẩy vector tham chiếu lệch khỏi thứ mô hình đã
+        học - đo được: Top-1 holdout tụt 72,5% -> 70,6%, nhóm polarity trên tập
+        phát triển tụt 94,4% -> 83,3%.
+
+        Tầng embedding vốn đã chịu được lối gõ khác nhờ các biến thể không dấu.
+        Chỗ thật sự gãy là so khớp token - "thùy" và "thuỳ" là hai chuỗi khác
+        nhau nên điểm khớp từ vựng mất trắng. Sửa đúng tầng đó thôi.
+        """
+        text = thong_nhat_dau_thanh(text)
         return [t for t in text.split() if t not in STOPWORDS and len(t) > 1]
 
     # ------------------------------------------------------------------
@@ -895,8 +950,21 @@ class NLPEngine:
     # ------------------------------------------------------------------
     # Truy vấn
     # ------------------------------------------------------------------
-    def query(self, user_query: str, top_k: int = 4) -> List[dict]:
-        """Trả về danh sách mã ICD-10 ứng viên đã tái xếp hạng và hiệu chuẩn."""
+    def query(self, user_query: str, top_k: int = 4,
+              patient_sex: Optional[str] = None,
+              patient_birth_date: Optional[str] = None,
+              patient_age_days: Optional[int] = None) -> List[dict]:
+        """
+        Trả về danh sách mã ICD-10 ứng viên đã tái xếp hạng và hiệu chuẩn.
+
+        `patient_sex` ("male"/"female") và tuổi bệnh nhân là TÙY CHỌN. Có thì ứng
+        viên sai về mặt lâm sàng bị hạ bậc theo phụ lục A2/A3/A4 của Bộ Y tế -
+        bệnh nhân nam không nhận mã sản khoa, người 60 tuổi không nhận mã sơ sinh.
+        Không có thì hành vi y hệt trước đây, nên mọi đường gọi cũ không đổi.
+        """
+        if patient_age_days is None:
+            patient_age_days = tuoi_theo_ngay(patient_birth_date)
+
         expanded = self.expand_query(user_query)
         if not expanded:
             return []
@@ -906,6 +974,8 @@ class NLPEngine:
 
         q_labels = self._polarity_labels(expanded)
         q_tokens = frozenset(self._content_tokens(expanded))
+        # Một lần cho cả truy vấn, thay vì lặp lại ở từng ứng viên.
+        expanded_tone = thong_nhat_dau_thanh(expanded)
         alias_boosts = self._alias_targets(expanded)
 
         pool_size = min(CANDIDATE_POOL, len(cos_scores))
@@ -925,7 +995,10 @@ class NLPEngine:
             score += W_LEXICAL * self._lexical_f1(q_tokens, self._entry_tokens[idx])
 
             entry_norm = self._entry_norm[idx]
-            if entry_norm and len(entry_norm) >= 5 and entry_norm in expanded:
+            # Cùng lý do với `_content_tokens`: so chuỗi thô thì "viêm phổi thuỳ"
+            # không nằm trong "viêm phổi thùy", mất luôn điểm khớp trọn cụm.
+            if (entry_norm and len(entry_norm) >= 5
+                    and self._entry_norm_tone[idx] in expanded_tone):
                 score += W_EXACT
                 notes.append(f"khớp trọn cụm '{entry_norm}'")
 
@@ -945,6 +1018,14 @@ class NLPEngine:
             chapter_delta, chapter_notes = self._chapter_delta(expanded, code)
             score += chapter_delta
             notes.extend(chapter_notes)
+
+            # Ràng buộc lâm sàng theo phụ lục Bộ Y tế. Đây là thứ độ tương đồng
+            # văn bản không bao giờ bắt được: "viêm tinh hoàn" và "viêm buồng
+            # trứng" giống nhau về mặt chữ hơn hẳn về mặt người bệnh.
+            cons_delta, cons_notes = rang_buoc_lam_sang(
+                self.db_index[code].get("meta"), patient_sex, patient_age_days)
+            score += cons_delta
+            notes.extend(cons_notes)
 
             # Tỉ lệ từ trong câu hỏi được tên mã phủ. Giữ lại để khâu hiệu chuẩn
             # phân biệt "khớp trọn nghĩa" với "khớp phần đầu rồi bỏ mất chi tiết".
@@ -1146,7 +1227,9 @@ class NLPEngine:
             "explanation": [],
         }
 
-    def query_composite(self, user_query: str, top_k: int = 4) -> dict:
+    def query_composite(self, user_query: str, top_k: int = 4,
+                        patient_sex: Optional[str] = None,
+                        patient_birth_date: Optional[str] = None) -> dict:
         """
         Truy vấn có nhận diện chẩn đoán kép †/*.
 
@@ -1157,7 +1240,8 @@ class NLPEngine:
         không phải hai bằng chứng độc lập, cộng lại là đếm trùng. Cái được cộng là
         bằng chứng - một cặp †/* hợp lệ mới là lý do để nâng hạng mã bệnh nguyên.
         """
-        predictions = self.query(user_query, top_k=top_k)
+        predictions = self.query(user_query, top_k=top_k, patient_sex=patient_sex,
+                                 patient_birth_date=patient_birth_date)
         fragments = self._candidate_fragments(user_query)
 
         # Ứng viên gộp từ cả câu lẫn từng vế, giữ bản ghi có độ tin cậy cao nhất.
@@ -1167,7 +1251,9 @@ class NLPEngine:
         sources = [(user_query, predictions)]
         if len(fragments) >= 2:
             for fragment in fragments:
-                fragment_results[fragment] = self.query(fragment, top_k=FRAGMENT_TOP_K)
+                fragment_results[fragment] = self.query(
+                    fragment, top_k=FRAGMENT_TOP_K, patient_sex=patient_sex,
+                    patient_birth_date=patient_birth_date)
                 sources.append((fragment, fragment_results[fragment]))
         for source, items in sources:
             for item in items:
