@@ -40,9 +40,8 @@ SYSTEM_FACILITY = f"{SMIG_NAMESPACE}/identifier/co-so-kcb"
 # nhận mọi chuỗi - kể cả một tên bệnh gõ nhầm ô. Hậu quả của hai lỗi không cân
 # nhau: mã ICD sai thì bác sĩ nhìn ra ngay, còn định danh sai thì âm thầm tách
 # hồ sơ của một người thành hai, và chỉ lộ ra đúng lúc cần bệnh sử nhất.
-_CCCD_RE = re.compile(r"^\d{12}$")           # Căn cước công dân
-_CMND_RE = re.compile(r"^\d{9}$")            # CMND đời cũ, vẫn còn lưu hành
-_BHYT_RE = re.compile(r"^[A-Z]{2}\d{13}$")   # ví dụ GD4010120152431
+_CCCD_RE = re.compile(r"^\d{12}$") # Căn cước công dân
+_BHYT_RE = re.compile(r"^\d{10}$") # BHYT theo luat moi 10 so
 # Người nhập liệu hay chấm/cách/gạch cho dễ đọc. Bỏ các ký tự này TRƯỚC khi so
 # khớp, và lưu bản đã bỏ: giữ nguyên thì "079 095 010245" và "079095010245" là
 # hai định danh khác nhau, tách hồ sơ đúng theo kiểu mà lớp kiểm này sinh ra để
@@ -63,10 +62,10 @@ def normalize_citizen_id(value: Optional[str]) -> Optional[str]:
     cleaned = _NGAN_CACH_RE.sub("", value).strip()
     if not cleaned:
         return None
-    if not (_CCCD_RE.match(cleaned) or _CMND_RE.match(cleaned)):
+    if not (_CCCD_RE.match(cleaned)):
         raise ValueError(
             f"Số CCCD '{value}' không hợp lệ: phải là 12 chữ số "
-            f"(hoặc 9 chữ số nếu là CMND cũ). Bỏ trống nếu chưa có giấy tờ.")
+            f" Bỏ trống nếu chưa có giấy tờ.")
     return cleaned
 
 
@@ -347,11 +346,18 @@ def patient_match_key(
     """
     Chọn khóa đồng nhất bệnh nhân, trả về (system, value).
 
+    Khóa đồng nhất chỉ được là MỘT cặp - nó là khóa để conditional update tìm
+    lại đúng một bản ghi. Vậy nên "ngang hàng" ở đây nghĩa là BHYT mang system
+    riêng và đứng ngay sau CCCD, chứ không phải trả về cả hai cùng lúc.
+
     Thứ tự ưu tiên phản ánh phạm vi hiệu lực của từng loại định danh:
 
     1. Số CCCD - duy nhất toàn quốc, nên cùng một người khám ở hai bệnh viện vẫn
        quy về đúng một hồ sơ trên trục.
-    2. Thẻ BHYT - cũng toàn quốc, dùng khi chưa có CCCD.
+    2. Số thẻ BHYT - cũng có giá trị toàn quốc, dùng khi HIS chưa gửi CCCD. Phải
+       trả kèm SYSTEM_BHYT chứ không mượn SYSTEM_CCCD: `validate_identifier_value`
+       chạy `normalize_citizen_id` lên mọi giá trị mang system CCCD, nên số thẻ
+       BHYT dán nhầm nhãn sẽ bị 422 oan.
     3. Mã bệnh án + mã cơ sở - phương án cuối. Mã bệnh án chỉ có nghĩa trong
        phạm vi một bệnh viện, nên bắt buộc phải kèm mã cơ sở; thiếu nó thì
        "BN001" của hai bệnh viện khác nhau sẽ bị trộn thành một người.
