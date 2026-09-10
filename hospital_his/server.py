@@ -52,8 +52,11 @@ REQUEST_TIMEOUT = float(os.getenv("SMIG_HIS_TIMEOUT", "60"))
 # Gateway đó, nếu không Gateway trả 403. Khi thử nghiệm cục bộ mà một bản Gateway
 # phục vụ cả hai bệnh viện (Gateway bật SMIG_ALLOW_CLIENT_FACILITY=1), chính mã
 # này là thứ giữ cho hồ sơ hai nơi không lẫn vào nhau.
-FACILITY_CODE = os.getenv("SMIG_FACILITY_CODE", "BV-DEMO-01")
-FACILITY_NAME = os.getenv("SMIG_FACILITY_NAME", "Bệnh viện Demo SMIG")
+FACILITY_CODE = os.getenv("SMIG_FACILITY_CODE", "79001")
+# Giữ nguyên văn chuỗi ASCII mà `run.ps1` / `run_his.ps1` đặt: hai tệp .ps1 để
+# ASCII cho console Windows, nên mặc định ở đây lệch dấu thanh là đủ để cùng
+# một cơ sở hiện hai tên khác nhau tùy cách khởi động.
+FACILITY_NAME = os.getenv("SMIG_FACILITY_NAME", "Benh vien mo phong Viettel")
 
 # Mã bệnh án nằm ở Patient.identifier chứ không còn là id tài nguyên: từ khi EMR
 # tự cấp id, tra cứu phải đi qua identifier mới tìm ra hồ sơ.

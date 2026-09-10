@@ -22,7 +22,7 @@ public class GatewayService {
      * nghiệm là quá nặng. Thiếu trường này thì Gateway lấy mã trong cấu hình của
      * chính nó, và mọi chẩn đoán của hai bệnh viện đều mang tên cùng một cơ sở.
      */
-    @Value("${smig.facility.code:BV-VNPT-02}")
+    @Value("${smig.facility.code:79002}")
     private String facilityCode;
 
     @Value("${smig.facility.name:Benh vien VNPT}")

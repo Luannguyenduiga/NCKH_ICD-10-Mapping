@@ -41,7 +41,8 @@ SYSTEM_FACILITY = f"{SMIG_NAMESPACE}/identifier/co-so-kcb"
 # nhau: mã ICD sai thì bác sĩ nhìn ra ngay, còn định danh sai thì âm thầm tách
 # hồ sơ của một người thành hai, và chỉ lộ ra đúng lúc cần bệnh sử nhất.
 _CCCD_RE = re.compile(r"^\d{12}$") # Căn cước công dân
-_BHYT_RE = re.compile(r"^\d{10}$") # BHYT theo luat moi 10 so
+_BHYT_MOI_RE = re.compile(r"^\d{10}$")         # mẫu mới từ 01/4/2021, = mã số BHXH
+_BHYT_CU_RE = re.compile(r"^[A-Z]{2}\d{13}$")  # mẫu cũ 15 ký tự, vd GD4010120152431
 # Người nhập liệu hay chấm/cách/gạch cho dễ đọc. Bỏ các ký tự này TRƯỚC khi so
 # khớp, và lưu bản đã bỏ: giữ nguyên thì "079 095 010245" và "079095010245" là
 # hai định danh khác nhau, tách hồ sơ đúng theo kiểu mà lớp kiểm này sinh ra để
@@ -64,22 +65,39 @@ def normalize_citizen_id(value: Optional[str]) -> Optional[str]:
         return None
     if not (_CCCD_RE.match(cleaned)):
         raise ValueError(
-            f"Số CCCD '{value}' không hợp lệ: phải là 12 chữ số "
-            f" Bỏ trống nếu chưa có giấy tờ.")
+            f"Số CCCD '{value}' không hợp lệ: phải là 12 chữ số. "
+            f"Bỏ trống nếu chưa có giấy tờ.")
     return cleaned
 
 
 def normalize_insurance_card(value: Optional[str]) -> Optional[str]:
-    """Chuẩn hóa và kiểm số thẻ BHYT. Cùng quy ước với `normalize_citizen_id`."""
+    """
+    Chuẩn hóa và kiểm số thẻ BHYT. Cùng quy ước với `normalize_citizen_id`.
+
+    Nhận cả hai mẫu đang lưu hành.
+
+    Thẻ mẫu mới trùng mã số BHXH, mà mã số BHXH nay tra được từ CCCD qua VNeID,
+    nên HIS đã nối VNeID thường gửi kèm cả hai và CCCD đứng ra làm khóa. BHYT chỉ
+    thực sự làm khóa đồng nhất trong phần còn lại: bệnh nhân chưa có CCCD, hoặc
+    HIS chưa nối VNeID.
+
+    Đúng ở phần còn lại đó mới có rủi ro tách hồ sơ: thẻ cũ và thẻ mới của CÙNG
+    một người là hai chuỗi khác nhau, và không có CCCD thì không gì nối chúng
+    lại. `patient_identifier_candidates` chỉ đỡ được khi lần ghi sau có thêm định
+    danh mới, chứ không suy ngược được thẻ cũ ra thẻ mới.
+
+    Gateway KHÔNG tự tra BHYT từ CCCD - việc đó thuộc phía HIS, nơi có VNeID/VSSID.
+    """
     if value is None:
         return None
     cleaned = _NGAN_CACH_RE.sub("", value).strip().upper()
     if not cleaned:
         return None
-    if not _BHYT_RE.match(cleaned):
+    if not (_BHYT_MOI_RE.match(cleaned) or _BHYT_CU_RE.match(cleaned)):
         raise ValueError(
-            f"Số thẻ BHYT '{value}' không hợp lệ: phải là 2 chữ cái + 13 chữ số, "
-            f"ví dụ GD4010120152431. Bỏ trống nếu chưa có thẻ.")
+            f"Số thẻ BHYT '{value}' không hợp lệ: phải là 10 chữ số theo mẫu cấp "
+            f"từ 01/4/2021 (trùng mã số BHXH), hoặc 2 chữ cái + 13 chữ số theo "
+            f"mẫu cũ. Bỏ trống nếu chưa có thẻ.")
     return cleaned
 
 
@@ -95,6 +113,55 @@ def validate_identifier_value(system: str, value: str) -> None:
         normalize_citizen_id(value)
     elif system == SYSTEM_BHYT:
         normalize_insurance_card(value)
+
+
+# --- Mã cơ sở khám chữa bệnh ------------------------------------------------
+# Mã CSKCB do cơ quan BHXH cấp, dài đúng 5 CHỮ SỐ: hai số đầu là mã tỉnh, ba số
+# sau phân biệt cơ sở trong tỉnh. Không có chữ cái trong mã. Đây là khóa mà cả
+# cổng tiếp nhận giám định BHYT lẫn XML theo QĐ 130 đều dùng, nên một mã tự đặt
+# kiểu "BV-DEMO-01" làm dữ liệu lên trục không đối chiếu được với bất kỳ hệ
+# thống nhà nước nào.
+#
+# Viết tách \d{2}\d{3} thay vì \d{5} để giữ lại cấu trúc: hai số đầu là mã tỉnh,
+# ba số sau là số thứ tự trong tỉnh - đọc mã là biết cơ sở nằm ở đâu.
+_CSKCB_RE = re.compile(r"^\d{2}\d{3}$")
+
+
+def validate_facility_code(code: Optional[str], allow_demo: bool = False) -> str:
+    """
+    Kiểm dạng mã cơ sở khám chữa bệnh, trả về mã đã chuẩn hóa.
+
+    Khác `normalize_citizen_id` ở một điểm quyết định chỗ gọi: định danh bệnh
+    nhân sai thì hỏng MỘT hồ sơ, còn mã cơ sở sai thì hỏng MỌI bản ghi bản
+    Gateway này từng ghi - nó nằm trong `stable_condition_key`, trong `meta.tag`
+    và trong `mrn_system`. Vì vậy hàm này dành cho lúc khởi động: sai cấu hình
+    thì phải chết khi bật máy, chứ không phải chết giữa ca khám.
+
+    `allow_demo` mở đường cho mã tự đặt của môi trường trình diễn. Mặc định tắt,
+    cùng quy ước với `SMIG_ALLOW_CLIENT_FACILITY`: cái gì nới lỏng cho demo thì
+    phải khai báo ra, không được là mặc định.
+
+    Trả về bản đã bỏ khoảng trắng, và người gọi nên DÙNG bản trả về: giữ nguyên
+    bản thô thì một khoảng trắng thừa trong cấu hình cũng đủ làm `to_fhir_id`
+    sinh ra một system khác, tức là một bệnh viện khác.
+
+    Không đụng tới chữ hoa/thường: mã CSKCB toàn chữ số nên chuyển hoa là thao
+    tác chết, mà với mã demo thì nó lại âm thầm đổi khóa nghiệp vụ.
+    """
+    cleaned = (code or "").strip()
+    if not cleaned:
+        raise ValueError(
+            "Thiếu mã cơ sở khám chữa bệnh. Đặt SMIG_FACILITY_CODE bằng mã CSKCB "
+            "do cơ quan BHXH cấp cho đơn vị (5 chữ số, ví dụ 01001).")
+    if _CSKCB_RE.match(cleaned):
+        return cleaned
+    if allow_demo:
+        return cleaned
+    raise ValueError(
+        f"Mã cơ sở khám chữa bệnh '{code}' không đúng dạng: mã CSKCB do cơ quan "
+        f"BHXH cấp gồm 5 chữ số, hai số đầu là mã tỉnh, ví dụ 01001. Mã này đi "
+        f"vào khóa nghiệp vụ của mọi bản ghi nên không thể tự đặt. Nếu đang chạy "
+        f"môi trường trình diễn với mã tự đặt, hãy bật SMIG_ALLOW_DEMO_FACILITY=1.")
 
 
 def mrn_system(facility_code: str) -> str:

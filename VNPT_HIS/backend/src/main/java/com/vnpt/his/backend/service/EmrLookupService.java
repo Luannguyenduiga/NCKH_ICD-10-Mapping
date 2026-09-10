@@ -32,7 +32,7 @@ public class EmrLookupService {
      * gửi lên, nếu không thì hồ sơ ghi lên một namespace mà tra cứu lại tìm ở
      * namespace khác, và kết quả luôn rỗng mà không có lỗi nào hiện ra.
      */
-    @Value("${smig.facility.code:BV-VNPT-02}")
+    @Value("${smig.facility.code:79002}")
     private String facilityCode;
 
     private static final String NS = "https://smig.nckh.vn/fhir";

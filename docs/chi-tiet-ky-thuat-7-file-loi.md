@@ -992,8 +992,9 @@ File này **hiện đang để rỗng, có lý do** — và đây là một ví 
 | --- | --- | --- |
 | `SMIG_FHIR_SERVER_URL` | `http://127.0.0.1:8090/fhir` | Địa chỉ EMR Cloud |
 | `SMIG_FHIR_TIMEOUT` | `8` | Thời gian chờ gọi FHIR (giây) |
-| `SMIG_FACILITY_CODE` | `BV-DEMO-01` | **Mã cơ sở của bản Gateway này** |
-| `SMIG_FACILITY_NAME` | `Bệnh viện Demo SMIG` | Tên cơ sở |
+| `SMIG_FACILITY_CODE` | `79001` | **Mã cơ sở của bản Gateway này** — kiểm dạng CSKCB lúc khởi động |
+| `SMIG_ALLOW_DEMO_FACILITY` | *tắt* | Cho phép mã cơ sở tự đặt thay cho mã CSKCB thật |
+| `SMIG_FACILITY_NAME` | `Benh vien mo phong Viettel` | Tên cơ sở |
 | `SMIG_ALLOW_CLIENT_FACILITY` | `0` (tắt) | Cho HIS tự khai mã cơ sở |
 | `SMIG_ALLOWED_ORIGINS` | 4 origin localhost | Danh sách CORS |
 
@@ -1411,7 +1412,7 @@ làm kết nối bị bỏ ngỏ.
 
 ```python
 DB_PATH = os.getenv("SMIG_HIS_DB") or ".../his_db.sqlite"
-FACILITY_CODE = os.getenv("SMIG_FACILITY_CODE", "BV-DEMO-01")
+FACILITY_CODE = os.getenv("SMIG_FACILITY_CODE", "79001")
 ```
 
 Comment dòng 39–42 nêu một cạm bẫy demo: chạy hai bản HIS trên cùng một máy để trình diễn
