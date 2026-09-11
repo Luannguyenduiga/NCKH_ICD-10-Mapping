@@ -1,3 +1,279 @@
+# Nhật ký thay đổi — 10–11/09/2026 (T1.1)
+
+Mục đầu tiên của kế hoạch [`docs/T1.md`](T1.md): **định danh phải khớp thực tế
+đang lưu hành**. Làm trên nhánh `feat/t1-1-dinh-danh-bhyt-va-ma-cskcb`, hai commit
+ngày 10/09 (`96e542f` mã nguồn, `3e4c398` README), rà lại toàn bộ ngày 11/09.
+
+Nhánh **chưa merge** — dừng ở bước đẩy lên để người dùng duyệt. Bộ `tests/` từ 76
+lên **99 ca, tất cả xanh**; `nlp.test_nlp` kết luận ĐẠT với chỉ số không đổi.
+
+---
+
+## 1. T1.1 xong, bốn mục còn lại chưa chạm
+
+Rà theo đúng kế hoạch, kiểm bằng cách tìm dấu vết trong `backend/`:
+
+| Mục | Trạng thái | Căn cứ |
+| --- | --- | --- |
+| **T1.1** Thẻ BHYT hai mẫu + mã CSKCB | **Xong**, đủ 7 tiêu chí | Mục 3–4 dưới đây |
+| T1.2 VN Core + `meta.profile` | Chưa làm | Không có `meta.profile`, ba `SYSTEM_*` vẫn là hằng số |
+| T1.3 `Encounter` + `Practitioner` | Chưa làm | Chuỗi `Encounter` chỉ xuất hiện trong nhãn `Encounter Diagnosis` |
+| T1.4 Khóa API + `AuditEvent` | Chưa làm | Không có header khóa, không có `AuditEvent` |
+| T1.5 Đường vào XML130 | Chưa làm | Không có `MA_LK` |
+
+Ranh giới với khối NLP giữ nguyên: `nlp/` không có dòng nào đổi,
+`tests/test_luong_nlp_khong_doi.py` vẫn xanh.
+
+---
+
+## 2. Điểm xuất phát không giống kế hoạch mô tả
+
+[`docs/T1.md`](T1.md) viết ngày 06/09 nói hiện trạng là regex **chỉ nhận thẻ mẫu cũ
+15 ký tự**. Nhưng commit `549060e` ("fix API", 10/09 lúc 20:17, trước khi mở nhánh)
+đã đổi thành **chỉ nhận 10 chữ số** và bỏ luôn CMND 9 số:
+
+```python
+# main tại thời điểm mở nhánh (549060e)
+_CCCD_RE = re.compile(r"^\d{12}$")
+_BHYT_RE = re.compile(r"^\d{10}$")   # BHYT theo luat moi 10 so
+```
+
+Tức là lỗi đã **đảo chiều**: thay vì từ chối thẻ mới, main từ chối mọi thẻ mẫu cũ —
+mà thẻ cũ chưa hết hiệu lực, vẫn còn lưu hành tới khi được đổi. Hai cách đều sai
+cùng một kiểu: khóa hệ thống vào đúng một mẫu thẻ.
+
+Việc bỏ CMND 9 số thì **giữ**: theo Luật Căn cước 26/2023/QH15, CMND chỉ còn giá trị
+tới hết 31/12/2024, nên một số CMND gửi lên hôm nay hoặc gõ nhầm hoặc là dữ liệu chưa
+cập nhật, không đáng làm khóa đồng nhất toàn quốc. Test cũ
+`test_cccd_12_so_va_cmnd_9_so_deu_hop_le` đổi thành `test_chi_cccd_12_so_moi_hop_le`,
+chốt cả hai chiều.
+
+`T1.md` chưa sửa lại khối "Hiện trạng" này — ghi ở mục 8.
+
+---
+
+## 3. T1.1(a) — Thẻ BHYT nhận cả hai mẫu
+
+[`backend/fhir_helper.py`](../backend/fhir_helper.py):
+
+```python
+_BHYT_MOI_RE = re.compile(r"^\d{10}$")         # mẫu mới từ 01/4/2021, = mã số BHXH
+_BHYT_CU_RE  = re.compile(r"^[A-Z]{2}\d{13}$")  # mẫu cũ 15 ký tự, vd GD4010120152431
+```
+
+Thông báo lỗi 422 mô tả cả hai dạng. Thứ tự trong `patient_match_key()` **không
+đổi**: CCCD → BHYT → mã bệnh án. Kế hoạch gợi ý đưa BHYT "ngang CCCD", nhưng khóa
+đồng nhất chỉ được là *một* cặp `(system, value)` để conditional update tìm lại đúng
+một bản ghi, nên "ngang hàng" ở đây nghĩa là BHYT mang system riêng và đứng ngay sau
+CCCD — điều này đã đúng từ `549060e`, chỉ cần chốt bằng test.
+
+### 3.1 Điều docstring nói thẳng
+
+Thẻ mẫu mới trùng mã số BHXH, mà mã số BHXH tra được từ CCCD qua VNeID. HIS đã nối
+VNeID thường gửi kèm cả hai, CCCD đứng ra làm khóa. BHYT chỉ thực sự làm khóa trong
+phần còn lại: bệnh nhân chưa có CCCD, hoặc HIS chưa nối VNeID.
+
+Đúng ở phần đó mới có rủi ro: **thẻ cũ và thẻ mới của cùng một người là hai chuỗi
+khác nhau**, không có CCCD thì không gì nối chúng lại. `patient_identifier_candidates`
+chỉ đỡ được khi lần ghi sau có thêm định danh mới, không suy ngược được thẻ cũ ra thẻ
+mới. Gateway **không** tự tra BHYT từ CCCD — việc đó thuộc phía HIS, nơi có VNeID/VSSID.
+
+### 3.2 Test
+
+[`tests/test_kiem_dinh_danh.py`](../tests/test_kiem_dinh_danh.py):
+
+| Ca | Kỳ vọng |
+| --- | --- |
+| `8901234567`, `GD4010120152431` | Nhận, vào `Patient.identifier` với system `bhyt` |
+| `tiêu chảy`, `4010120152431`, `GD40101`, `123456789`, `12345678901`, `GD401012015243X` | 422 |
+| Thẻ 10 số, **không** CCCD | Khóa là BHYT, không lùi về `mrn` |
+
+Ca cuối là ca quan trọng nhất: lùi về mã bệnh án là mất đồng nhất bệnh nhân giữa
+các viện, đúng chức năng cốt lõi của khối liên thông.
+
+---
+
+## 4. T1.1(b) — Mã cơ sở khám chữa bệnh phải đúng dạng
+
+### 4.1 Kiểm lúc khởi động, không phải lúc xử lý yêu cầu
+
+Thêm `validate_facility_code(code, allow_demo)` trong `fhir_helper.py`, regex
+`^\d{2}\d{3}$` — viết tách để giữ cấu trúc: hai số đầu là mã tỉnh, ba số sau là số
+thứ tự trong tỉnh. Hàm bỏ khoảng trắng hai đầu (một khoảng trắng thừa trong biến môi
+trường là đủ để `to_fhir_id` sinh ra một bệnh viện khác), **không** chuyển hoa/thường
+(mã toàn chữ số nên chuyển hoa là thao tác chết, mà với mã demo lại âm thầm đổi khóa).
+
+[`backend/main.py`](../backend/main.py) gọi `_chot_ma_co_so()` trong `lifespan`,
+**trước** khi nạp mô hình NLP: mô hình hỏng thì `/health` báo `degraded` và phần
+không cần NLP vẫn dùng được, còn mã cơ sở sai thì không có đường đi nào đúng cả.
+Mã sai → `RuntimeError` → uvicorn dừng. Đã thử thật:
+
+```
+$ SMIG_FACILITY_CODE=BV-DEMO-01 uvicorn backend.main:app --port 8765
+RuntimeError: Cấu hình SMIG_FACILITY_CODE không dùng được. Mã cơ sở khám chữa bệnh
+'BV-DEMO-01' không đúng dạng: mã CSKCB do cơ quan BHXH cấp gồm 5 chữ số, hai số đầu
+là mã tỉnh, ví dụ 01001. ... hãy bật SMIG_ALLOW_DEMO_FACILITY=1.
+ERROR:    Application startup failed. Exiting.
+```
+
+Lý do đặt ở khởi động: mã cơ sở nằm trong `stable_condition_key`, `meta.tag` và
+`mrn_system` — ba chỗ định danh của **mọi** bản ghi. Sai ở đây không phải lỗi một hồ
+sơ mà là lỗi cấu hình làm hỏng toàn bộ đầu ra, phải lộ ra lúc còn sửa được bằng cách
+đổi biến môi trường, không phải sau vài trăm ca khám.
+
+### 4.2 Cờ demo, mặc định tắt
+
+`SMIG_ALLOW_DEMO_FACILITY` cho qua mã tự đặt kiểu `BV-DEMO-01`, cùng quy ước với
+`SMIG_ALLOW_CLIENT_FACILITY`: nới lỏng cho demo thì phải khai ra, không được là mặc
+định. Bật cờ vẫn **không** cho qua mã rỗng — chấp nhận mã tự đặt là một chuyện,
+chấp nhận không có mã là chuyện khác (khi đó `mrn_system` lùi về nhãn
+`khong-ro-co-so` và mọi bệnh viện dùng chung nhãn đó).
+
+`/health` thêm `allow_demo_facility`. Nhìn hai cờ là biết bản Gateway đang ở chế độ
+trình diễn hay triển khai.
+
+### 4.3 Đổi mặc định ở sáu chỗ, và vì sao phải trùng nhau
+
+| Chỗ | Trước | Sau |
+| --- | --- | --- |
+| `backend/main.py`, `hospital_his/server.py`, `run.ps1`, `run_his.ps1`, `run.bat` | `BV-DEMO-01` / `Bệnh viện Demo SMIG` | `79001` / `Benh vien mo phong Viettel` |
+| VNPT HIS (`application.properties`, `GatewayService`, `EmrLookupService`) | `BV-VNPT-02` | `79002` |
+
+Mặc định phải là mã **đúng dạng** chứ không phải mã demo, vì mã demo sẽ làm
+`_chot_ma_co_so` dừng Gateway ngay — chạy thẳng `uvicorn backend.main:app` không lên
+nổi. Và mặc định trong `main.py` phải **trùng** với `run.ps1` và `run.bat`: hai
+launcher ra hai mã khác nhau thì HIS gọi Gateway ăn 403.
+
+Tên cơ sở để ASCII có chủ ý: hai tệp `.ps1` vốn để ASCII cho console Windows, mặc
+định trong Python lệch dấu thanh là đủ để cùng một cơ sở hiện hai tên tùy cách khởi
+động.
+
+`79001` và `79002` là **mã ví dụ đúng dạng, không trỏ tới cơ sở nào** — README ghi
+rõ, và ghi rõ luôn triển khai thật phải thay cả mã lẫn tên.
+
+### 4.4 `run.ps1` tự nhận mã demo
+
+Mã demo trong README đều bắt đầu bằng `BV-`, nên `run.ps1` gặp tiền tố này thì bật
+cờ demo kèm cảnh báo vàng; gặp **bất kỳ** mã nào khác thì giữ chế độ chặt. Gõ nhầm
+một ký tự của mã thật → Gateway dừng hẳn, không chạy tiếp ghi ra một đống bản ghi
+khóa hỏng. `run.bat` không nhận tham số nên đặt cứng `79001` và cờ `0`.
+
+### 4.5 Test
+
+[`tests/test_ma_co_so_kcb.py`](../tests/test_ma_co_so_kcb.py) mới, 17 ca: ba mã đúng
+dạng ở ba tỉnh khác nhau (chốt là không ràng buộc riêng tỉnh nào), khoảng trắng thừa
+được bỏ, sáu mã sai dạng, ba dạng rỗng, hai ca cờ demo, và hai ca đi qua đúng
+`_chot_ma_co_so()` để chốt "sai cấu hình thì chết lúc bật máy".
+
+### 4.6 Lỗ còn hở, thuộc T1.4
+
+Cửa kiểm mã CSKCB **chỉ đứng ở cấu hình lúc khởi động**. Khi bật
+`SMIG_ALLOW_CLIENT_FACILITY=1`, mã HIS tự khai trong từng yêu cầu **không bị kiểm
+dạng** — nên kịch bản hai viện `BV-A-001` / `BV-B-002` trong README vẫn chạy được kể
+cả khi Gateway ở chế độ chặt. README nói thẳng điều này. Siết đường tự khai thuộc
+T1.4, nơi mã cơ sở chuyển từ lời khai sang tra ra từ khóa API đã xác thực.
+
+---
+
+## 5. README và tài liệu
+
+- Mục mới **"Mã cơ sở khám chữa bệnh lấy ở đâu"**: mã là trường `MA_CSKCB` trong bộ
+  XML gửi cổng giám định theo QĐ 130, và nằm trong hợp đồng KCB BHYT với BHXH tỉnh;
+  phòng Kế hoạch tổng hợp nắm; chắc nhất là lấy đúng mã HIS đang xuất XML.
+- Ghi chú `BV-A-001` / `BV-B-002` là mã đặt tạm, muốn diễn đúng điều kiện triển khai
+  thì thay bằng hai mã CSKCB thật.
+- Bảng biến môi trường, bảng trong
+  [`docs/chi-tiet-ky-thuat-7-file-loi.md`](chi-tiet-ky-thuat-7-file-loi.md) cập nhật
+  mã mặc định và cờ mới.
+- Bảng markdown căn lại cột — phần lớn +436 dòng của diff README là khoảng trắng.
+- Rà ngày 11/09 sửa thêm hai dòng lệch: dòng `GET /health` thiếu cờ
+  `allow_demo_facility`; bảng ưu tiên khóa vẫn ghi "Thẻ BHYT (10 số)" như thể chỉ
+  nhận một mẫu.
+
+---
+
+## 6. Rủi ro chung: dữ liệu cũ trên trục thành mồ côi
+
+Kế hoạch đã cảnh báo, và nó xảy ra đúng như thế: đổi mặc định `BV-DEMO-01` → `79001`
+làm đổi cả ba thành phần định danh, nên **mọi bản ghi demo đã ghi lên HAPI dưới mã
+cũ** không còn khớp conditional update. Lần đồng bộ kế tiếp sinh bản mới dưới
+`79001`; bản cũ nằm lại, không ai trỏ tới.
+
+Chọn **phương án 1 — reset môi trường demo**, vì dữ liệu hiện có là dữ liệu thử.
+Không viết script migrate. Trước khi trình diễn:
+
+```powershell
+docker compose down -v    # xóa named volume hapi-pgdata
+docker compose up -d
+```
+
+Bệnh án cục bộ của HIS mô phỏng không mất: `run_his.ps1` giữ tên tệp
+`his_db.sqlite` cho cấu hình mặc định. Script migrate vẫn là thứ triển khai thật bắt
+buộc phải có — ghi ở mục 8.
+
+---
+
+## 7. Kiểm thử hồi quy theo bảng của T1.md
+
+| # | Kịch bản | Kết quả 11/09 |
+| --- | --- | --- |
+| 1 | `python -m nlp.test_nlp` | **ĐẠT**. Dev Top-1 99,1% / Top-3 100% / MRR 0,995. Holdout Top-1 72,5% / Top-5 86,3% / MRR 0,788 |
+| 2 | Chỉ số không đổi so với lần đo trước | Đúng — trùng từng chữ số với mục 16 của 28/08 |
+| 3 | `pytest tests/` | **99/99**, gồm `test_luong_nlp_khong_doi.py` (main: 76) |
+| 4 | Thẻ BHYT 10 chữ số | Nhận — `test_bhyt_ca_hai_mau_deu_hop_le` |
+| 5 | Thẻ BHYT 15 ký tự mẫu cũ | Nhận — cùng test |
+| 6 | Chuỗi rác vào ô BHYT | 422 — 6 biến thể |
+| 7 | Khởi động với mã CSKCB sai dạng | Dừng ngay, thông báo rõ — thử thật với uvicorn, mục 4.1 |
+| 9 | Đồng bộ nhiều lần cùng một chẩn đoán | Vẫn một Condition — `test_ban_cua_vien_minh_tren_truc_khong_nhan_doi_ban_cuc_bo` |
+| 13 | Chuyển tuyến A → B, tra bệnh sử bằng CCCD | Xanh — `tests/test_benh_su_toan_truc.py` |
+| 8, 10, 11, 12 | Validator VN Core, 401, 403, `AuditEvent` | **Chưa áp dụng** — thuộc T1.2 và T1.4 |
+
+`nlp/test_rang_buoc.py` 33/33. Tổng ba bộ: **161 ca xanh** (trước: 138).
+
+---
+
+## 8. Việc còn lại
+
+| Việc | Ghi chú |
+| --- | --- |
+| **T1.2** VN Core + `meta.profile` | Làm kế tiếp. Cùng đụng `fhir_helper.py`. Phải lấy URI NamingSystem thật từ package IG, **không đoán** |
+| T1.3 → T1.5 | Theo thứ tự trong `T1.md` |
+| Sửa khối "Hiện trạng" T1.1(a) trong `T1.md` | Đang mô tả regex 15 ký tự, trong khi main đã đổi sang 10 số từ `549060e` |
+| Kiểm dạng mã HIS tự khai | Lỗ ở mục 4.6, gộp vào T1.4 |
+| Script migrate định danh | Cần cho triển khai thật; T1.2 đổi `identifier.system` sẽ cần nó lần nữa — nên viết một lần dùng cho cả hai |
+| Placeholder ô BHYT của VNPT HIS | Vẫn gợi ý `VD: GD401...` — chỉ mẫu cũ. Ngoài phạm vi T1 (giao diện demo), sửa khi tiện |
+
+---
+
+## 9. Danh sách file đã sửa
+
+| File | Loại thay đổi |
+| --- | --- |
+| [`backend/fhir_helper.py`](../backend/fhir_helper.py) | Hai regex BHYT, `validate_facility_code` |
+| [`backend/main.py`](../backend/main.py) | `_chot_ma_co_so` trong `lifespan`, cờ `ALLOW_DEMO_FACILITY`, mặc định `79001`, `/health` |
+| [`hospital_his/server.py`](../hospital_his/server.py), [`hospital_his/run_his.ps1`](../hospital_his/run_his.ps1) | Mặc định `79001` |
+| [`run.ps1`](../run.ps1), [`run.bat`](../run.bat) | Mặc định `79001`, tự bật cờ demo theo tiền tố `BV-` |
+| `VNPT_HIS/backend/...` (3 file) | Mặc định `79002` |
+| [`tests/test_kiem_dinh_danh.py`](../tests/test_kiem_dinh_danh.py) | +3 ca rác, +2 mẫu hợp lệ, +1 ca khóa đồng nhất, đổi ca CMND |
+| [`tests/test_ma_co_so_kcb.py`](../tests/test_ma_co_so_kcb.py) | File mới, 17 ca |
+| [`README.md`](../README.md) | Mục lấy mã CSKCB, bảng biến môi trường, căn bảng; hai dòng sửa ngày 11/09 |
+| [`docs/chi-tiet-ky-thuat-7-file-loi.md`](chi-tiet-ky-thuat-7-file-loi.md) | Bảng biến môi trường |
+
+---
+
+## 10. Cách kiểm chứng
+
+```powershell
+.venv\Scripts\python -m pytest tests/ -q                       # 99 ca, không cần Docker
+.venv\Scripts\python -m pytest nlp/test_rang_buoc.py -q        # 33 ca
+.venv\Scripts\python -m nlp.test_nlp                           # nạp mô hình, ~2 phút
+$env:SMIG_FACILITY_CODE="BV-DEMO-01"; .venv\Scripts\python -m uvicorn backend.main:app   # phải dừng ngay
+.\run.ps1 -FacilityCode BV-A-001                               # cảnh báo vàng, cờ demo bật
+```
+
+---
+---
+
 # Nhật ký thay đổi — 28/08/2026 (phần 2)
 
 Nửa sau của phiên, sau khi mục 28/08 phần 1 đã merge. Trọng tâm chuyển sang **hai

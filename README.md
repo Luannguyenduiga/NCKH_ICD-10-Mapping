@@ -446,7 +446,7 @@ Chín endpoint, chia đúng theo hai khối:
 
 | Endpoint                            | Khối                  | Việc làm                                                                               |
 | ----------------------------------- | ---------------------- | ---------------------------------------------------------------------------------------- |
-| `GET /health`                     | —                     | Trạng thái mô hình, chính sách tin cậy, mã cơ sở, cờ`allow_client_facility` |
+| `GET /health`                     | —                     | Trạng thái mô hình, chính sách tin cậy, mã cơ sở, cờ `allow_client_facility` và `allow_demo_facility` |
 | `POST /api/standardize`           | **NLP**          | Chuẩn hóa câu chẩn đoán → danh sách mã ICD-10 (mục A.7)                        |
 | `GET /api/icd10/{code}`           | **NLP**          | Tra tên bệnh theo mã trong danh mục 12 137 mã                                       |
 | `POST /api/fhir/condition`        | **Liên thông** | Sinh tài nguyên FHIR Condition từ một mã                                            |
@@ -562,7 +562,7 @@ nhân mang họ tên, giới tính và ngày sinh của **người thứ hai**.
 | Ưu tiên | Định danh        | Phạm vi               | `identifier.system`                |
 | --------- | ------------------ | ---------------------- | ------------------------------------ |
 | 1         | Số CCCD (12 số)  | Toàn quốc            | `.../identifier/cccd`              |
-| 2         | Thẻ BHYT (10 số) | Toàn quốc            | `.../identifier/bhyt`              |
+| 2         | Thẻ BHYT (10 số mẫu mới, hoặc 15 ký tự mẫu cũ) | Toàn quốc            | `.../identifier/bhyt`              |
 | 3         | Mã bệnh án      | **Một cơ sở** | `.../identifier/mrn/{mã cơ sở}` |
 
 Khóa đồng nhất chỉ được là **một** cặp `(system, value)` — nó là khóa để conditional update
