@@ -5,8 +5,8 @@
 # benh vien vao nhau (xem README muc 6.6).
 param(
     [int]$Port = 8000,
-    [string]$FacilityCode = "BV-DEMO-01",
-    [string]$FacilityName = "Benh vien Demo SMIG",
+    [string]$FacilityCode = "79001",
+    [string]$FacilityName = "Benh vien mo phong Viettel",
     # Cho phep MOT ban Gateway phuc vu NHIEU benh vien: moi HIS tu khai ma co so
     # trong tung yeu cau. Chi dung khi thu nghiem cuc bo - mo hinh NLP chiem vai
     # GB RAM nen chay hai ban Gateway tren mot may la qua nang.
@@ -55,6 +55,18 @@ $env:SMIG_FACILITY_CODE = $FacilityCode
 $env:SMIG_FACILITY_NAME = $FacilityName
 if ($AllowClientFacility) { $env:SMIG_ALLOW_CLIENT_FACILITY = "1" }
 else { $env:SMIG_ALLOW_CLIENT_FACILITY = "0" }
+
+# Ma CSKCB that do co quan BHXH cap, gom 5 chu so (vd 01001), va Gateway kiem dang
+# no ngay luc khoi dong. Cac ma demo trong README deu bat dau bang "BV-" nen nhan
+# ra duoc: gap ma demo thi noi long de con chay trinh dien; gap BAT KY ma nao
+# khac thi giu che do chat, nen go nham mot ky tu cua ma that se lam Gateway dung
+# han kem thong bao ro, thay vi chay tiep va ghi ra mot dong ban ghi khoa hong.
+if ($FacilityCode -like "BV-*") { $env:SMIG_ALLOW_DEMO_FACILITY = "1" }
+else { $env:SMIG_ALLOW_DEMO_FACILITY = "0" }
+if ($env:SMIG_ALLOW_DEMO_FACILITY -eq "1") {
+    Write-Host "[WARN] Ma co so '$FacilityCode' la ma tu dat, khong phai ma CSKCB do BHXH cap." -ForegroundColor Yellow
+    Write-Host "       Du lieu ghi ra KHONG doi chieu duoc voi cong giam dinh BHYT." -ForegroundColor Yellow
+}
 # HIS goi Gateway tu cong khac nen phai nam trong danh sach CORS.
 $env:SMIG_ALLOWED_ORIGINS = "http://127.0.0.1:$Port,http://localhost:$Port," +
     "http://127.0.0.1:8085,http://localhost:8085," +

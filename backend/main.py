@@ -38,6 +38,7 @@ from backend.fhir_helper import (
     patient_local_key,
     patient_match_key,
     sanitize_icd10_code,
+    validate_facility_code,
     validate_identifier_value,
     subject_identifier_of,
     to_fhir_id,
@@ -54,8 +55,16 @@ FHIR_TIMEOUT = float(os.getenv("SMIG_FHIR_TIMEOUT", "8"))
 # định: (a) mã bệnh án được quy về đúng bệnh viện đã cấp nó, (b) mỗi chẩn đoán
 # trên trục mang tên nơi đã ghi. Để mặc định giống nhau ở hai bệnh viện là quay
 # lại đúng lỗi trộn hồ sơ mà cấu hình này sinh ra để chặn.
-FACILITY_CODE = os.getenv("SMIG_FACILITY_CODE", "BV-DEMO-01")
-FACILITY_NAME = os.getenv("SMIG_FACILITY_NAME", "Bệnh viện Demo SMIG")
+#
+# Mặc định là mã CSKCB đúng dạng chứ không phải mã tự đặt: mã tự đặt sẽ làm
+# `_chot_ma_co_so` dừng Gateway ngay, nên chạy thẳng `uvicorn backend.main:app`
+# không lên nổi. Giá trị này phải TRÙNG với mặc định trong `run.ps1` và
+# `run.bat` - hai launcher ra hai mã khác nhau thì HIS gọi Gateway ăn 403.
+FACILITY_CODE = os.getenv("SMIG_FACILITY_CODE", "79001")
+# Giữ nguyên văn chuỗi ASCII mà `run.ps1` / `run_his.ps1` đặt: hai tệp .ps1 để
+# ASCII cho console Windows, nên mặc định ở đây lệch dấu thanh là đủ để cùng
+# một cơ sở hiện hai tên khác nhau tùy cách khởi động.
+FACILITY_NAME = os.getenv("SMIG_FACILITY_NAME", "Benh vien mo phong Viettel")
 
 # Cho phép HIS TỰ KHAI mã cơ sở trong từng yêu cầu, để MỘT bản Gateway phục vụ
 # nhiều bệnh viện. Mặc định TẮT, và đó là mặc định đúng cho triển khai thật: mã
@@ -67,6 +76,16 @@ FACILITY_NAME = os.getenv("SMIG_FACILITY_NAME", "Bệnh viện Demo SMIG")
 # RAM nên chạy hai bản Gateway trên một máy là quá nặng, trong khi vẫn cần hai
 # bệnh viện phân biệt được nhau để trình diễn kịch bản liên thông.
 ALLOW_CLIENT_FACILITY = os.getenv("SMIG_ALLOW_CLIENT_FACILITY", "0").strip().lower() in {
+    "1", "true", "yes", "on",
+}
+
+# Cho phép mã cơ sở TỰ ĐẶT, kiểu "BV-DEMO-01". Mặc định TẮT: mã CSKCB thật do cơ
+# quan BHXH cấp và là khóa mà cổng giám định BHYT dùng, nên chạy thật với mã tự
+# đặt là ghi lên trục một đống bản ghi không đối chiếu được với đâu cả.
+#
+# Bật lên cho môi trường trình diễn, nơi chưa có mã thật để dùng. `run.ps1` tự
+# bật khi mã bắt đầu bằng "BV-" - xem chú thích ở đó.
+ALLOW_DEMO_FACILITY = os.getenv("SMIG_ALLOW_DEMO_FACILITY", "0").strip().lower() in {
     "1", "true", "yes", "on",
 }
 ALLOWED_ORIGINS = [
@@ -81,10 +100,32 @@ nlp_engine: Optional[NLPEngine] = None
 engine_error: Optional[str] = None
 
 
+def _chot_ma_co_so() -> None:
+    """
+    Kiểm mã cơ sở lúc khởi động, dừng Gateway nếu sai dạng.
+
+    Đứng ở đây chứ không ở từng yêu cầu vì mã cơ sở là CẤU HÌNH, không phải dữ
+    liệu người dùng: nó không đổi giữa hai yêu cầu, nên kiểm lại mỗi lần chỉ tốn
+    công mà vẫn để lọt đúng cái cần chặn. Sai cấu hình phải lộ ra lúc bật máy,
+    lúc còn sửa được, chứ không phải giữa ca khám khi đã có bệnh nhân chờ.
+
+    Ghi đè `FACILITY_CODE` bằng bản đã chuẩn hóa: xem `validate_facility_code`.
+    """
+    global FACILITY_CODE
+    try:
+        FACILITY_CODE = validate_facility_code(FACILITY_CODE, ALLOW_DEMO_FACILITY)
+    except ValueError as exc:
+        raise RuntimeError(f"Cấu hình SMIG_FACILITY_CODE không dùng được. {exc}") from exc
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     """Nạp mô hình NLP một lần khi khởi động (thay cho @app.on_event đã lỗi thời)."""
     global nlp_engine, engine_error
+    # Trước cả việc nạp mô hình: mô hình hỏng thì `/health` báo "degraded" và
+    # Gateway còn dùng được phần không cần NLP, còn mã cơ sở sai thì không có
+    # đường đi nào là đúng cả.
+    _chot_ma_co_so()
     try:
         nlp_engine = NLPEngine()
     except Exception as exc:  # noqa: BLE001 - giữ server sống để /health báo lỗi rõ ràng
@@ -440,6 +481,10 @@ def health_check():
         # do bên gọi khai. Phơi ra đây để nhìn là biết Gateway đang ở chế độ thử
         # nghiệm, không nhầm với cấu hình triển khai thật.
         "allow_client_facility": ALLOW_CLIENT_FACILITY,
+        # Bật nghĩa là Gateway đang chấp nhận mã cơ sở tự đặt, tức dữ liệu ghi ra
+        # KHÔNG đối chiếu được với cổng giám định BHYT. Nhìn hai cờ này là biết
+        # bản Gateway đang chạy ở chế độ trình diễn hay chế độ triển khai.
+        "allow_demo_facility": ALLOW_DEMO_FACILITY,
         "timestamp": time.time(),
     }
 

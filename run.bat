@@ -22,6 +22,12 @@ echo.
 echo [LUU Y] Chuc nang "Dong bo len EMR Cloud" can HAPI FHIR chay o cong 8090.
 echo         Neu chua chay, mo mot cua so khac va go: docker compose up -d
 echo.
+REM run.bat khong nhan tham so nen phai dat ma co so o day, va phai dat TRUNG
+REM voi mac dinh cua run.ps1: hai trinh khoi dong ma ra hai ma khac nhau thi
+REM HIS goi Gateway se an 403 vi khai mot co so ma Gateway khong phuc vu.
+REM Doi ma co so: dung run.ps1 -FacilityCode <ma CSKCB 5 chu so>.
+set SMIG_FACILITY_CODE=79001
+set SMIG_ALLOW_DEMO_FACILITY=0
 echo [INFO] Khoi dong FastAPI Gateway va giao dien Dashboard...
 echo [INFO] Dia chi: http://127.0.0.1:8000
 echo [INFO] Lan chay dau tien can ~30 giay de nap mo hinh NLP.

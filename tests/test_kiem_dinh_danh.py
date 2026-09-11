@@ -40,7 +40,14 @@ def test_cccd_sai_dinh_dang_bi_tu_choi(gateway, rac):
     assert "CCCD" in str(loi.value)
 
 
-@pytest.mark.parametrize("rac", ["tiêu chảy", "4010120152431", "GD40101"])
+@pytest.mark.parametrize("rac", [
+    "tiêu chảy",          # tên bệnh gõ nhầm ô
+    "4010120152431",      # 13 chữ số: mẫu cũ thiếu hai chữ cái đầu
+    "GD40101",            # mẫu cũ bị cắt cụt
+    "123456789",          # 9 chữ số: thiếu một số so với mẫu mới
+    "12345678901",        # 11 chữ số: thừa một số so với mẫu mới
+    "GD401012015243X",    # đủ 15 ký tự nhưng lẫn chữ ở phần số
+])
 def test_bhyt_sai_dinh_dang_bi_tu_choi(gateway, rac):
     with pytest.raises(ValidationError) as loi:
         _sinh(gateway, insurance_card=rac)
@@ -63,11 +70,45 @@ def test_duong_dong_bo_cung_bi_chan(gateway):
 
 # --- Chấp nhận giá trị hợp lệ ---------------------------------------------
 
-def test_cccd_12_so_va_cmnd_9_so_deu_hop_le(gateway):
-    assert _sinh(gateway, citizen_id="079075001234")["subject"]["identifier"]["value"] \
-        == "079075001234"
-    assert _sinh(gateway, citizen_id="079075001")["subject"]["identifier"]["value"] \
-        == "079075001"
+def test_chi_cccd_12_so_moi_hop_le(gateway):
+    """
+    CMND 9 chữ số từng được nhận, nay thì không. Theo Luật Căn cước
+    26/2023/QH15, CMND chỉ còn giá trị sử dụng tới hết 31/12/2024, nên một số
+    CMND gửi lên hôm nay hoặc là gõ nhầm, hoặc là dữ liệu chưa được cập nhật -
+    cả hai đều không đáng đứng ra làm khóa đồng nhất bệnh nhân toàn quốc.
+    """
+    hop_le = _sinh(gateway, citizen_id="079075001234")
+    assert hop_le["subject"]["identifier"]["value"] == "079075001234"
+
+    with pytest.raises(ValidationError) as loi:
+        _sinh(gateway, citizen_id="079075001")
+    assert "CCCD" in str(loi.value)
+
+
+@pytest.mark.parametrize("the", [
+    "8901234567",         # mẫu cấp từ 01/4/2021, trùng mã số BHXH
+    "GD4010120152431",    # mẫu cũ 15 ký tự, còn lưu hành tới khi được đổi
+])
+def test_bhyt_ca_hai_mau_deu_hop_le(gateway, the):
+    """
+    QĐ 1666/QĐ-BHXH đổi thẻ sang 10 chữ số từ 01/4/2021, nhưng thẻ mẫu cũ không
+    hết hiệu lực cùng ngày. Nhận đúng một mẫu là từ chối phần lớn bệnh nhân đến
+    khám hôm nay - hoặc ngược lại, khóa hệ thống vào mẫu đang mất dần.
+    """
+    tai_nguyen = _sinh(gateway, insurance_card=the)
+    dinh_danh = tai_nguyen["subject"]["identifier"]
+    assert dinh_danh["value"] == the
+    assert "bhyt" in dinh_danh["system"]
+
+
+def test_bhyt_mau_moi_van_dung_lam_khoa_dong_nhat(gateway):
+    """
+    Thẻ mẫu mới trùng mã số BHXH nên vẫn là định danh toàn quốc: thiếu CCCD thì
+    nó phải đứng ra làm khóa, KHÔNG được lùi về mã bệnh án nội viện - lùi là mất
+    khả năng đồng nhất bệnh nhân giữa các viện.
+    """
+    tai_nguyen = _sinh(gateway, citizen_id=None, insurance_card="8901234567")
+    assert "mrn" not in tai_nguyen["subject"]["identifier"]["system"]
 
 
 def test_bo_trong_van_hop_le(gateway):

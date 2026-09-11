@@ -11,8 +11,8 @@
 param(
     [int]$Port = 8085,
     [string]$GatewayUrl = "http://127.0.0.1:8000",
-    [string]$FacilityCode = "BV-DEMO-01",
-    [string]$FacilityName = "Benh vien Demo SMIG",
+    [string]$FacilityCode = "79001",
+    [string]$FacilityName = "Benh vien mo phong Viettel",
     # Benh an cuc bo cua RIENG benh vien nay. Bo trong thi suy ra tu -FacilityCode,
     # nen chay hai ban HIS tren cung mot may la moi ban tu co tep rieng - khong
     # con canh hai "benh vien" nhin thay y nguyen danh sach benh nhan cua nhau.
@@ -39,7 +39,7 @@ $env:SMIG_HIS_ALLOWED_ORIGINS = "http://127.0.0.1:$Port,http://localhost:$Port"
 
 if ($DbPath) {
     $env:SMIG_HIS_DB = $DbPath
-} elseif ($FacilityCode -ne "BV-DEMO-01") {
+} elseif ($FacilityCode -ne "79001") {
     # Giu nguyen ten tep cu cho cau hinh mac dinh, de ban demo dang dung khong
     # bong dung mat het benh an sau khi cap nhat.
     $safe = ($FacilityCode -replace '[^A-Za-z0-9\-_]', '_')

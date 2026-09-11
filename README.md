@@ -10,9 +10,9 @@ Hệ thống nhận chẩn đoán lâm sàng viết tự do bằng tiếng Việ
 Toàn bộ mã nguồn chia thành **hai khối tách bạch**, và tài liệu này cũng chia theo đúng hai
 khối đó:
 
-| | Khối | Trả lời câu hỏi | Thư mục chính |
-| --- | --- | --- | --- |
-| **[Phần A](#phần-a--khối-nlp)** | **NLP** | Câu chẩn đoán này là mã ICD-10 nào, chắc bao nhiêu phần trăm? | `nlp/`, `ChangeJson.py` |
+|                                                      | Khối                      | Trả lời câu hỏi                                                              | Thư mục chính                               |
+| ---------------------------------------------------- | -------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------- |
+| **[Phần A](#phần-a--khối-nlp)**              | **NLP**              | Câu chẩn đoán này là mã ICD-10 nào, chắc bao nhiêu phần trăm?        | `nlp/`, `ChangeJson.py`                    |
 | **[Phần B](#phần-b--khối-api-liên-thông)** | **API liên thông** | Mã đó đi lên trục dữ liệu thế nào để bệnh viện khác đọc đúng? | `backend/`, `hospital_his/`, `VNPT_HIS/` |
 
 > **Ranh giới giữa hai khối nằm ở đúng một điểm:** khối NLP kết thúc khi trả ra danh sách mã
@@ -78,20 +78,20 @@ khối đó:
                 (HAPI FHIR + PostgreSQL — trục dữ liệu)
 ```
 
-| Thành phần | Cổng | Vai trò | Công nghệ |
-| --- | --- | --- | --- |
-| **SMIG Gateway** | 8000 | Chuẩn hóa NLP, sinh FHIR, cầu nối tới trục | FastAPI + SBERT |
-| **EMR Cloud** | 8090 | Trục dữ liệu y tế quốc gia (mô phỏng) | HAPI FHIR R4 + PostgreSQL |
-| **HIS mô phỏng** | 8085 | Bệnh viện gửi dữ liệu, có bệnh án riêng | FastAPI + SQLite |
-| **VNPT HIS** | 8089 / 3000 | HIS thứ hai, **khác công nghệ** để chứng minh liên thông | Spring Boot + React |
+| Thành phần             | Cổng       | Vai trò                                                               | Công nghệ               |
+| ------------------------ | ----------- | ---------------------------------------------------------------------- | ------------------------- |
+| **SMIG Gateway**   | 8000        | Chuẩn hóa NLP, sinh FHIR, cầu nối tới trục                       | FastAPI + SBERT           |
+| **EMR Cloud**      | 8090        | Trục dữ liệu y tế quốc gia (mô phỏng)                           | HAPI FHIR R4 + PostgreSQL |
+| **HIS mô phỏng** | 8085        | Bệnh viện gửi dữ liệu, có bệnh án riêng                       | FastAPI + SQLite          |
+| **VNPT HIS**       | 8089 / 3000 | HIS thứ hai,**khác công nghệ** để chứng minh liên thông | Spring Boot + React       |
 
 Quy mô mã nguồn:
 
-| Khối | Số file mã nguồn | Số dòng |
-| --- | --- | --- |
-| NLP | 5 | ~3 100 |
-| API liên thông (Gateway + 2 HIS + 2 giao diện) | 12 | ~8 400 |
-| Kiểm thử | 13 | ~2 000 |
+| Khối                                             | Số file mã nguồn | Số dòng |
+| ------------------------------------------------- | ------------------- | --------- |
+| NLP                                               | 5                   | ~3 100    |
+| API liên thông (Gateway + 2 HIS + 2 giao diện) | 12                  | ~8 400    |
+| Kiểm thử                                        | 13                  | ~2 000    |
 
 ---
 
@@ -137,14 +137,14 @@ NCKH/
 └── Cong_thuc_toan_hoc_NLP_ICD10.docx       # Công thức toán học của phần tái xếp hạng
 ```
 
-| File | Vai trò |
-| --- | --- |
-| `nlp/nlp_engine.py` | Lớp `NLPEngine` — trái tim hệ thống. Chuẩn hóa, truy hồi, tái xếp hạng, hiệu chuẩn, tách nhiều bệnh, ghép cặp †/*, quản lý cache embedding |
-| `nlp/clinical_rules.py` | Dữ liệu tri thức: viết tắt, tiền tố nhiễu, cầu nối từ vựng, trục đối lập, cổng chương, alias, ngưỡng tin cậy, ràng buộc tuổi/giới |
-| `nlp/evaluate.py` | Đo Top-1/3/5 accuracy, MRR, độ trễ và độ chính xác **theo từng dải tin cậy** |
-| `nlp/test_nlp.py` | Kiểm thử chất lượng nhận diện — chỉ đích danh mã đúng, không dùng tiền tố lỏng |
-| `nlp/test_rang_buoc.py` | Kiểm thử luật ràng buộc lâm sàng trên dữ liệu danh mục, chạy dưới 1 giây |
-| `ChangeJson.py` | Chuyển Excel Bộ Y tế → `icd10_db.json`, kèm phụ lục A1–A4 |
+| File                      | Vai trò                                                                                                                                                         |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nlp/nlp_engine.py`     | Lớp`NLPEngine` — trái tim hệ thống. Chuẩn hóa, truy hồi, tái xếp hạng, hiệu chuẩn, tách nhiều bệnh, ghép cặp †/*, quản lý cache embedding |
+| `nlp/clinical_rules.py` | Dữ liệu tri thức: viết tắt, tiền tố nhiễu, cầu nối từ vựng, trục đối lập, cổng chương, alias, ngưỡng tin cậy, ràng buộc tuổi/giới      |
+| `nlp/evaluate.py`       | Đo Top-1/3/5 accuracy, MRR, độ trễ và độ chính xác**theo từng dải tin cậy**                                                                    |
+| `nlp/test_nlp.py`       | Kiểm thử chất lượng nhận diện — chỉ đích danh mã đúng, không dùng tiền tố lỏng                                                                |
+| `nlp/test_rang_buoc.py` | Kiểm thử luật ràng buộc lâm sàng trên dữ liệu danh mục, chạy dưới 1 giây                                                                          |
+| `ChangeJson.py`         | Chuyển Excel Bộ Y tế →`icd10_db.json`, kèm phụ lục A1–A4                                                                                               |
 
 ## A.2 Vấn đề khoa học
 
@@ -170,12 +170,12 @@ Nguyên nhân kép:
 
 ## A.3 Kiến trúc truy hồi lai 4 tầng
 
-| Tầng | Chức năng | Hàm chính trong `nlp_engine.py` |
-| --- | --- | --- |
-| **1. Chuẩn hóa** | Bóc tiền tố/hậu tố hành văn (lặp đến khi ổn định), giải nghĩa viết tắt, **khôi phục dấu tiếng Việt**, thống nhất dấu thanh Unicode (NFD/NFC), nối cầu nối từ vựng | `normalize_text()`, `expand_query()`, `restore_diacritics()`, `thong_nhat_dau_thanh()` |
-| **2. Truy hồi** | Cosine similarity trên embedding SBERT đã tiền tính cho 12 137 mã, lấy 400 ứng viên | `query()`, `_prepare_embeddings()` |
-| **3. Tái xếp hạng** | Điểm ngữ nghĩa **+** trùng lặp từ vựng **+** alias đã kiểm chứng **−** vi phạm trục đối lập **−** cổng chương **±** mức chi tiết **−** ràng buộc tuổi/giới | `_polarity_delta()`, `_lexical_f1()`, `_alias_targets()`, `_chapter_delta()`, `_specificity_delta()`, `rang_buoc_lam_sang()` |
-| **4. Hiệu chuẩn** | Softmax gộp theo khối 3 ký tự, kết hợp độ tương đồng tuyệt đối → độ tin cậy 0–100% | `_calibrate()` |
+| Tầng                        | Chức năng                                                                                                                                                                                                                 | Hàm chính trong`nlp_engine.py`                                                                                                       |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **1. Chuẩn hóa**     | Bóc tiền tố/hậu tố hành văn (lặp đến khi ổn định), giải nghĩa viết tắt,**khôi phục dấu tiếng Việt**, thống nhất dấu thanh Unicode (NFD/NFC), nối cầu nối từ vựng                        | `normalize_text()`, `expand_query()`, `restore_diacritics()`, `thong_nhat_dau_thanh()`                                           |
+| **2. Truy hồi**       | Cosine similarity trên embedding SBERT đã tiền tính cho 12 137 mã, lấy 400 ứng viên                                                                                                                                | `query()`, `_prepare_embeddings()`                                                                                                   |
+| **3. Tái xếp hạng** | Điểm ngữ nghĩa**+** trùng lặp từ vựng **+** alias đã kiểm chứng **−** vi phạm trục đối lập **−** cổng chương **±** mức chi tiết **−** ràng buộc tuổi/giới | `_polarity_delta()`, `_lexical_f1()`, `_alias_targets()`, `_chapter_delta()`, `_specificity_delta()`, `rang_buoc_lam_sang()` |
+| **4. Hiệu chuẩn**    | Softmax gộp theo khối 3 ký tự, kết hợp độ tương đồng tuyệt đối → độ tin cậy 0–100%                                                                                                                      | `_calibrate()`                                                                                                                         |
 
 **Vì sao tầng 3 là mấu chốt.** SBERT xếp gần như ngang nhau những cặp mã mà lâm sàng phân
 biệt rạch ròi: E10 (phụ thuộc insulin) với E11 (không phụ thuộc insulin), I10 (tăng huyết áp
@@ -185,49 +185,49 @@ hoặc trừ điểm cho nó.
 
 Ba hàm đối ngoại:
 
-| Hàm | Trả về |
-| --- | --- |
-| `query(user_query, top_k)` | Top-k mã cho **một** chẩn đoán |
-| `query_composite(user_query, top_k)` | Tách **nhiều bệnh trong một câu** thành nhiều chẩn đoán độc lập, mỗi chẩn đoán giữ độ tin cậy riêng; nhận diện thêm **cặp mã dagger/asterisk (†/\*)** |
-| `extract_entities_regex(text)` | Vị trí thực thể lâm sàng trong nguyên văn, phục vụ bôi màu trên giao diện |
+| Hàm                                   | Trả về                                                                                                                                                                                     |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `query(user_query, top_k)`           | Top-k mã cho**một** chẩn đoán                                                                                                                                                     |
+| `query_composite(user_query, top_k)` | Tách**nhiều bệnh trong một câu** thành nhiều chẩn đoán độc lập, mỗi chẩn đoán giữ độ tin cậy riêng; nhận diện thêm **cặp mã dagger/asterisk (†/\*)** |
+| `extract_entities_regex(text)`       | Vị trí thực thể lâm sàng trong nguyên văn, phục vụ bôi màu trên giao diện                                                                                                      |
 
 ## A.4 Tri thức lâm sàng (`nlp/clinical_rules.py`)
 
 Tách riêng khỏi bộ máy để sửa **tri thức** mà không đụng **thuật toán**:
 
-| Hằng số | Nội dung |
-| --- | --- |
-| `ABBREVIATIONS`, `QUERY_ABBREVIATIONS` | Viết tắt bác sĩ hay dùng: `đtđ` → đái tháo đường, `THA` → tăng huyết áp |
-| `NOISE_PREFIXES`, `NOISE_SUFFIXES`, `STOPWORDS` | Cụm không mang thông tin chẩn đoán: "bệnh nhân bị", "theo dõi", "nhẹ" |
-| `BRIDGE_TERMS` | **Cầu nối từ vựng** — nối thuật ngữ chuẩn của danh mục vào truy vấn. *"ung thư"* → *"u ác"*: cả 553 mã chương C dùng "u ác", không mã nào ghi "ung thư" |
-| `POLARITY_AXES` | **Trục đối lập ngữ nghĩa** — 5 trục: típ đái tháo đường, nguyên nhân tăng huyết áp, biến chứng, cấp/mạn, dị ứng. Nhãn truy vấn xung đột nhãn ứng viên thì trừ điểm |
-| `CHAPTER_GATES` | **Cổng chương** — chương O (thai sản), S/T (chấn thương), V–Y (ngoại sinh), Z chỉ hợp lệ khi câu chẩn đoán có ngữ cảnh tương ứng |
-| `UNSPECIFIED_*`, `OTHER_*` | **Mức chi tiết** — không nêu thể bệnh thì ưu tiên mã ".9 không đặc hiệu"; có nêu thì hạ bậc ".9" và ".8 khác" |
-| `DIRECT_ALIASES` | Alias lâm sàng đã kiểm chứng — vừa cộng điểm, vừa được mã hóa embedding bổ sung |
-| `DATA_FIXES` | Sửa lỗi dữ liệu trong danh mục nguồn, ghi rõ từng chỗ |
-| `CONFIDENCE_POLICY` | Ba ngưỡng: `auto_confirm` 85%, `provisional` 60%, `reject` 40% |
-| `SEX_/AGE_/NON_PRIMARY_PENALTY` | Mức phạt cho ứng viên vi phạm ràng buộc giới tính, khoảng tuổi, hoặc không được làm bệnh chính |
+| Hằng số                                             | Nội dung                                                                                                                                                                                                     |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ABBREVIATIONS`, `QUERY_ABBREVIATIONS`            | Viết tắt bác sĩ hay dùng:`đtđ` → đái tháo đường, `THA` → tăng huyết áp                                                                                                                  |
+| `NOISE_PREFIXES`, `NOISE_SUFFIXES`, `STOPWORDS` | Cụm không mang thông tin chẩn đoán: "bệnh nhân bị", "theo dõi", "nhẹ"                                                                                                                              |
+| `BRIDGE_TERMS`                                      | **Cầu nối từ vựng** — nối thuật ngữ chuẩn của danh mục vào truy vấn. *"ung thư"* → *"u ác"*: cả 553 mã chương C dùng "u ác", không mã nào ghi "ung thư"                   |
+| `POLARITY_AXES`                                     | **Trục đối lập ngữ nghĩa** — 5 trục: típ đái tháo đường, nguyên nhân tăng huyết áp, biến chứng, cấp/mạn, dị ứng. Nhãn truy vấn xung đột nhãn ứng viên thì trừ điểm |
+| `CHAPTER_GATES`                                     | **Cổng chương** — chương O (thai sản), S/T (chấn thương), V–Y (ngoại sinh), Z chỉ hợp lệ khi câu chẩn đoán có ngữ cảnh tương ứng                                               |
+| `UNSPECIFIED_*`, `OTHER_*`                        | **Mức chi tiết** — không nêu thể bệnh thì ưu tiên mã ".9 không đặc hiệu"; có nêu thì hạ bậc ".9" và ".8 khác"                                                                     |
+| `DIRECT_ALIASES`                                    | Alias lâm sàng đã kiểm chứng — vừa cộng điểm, vừa được mã hóa embedding bổ sung                                                                                                             |
+| `DATA_FIXES`                                        | Sửa lỗi dữ liệu trong danh mục nguồn, ghi rõ từng chỗ                                                                                                                                                |
+| `CONFIDENCE_POLICY`                                 | Ba ngưỡng:`auto_confirm` 85%, `provisional` 60%, `reject` 40%                                                                                                                                         |
+| `SEX_/AGE_/NON_PRIMARY_PENALTY`                     | Mức phạt cho ứng viên vi phạm ràng buộc giới tính, khoảng tuổi, hoặc không được làm bệnh chính                                                                                             |
 
 ### Bốn khiếm khuyết phát hiện qua tập kiểm tra độc lập
 
-| Khiếm khuyết | Khắc phục |
-| --- | --- |
-| Danh mục dùng "u ác", bác sĩ nói "ung thư" (553 mã) | Cầu nối từ vựng |
+| Khiếm khuyết                                                | Khắc phục                           |
+| ------------------------------------------------------------- | ------------------------------------- |
+| Danh mục dùng "u ác", bác sĩ nói "ung thư" (553 mã)   | Cầu nối từ vựng                   |
 | Danh mục ghi "(Có hôn mê)" chứ không ghi "biến chứng" | Mở rộng phạm vi trục biến chứng |
-| Truy vấn không nêu thể bệnh lại ra mã ".8 khác" | Luật mức chi tiết |
-| Tương tự với "hạ glucose máu", "u cơ trơn tử cung" | Cầu nối từ vựng |
+| Truy vấn không nêu thể bệnh lại ra mã ".8 khác"       | Luật mức chi tiết                  |
+| Tương tự với "hạ glucose máu", "u cơ trơn tử cung"   | Cầu nối từ vựng                   |
 
 ## A.5 Ràng buộc lâm sàng và cặp dagger/asterisk
 
 `ChangeJson.py` không chỉ đọc sheet mã chính, mà còn đọc các phụ lục mang **ràng buộc lâm
 sàng** của Bộ Y tế và đưa vào `meta` của từng mã:
 
-| Phụ lục | Ràng buộc | Cách dùng khi xếp hạng |
-| --- | --- | --- |
-| **A1** | Ghép cặp **dagger (†) / asterisk (\*)** — bệnh nguyên và biểu hiện | `query_composite()` nhận diện và trả cặp mã, thay vì chọn một trong hai |
-| **A2** | Mã **không được dùng làm bệnh chính** | Trừ `NON_PRIMARY_PENALTY` khi mã đó định làm chẩn đoán chính |
-| **A3.x** | Giới hạn **khoảng tuổi** | Trừ `AGE_CONFLICT_PENALTY` nếu HIS gửi kèm `patient_birth_date` |
-| **A4.x** | Giới hạn **giới tính** | Trừ `SEX_CONFLICT_PENALTY` nếu HIS gửi kèm `patient_sex` — phạt nặng nhất vì giới tính gần như bất biến |
+| Phụ lục      | Ràng buộc                                                                      | Cách dùng khi xếp hạng                                                                                                |
+| -------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **A1**   | Ghép cặp**dagger (†) / asterisk (\*)** — bệnh nguyên và biểu hiện | `query_composite()` nhận diện và trả cặp mã, thay vì chọn một trong hai                                        |
+| **A2**   | Mã**không được dùng làm bệnh chính**                              | Trừ`NON_PRIMARY_PENALTY` khi mã đó định làm chẩn đoán chính                                                  |
+| **A3.x** | Giới hạn**khoảng tuổi**                                                | Trừ`AGE_CONFLICT_PENALTY` nếu HIS gửi kèm `patient_birth_date`                                                    |
+| **A4.x** | Giới hạn**giới tính**                                                  | Trừ`SEX_CONFLICT_PENALTY` nếu HIS gửi kèm `patient_sex` — phạt nặng nhất vì giới tính gần như bất biến |
 
 Bối cảnh bệnh nhân là **tùy chọn**: không gửi thì kết quả y hệt như trước, nên HIS chưa cập
 nhật vẫn chạy nguyên. Gửi thì bệnh nhân nam không nhận mã sản khoa, người 60 tuổi không nhận
@@ -241,15 +241,15 @@ mã sơ sinh.
 
 ## A.6 Dữ liệu và cache embedding
 
-| Đường dẫn | Nội dung |
-| --- | --- |
-| `nlp/data/icd10_db.json` | **12 137 mã**, mỗi mã có `code`, `code_no_dot`, `name_vi`, `name_en`, `synonyms`, `meta` (chương, nhóm, nguồn, ràng buộc A1–A4) |
-| `nlp/data/icd10_supplement.json` | Mã bổ sung thủ công, bắt buộc ghi nguồn |
-| `nlp/data/eval_set.json` | Tập phát triển — **110 ca**, dùng để hiệu chỉnh luật |
-| `nlp/data/eval_holdout.json` | Tập kiểm tra độc lập — **51 ca**, soạn sau khi đã khóa luật |
-| `nlp/data/embeddings_*.npy` | Cache embedding danh mục (~145 MB/bản), sinh tự động |
-| `nlp/data/alias_embeddings_*.npy` | Cache embedding của alias lâm sàng |
-| `nlp/my_medical_nlp_model/` | SBERT tiếng Việt đã fine-tune (~540 MB, **không đưa vào git**) |
+| Đường dẫn                       | Nội dung                                                                                                                                                    |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `nlp/data/icd10_db.json`          | **12 137 mã**, mỗi mã có `code`, `code_no_dot`, `name_vi`, `name_en`, `synonyms`, `meta` (chương, nhóm, nguồn, ràng buộc A1–A4) |
+| `nlp/data/icd10_supplement.json`  | Mã bổ sung thủ công, bắt buộc ghi nguồn                                                                                                               |
+| `nlp/data/eval_set.json`          | Tập phát triển —**110 ca**, dùng để hiệu chỉnh luật                                                                                          |
+| `nlp/data/eval_holdout.json`      | Tập kiểm tra độc lập —**51 ca**, soạn sau khi đã khóa luật                                                                                  |
+| `nlp/data/embeddings_*.npy`       | Cache embedding danh mục (~145 MB/bản), sinh tự động                                                                                                    |
+| `nlp/data/alias_embeddings_*.npy` | Cache embedding của alias lâm sàng                                                                                                                        |
+| `nlp/my_medical_nlp_model/`       | SBERT tiếng Việt đã fine-tune (~540 MB,**không đưa vào git**)                                                                                  |
 
 Định dạng một ca đánh giá:
 
@@ -328,13 +328,13 @@ vì tên bệnh — lỗi này đã xảy ra thật và được chốt bằng `
 
 ### Kết quả hiện tại
 
-| Chỉ số | Tập phát triển (110 ca) | **Tập kiểm tra độc lập (51 ca)** |
-| --- | --- | --- |
-| Top-1 accuracy | 100,0% | **70,6%** |
-| Top-3 accuracy | 100,0% | 88,2% |
-| Top-5 accuracy | 100,0% | 92,2% |
-| MRR | 1,000 | 0,796 |
-| Độ trễ trung bình | 60 ms | 59 ms |
+| Chỉ số              | Tập phát triển (110 ca) | **Tập kiểm tra độc lập (51 ca)** |
+| --------------------- | -------------------------- | ------------------------------------------- |
+| Top-1 accuracy        | 100,0%                     | **70,6%**                             |
+| Top-3 accuracy        | 100,0%                     | 88,2%                                       |
+| Top-5 accuracy        | 100,0%                     | 92,2%                                       |
+| MRR                   | 1,000                      | 0,796                                       |
+| Độ trễ trung bình | 60 ms                      | 59 ms                                       |
 
 > **Cách đọc bảng này.** Tập phát triển (`eval_set.json`) đã được dùng để hiệu chỉnh luật,
 > alias và trọng số, nên con số 100% trên đó **không** phản ánh năng lực tổng quát hóa — chỉ
@@ -347,14 +347,14 @@ vì tên bệnh — lỗi này đã xảy ra thật và được chốt bằng `
 
 ### Diễn giải theo nhóm đầu vào (tập độc lập)
 
-| Nhóm | Số ca | Top-1 | Top-5 |
-| --- | --- | --- | --- |
-| Có viết tắt lâm sàng | 4 | 100,0% | 100,0% |
-| Gõ không dấu | 4 | 75,0% | 75,0% |
-| Chẩn đoán viết đầy đủ | 32 | 71,9% | 90,6% |
-| Có tiền tố hành văn | 3 | 66,7% | 100,0% |
-| Cặp đối lập ngữ nghĩa | 4 | 50,0% | 100,0% |
-| Chọn mức chi tiết của mã | 4 | 50,0% | 100,0% |
+| Nhóm                         | Số ca | Top-1  | Top-5  |
+| ----------------------------- | ------ | ------ | ------ |
+| Có viết tắt lâm sàng     | 4      | 100,0% | 100,0% |
+| Gõ không dấu               | 4      | 75,0%  | 75,0%  |
+| Chẩn đoán viết đầy đủ | 32     | 71,9%  | 90,6%  |
+| Có tiền tố hành văn      | 3      | 66,7%  | 100,0% |
+| Cặp đối lập ngữ nghĩa   | 4      | 50,0%  | 100,0% |
+| Chọn mức chi tiết của mã | 4      | 50,0%  | 100,0% |
 
 Hai nhóm yếu nhất (đối lập ngữ nghĩa, mức chi tiết) đều đạt **Top-5 = 100%** — mã đúng luôn
 nằm trong danh sách gợi ý, phù hợp với thiết kế *"máy gợi ý, bác sĩ chọn"*.
@@ -366,10 +366,10 @@ nằm trong danh sách gợi ý, phù hợp với thiết kế *"máy gợi ý, 
 .venv\Scripts\python -m pytest nlp/test_rang_buoc.py -v  # KHÔNG cần mô hình, chạy <1 giây
 ```
 
-| File | Kiểm điều gì |
-| --- | --- |
-| `nlp/test_nlp.py` | Ca lâm sàng lõi, giải viết tắt, phục hồi dấu, chuẩn hóa Unicode NFD/NFC, tách nhiều bệnh, cặp †/\*, chặn hồi quy trên **cả hai** tập đánh giá |
-| `nlp/test_rang_buoc.py` | Ràng buộc A2/A3/A4 trên dữ liệu danh mục: khoảng tuổi, giới tính, mã không được làm bệnh chính |
+| File                      | Kiểm điều gì                                                                                                                                                            |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nlp/test_nlp.py`       | Ca lâm sàng lõi, giải viết tắt, phục hồi dấu, chuẩn hóa Unicode NFD/NFC, tách nhiều bệnh, cặp †/\*, chặn hồi quy trên **cả hai** tập đánh giá |
+| `nlp/test_rang_buoc.py` | Ràng buộc A2/A3/A4 trên dữ liệu danh mục: khoảng tuổi, giới tính, mã không được làm bệnh chính                                                            |
 
 > **Nguyên tắc của bộ test này: mọi ca phải chỉ đích danh mã ICD-10 đúng.** Phiên bản trước
 > dùng tiền tố lỏng ("E1" khớp cả E10 lẫn E11) nên báo 4/4 PASS trong khi mô hình đang trả
@@ -431,30 +431,30 @@ NCKH/
 └── tests/                           ◄── Kiểm thử khối liên thông — xem B.8
 ```
 
-| File | Vai trò |
-| --- | --- |
-| `backend/main.py` | 9 endpoint, khóa nghiệp vụ ổn định, conditional update, chốt chặn mã cơ sở |
-| `backend/fhir_helper.py` | Toàn bộ hệ định danh dưới namespace `https://smig.nckh.vn/fhir`, 4 hàm dựng tài nguyên, kiểm định dạng CCCD/BHYT |
-| `hospital_his/server.py` | Bệnh án nội viện, một dòng bệnh án → nhiều Condition, sửa/gỡ chẩn đoán, tra bệnh sử toàn tuyến |
-| `VNPT_HIS/.../GatewayService.java` | Client gọi Gateway, **có từ điển dự phòng cục bộ**: Gateway offline vẫn tra được mã cơ bản và **ghi rõ trong bản ghi rằng kết quả không đến từ mô hình NLP** |
-| `VNPT_HIS/.../HisController.java` | Luồng nghiệp vụ đầy đủ: tiếp đón → hàng chờ → phòng khám → cận lâm sàng → kho dược → viện phí BHYT. Chẩn đoán lên trục khi bác sĩ bấm **Hoàn thành khám** |
-| `docker-compose.yml` | Trục dữ liệu, bật 3 cấu hình an toàn (xem B.4) |
+| File                                 | Vai trò                                                                                                                                                                                            |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `backend/main.py`                  | 9 endpoint, khóa nghiệp vụ ổn định, conditional update, chốt chặn mã cơ sở                                                                                                               |
+| `backend/fhir_helper.py`           | Toàn bộ hệ định danh dưới namespace`https://smig.nckh.vn/fhir`, 4 hàm dựng tài nguyên, kiểm định dạng CCCD/BHYT                                                                    |
+| `hospital_his/server.py`           | Bệnh án nội viện, một dòng bệnh án → nhiều Condition, sửa/gỡ chẩn đoán, tra bệnh sử toàn tuyến                                                                                   |
+| `VNPT_HIS/.../GatewayService.java` | Client gọi Gateway,**có từ điển dự phòng cục bộ**: Gateway offline vẫn tra được mã cơ bản và **ghi rõ trong bản ghi rằng kết quả không đến từ mô hình NLP** |
+| `VNPT_HIS/.../HisController.java`  | Luồng nghiệp vụ đầy đủ: tiếp đón → hàng chờ → phòng khám → cận lâm sàng → kho dược → viện phí BHYT. Chẩn đoán lên trục khi bác sĩ bấm**Hoàn thành khám** |
+| `docker-compose.yml`               | Trục dữ liệu, bật 3 cấu hình an toàn (xem B.4)                                                                                                                                               |
 
 ## B.2 API của SMIG Gateway
 
 Chín endpoint, chia đúng theo hai khối:
 
-| Endpoint | Khối | Việc làm |
-| --- | --- | --- |
-| `GET /health` | — | Trạng thái mô hình, chính sách tin cậy, mã cơ sở, cờ `allow_client_facility` |
-| `POST /api/standardize` | **NLP** | Chuẩn hóa câu chẩn đoán → danh sách mã ICD-10 (mục A.7) |
-| `GET /api/icd10/{code}` | **NLP** | Tra tên bệnh theo mã trong danh mục 12 137 mã |
-| `POST /api/fhir/condition` | **Liên thông** | Sinh tài nguyên FHIR Condition từ một mã |
-| `POST /api/fhir/sync` | **Liên thông** | Đẩy Organization → Patient → Condition lên EMR Cloud |
-| `GET /api/fhir/sync` | **Liên thông** | Đọc các Condition mới nhất trên trục (mọi cơ sở, kèm `id`) |
-| `GET /api/fhir/condition/{id}` | **Liên thông** | Đọc lại một Condition để đối chiếu |
-| `DELETE /api/fhir/condition/{id}` | **Liên thông** | Gỡ một Condition — **chỉ trong phạm vi cơ sở của mình** |
-| `DELETE /api/fhir/sync` | **Liên thông** | Dọn dữ liệu demo — cũng chỉ trong phạm vi cơ sở của mình |
+| Endpoint                            | Khối                  | Việc làm                                                                               |
+| ----------------------------------- | ---------------------- | ---------------------------------------------------------------------------------------- |
+| `GET /health`                     | —                     | Trạng thái mô hình, chính sách tin cậy, mã cơ sở, cờ `allow_client_facility` và `allow_demo_facility` |
+| `POST /api/standardize`           | **NLP**          | Chuẩn hóa câu chẩn đoán → danh sách mã ICD-10 (mục A.7)                        |
+| `GET /api/icd10/{code}`           | **NLP**          | Tra tên bệnh theo mã trong danh mục 12 137 mã                                       |
+| `POST /api/fhir/condition`        | **Liên thông** | Sinh tài nguyên FHIR Condition từ một mã                                            |
+| `POST /api/fhir/sync`             | **Liên thông** | Đẩy Organization → Patient → Condition lên EMR Cloud                                |
+| `GET /api/fhir/sync`              | **Liên thông** | Đọc các Condition mới nhất trên trục (mọi cơ sở, kèm`id`)                   |
+| `GET /api/fhir/condition/{id}`    | **Liên thông** | Đọc lại một Condition để đối chiếu                                              |
+| `DELETE /api/fhir/condition/{id}` | **Liên thông** | Gỡ một Condition —**chỉ trong phạm vi cơ sở của mình**                    |
+| `DELETE /api/fhir/sync`           | **Liên thông** | Dọn dữ liệu demo — cũng chỉ trong phạm vi cơ sở của mình                      |
 
 ### `POST /api/fhir/condition` — hợp đồng dữ liệu
 
@@ -493,16 +493,16 @@ Chín endpoint, chia đúng theo hai khối:
 
 Toàn bộ hệ định danh của đề tài nằm dưới namespace `https://smig.nckh.vn/fhir`:
 
-| Hằng số | Ý nghĩa |
-| --- | --- |
-| `ICD10_SYSTEM` | `http://hl7.org/fhir/sid/icd-10` — hệ mã quốc tế chuẩn |
-| `SYSTEM_CCCD`, `SYSTEM_BHYT` | Định danh **cấp quốc gia** của bệnh nhân |
-| `mrn_system(facility_code)` | Mã bệnh án — **kèm mã cơ sở**, vì chỉ có nghĩa trong nội bộ một viện |
-| `SYSTEM_FACILITY` | Mã cơ sở khám chữa bệnh |
-| `SYSTEM_CONDITION_KEY` | Khóa nghiệp vụ của Condition |
-| `EXT_CONFIDENCE` | Extension mang **độ tin cậy của mô hình NLP** |
-| `EXT_ENGINE` | Extension mang **phiên bản mô hình** đã sinh ra mã |
-| `EXT_SOURCE_FACILITY` | Extension trỏ tới `Organization` đã ghi chẩn đoán |
+| Hằng số                        | Ý nghĩa                                                                                 |
+| -------------------------------- | ----------------------------------------------------------------------------------------- |
+| `ICD10_SYSTEM`                 | `http://hl7.org/fhir/sid/icd-10` — hệ mã quốc tế chuẩn                            |
+| `SYSTEM_CCCD`, `SYSTEM_BHYT` | Định danh**cấp quốc gia** của bệnh nhân                                      |
+| `mrn_system(facility_code)`    | Mã bệnh án —**kèm mã cơ sở**, vì chỉ có nghĩa trong nội bộ một viện |
+| `SYSTEM_FACILITY`              | Mã cơ sở khám chữa bệnh                                                             |
+| `SYSTEM_CONDITION_KEY`         | Khóa nghiệp vụ của Condition                                                          |
+| `EXT_CONFIDENCE`               | Extension mang**độ tin cậy của mô hình NLP**                                  |
+| `EXT_ENGINE`                   | Extension mang**phiên bản mô hình** đã sinh ra mã                            |
+| `EXT_SOURCE_FACILITY`          | Extension trỏ tới`Organization` đã ghi chẩn đoán                                 |
 
 Bốn hàm dựng tài nguyên: `build_fhir_condition_resource()`, `build_fhir_patient_resource()`,
 `build_fhir_organization_resource()`, và `patient_match_key()`.
@@ -536,11 +536,11 @@ Mỗi thành phần chặn một kiểu trộn dữ liệu:
 **(b) Conditional update.** Đồng bộ dùng `PUT /{Type}?identifier=...` thay vì `POST`, nên
 thao tác **idempotent**:
 
-| Số bản khớp | Hành vi máy chủ |
-| --- | --- |
-| 0 | Tạo mới, máy chủ tự cấp id |
-| 1 | Cập nhật đúng bản đó |
-| >1 | Trả **412**, không sửa gì |
+| Số bản khớp | Hành vi máy chủ                 |
+| -------------- | ---------------------------------- |
+| 0              | Tạo mới, máy chủ tự cấp id   |
+| 1              | Cập nhật đúng bản đó        |
+| >1             | Trả**412**, không sửa gì |
 
 Client **không tự đặt id tài nguyên** — id đoán được cộng với `PUT` theo id là một lỗ ghi đè.
 Ba cấu hình an toàn được bật trên EMR Cloud (`docker-compose.yml`):
@@ -559,11 +559,11 @@ nhân mang họ tên, giới tính và ngày sinh của **người thứ hai**.
 
 `patient_match_key()` chọn khóa theo **phạm vi hiệu lực** của định danh:
 
-| Ưu tiên | Định danh | Phạm vi | `identifier.system` |
-| --- | --- | --- | --- |
-| 1 | Số CCCD (12 số) | Toàn quốc | `.../identifier/cccd` |
-| 2 | Thẻ BHYT (10 số) | Toàn quốc | `.../identifier/bhyt` |
-| 3 | Mã bệnh án | **Một cơ sở** | `.../identifier/mrn/{mã cơ sở}` |
+| Ưu tiên | Định danh        | Phạm vi               | `identifier.system`                |
+| --------- | ------------------ | ---------------------- | ------------------------------------ |
+| 1         | Số CCCD (12 số)  | Toàn quốc            | `.../identifier/cccd`              |
+| 2         | Thẻ BHYT (10 số mẫu mới, hoặc 15 ký tự mẫu cũ) | Toàn quốc            | `.../identifier/bhyt`              |
+| 3         | Mã bệnh án      | **Một cơ sở** | `.../identifier/mrn/{mã cơ sở}` |
 
 Khóa đồng nhất chỉ được là **một** cặp `(system, value)` — nó là khóa để conditional update
 tìm lại đúng một bản ghi. BHYT mang `system` riêng chứ không mượn `SYSTEM_CCCD`: dán nhầm
@@ -607,18 +607,18 @@ Chốt chặn này áp cho **cả đường ghi lẫn đường xóa**:
 Lưu bệnh án cục bộ bằng SQLite (hai bảng: `patients`, `patient_conditions`), gọi Gateway để
 chuẩn hóa và liên thông.
 
-| Endpoint | Chức năng |
-| --- | --- |
-| `GET /api/config` | Mã cơ sở, địa chỉ Gateway mà bản HIS này đang trỏ tới |
-| `GET /api/patients` | Danh sách bệnh án — **kèm luôn chẩn đoán của tuyến khác** trên trục, ghi rõ nơi khám |
-| `GET /api/patients?search_id=` | Tra cứu bằng **mã bệnh án, CCCD hoặc thẻ BHYT**; không có cục bộ thì kéo từ EMR Cloud |
-| `GET /api/patients/{id}/history` | Bệnh sử **toàn tuyến** của một bệnh nhân đã tiếp nhận tại đây |
-| `POST /api/patients` | Tiếp nhận bệnh nhân mới |
-| `POST /api/patients/{id}/diagnosis` | Chẩn đoán thêm bệnh mới, **giữ nguyên** chẩn đoán cũ |
-| `PUT /api/patients/{id}/conditions/{code}` | **Sửa** một chẩn đoán đã ghi nhận |
-| `DELETE /api/patients/{id}/conditions/{code}` | Gỡ một chẩn đoán khỏi bệnh án **và khỏi trục** |
-| `POST /api/sync/{id}` | Liên thông lại toàn bộ hồ sơ |
-| `DELETE /api/patients/{id}` · `POST /api/reset` | Dọn dữ liệu demo |
+| Endpoint                                             | Chức năng                                                                                                |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `GET /api/config`                                  | Mã cơ sở, địa chỉ Gateway mà bản HIS này đang trỏ tới                                          |
+| `GET /api/patients`                                | Danh sách bệnh án —**kèm luôn chẩn đoán của tuyến khác** trên trục, ghi rõ nơi khám |
+| `GET /api/patients?search_id=`                     | Tra cứu bằng**mã bệnh án, CCCD hoặc thẻ BHYT**; không có cục bộ thì kéo từ EMR Cloud   |
+| `GET /api/patients/{id}/history`                   | Bệnh sử**toàn tuyến** của một bệnh nhân đã tiếp nhận tại đây                          |
+| `POST /api/patients`                               | Tiếp nhận bệnh nhân mới                                                                               |
+| `POST /api/patients/{id}/diagnosis`                | Chẩn đoán thêm bệnh mới,**giữ nguyên** chẩn đoán cũ                                      |
+| `PUT /api/patients/{id}/conditions/{code}`         | **Sửa** một chẩn đoán đã ghi nhận                                                            |
+| `DELETE /api/patients/{id}/conditions/{code}`      | Gỡ một chẩn đoán khỏi bệnh án**và khỏi trục**                                             |
+| `POST /api/sync/{id}`                              | Liên thông lại toàn bộ hồ sơ                                                                        |
+| `DELETE /api/patients/{id}` · `POST /api/reset` | Dọn dữ liệu demo                                                                                        |
 
 Hai điểm nghiệp vụ đáng nêu trong báo cáo:
 
@@ -637,15 +637,15 @@ Hai điểm nghiệp vụ đáng nêu trong báo cáo:
 Mô phỏng phần mềm bệnh viện thương mại, dùng để chứng minh **hai hệ thống khác công nghệ vẫn
 liên thông được qua cùng một Gateway**. `HisController.java` lộ 20 endpoint dưới `/api`:
 
-| Nhóm | Endpoint |
-| --- | --- |
-| Tiếp đón | `GET /patients`, `GET /patients/lookup`, `POST /patients`, `DELETE /patients/{id}` |
-| Hàng chờ | `GET /queue`, `POST /queue/register`, `POST /queue/update-status` |
-| Phòng khám | `POST /exam/standardize` → gọi `POST /api/standardize` của Gateway; `POST /exam/save` → **đẩy chẩn đoán lên trục**; `GET /exam/patient/{id}`, `GET /exam/records` |
-| Cận lâm sàng | `GET /cls/orders`, `POST /cls/result` |
-| Kho dược | `GET /drugs`, `POST /drugs`, `GET /pharmacy/prescriptions`, `POST /pharmacy/dispense/{id}` |
-| Viện phí BHYT | `GET /billing/bills`, `POST /billing/pay/{id}` |
-| Quản trị | `GET /admin/dashboard`, `POST /admin/reset` |
+| Nhóm           | Endpoint                                                                                                                                                                                     |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tiếp đón     | `GET /patients`, `GET /patients/lookup`, `POST /patients`, `DELETE /patients/{id}`                                                                                                   |
+| Hàng chờ      | `GET /queue`, `POST /queue/register`, `POST /queue/update-status`                                                                                                                      |
+| Phòng khám    | `POST /exam/standardize` → gọi `POST /api/standardize` của Gateway; `POST /exam/save` → **đẩy chẩn đoán lên trục**; `GET /exam/patient/{id}`, `GET /exam/records` |
+| Cận lâm sàng | `GET /cls/orders`, `POST /cls/result`                                                                                                                                                    |
+| Kho dược      | `GET /drugs`, `POST /drugs`, `GET /pharmacy/prescriptions`, `POST /pharmacy/dispense/{id}`                                                                                           |
+| Viện phí BHYT | `GET /billing/bills`, `POST /billing/pay/{id}`                                                                                                                                           |
+| Quản trị      | `GET /admin/dashboard`, `POST /admin/reset`                                                                                                                                              |
 
 `model/Patient.java` có `citizenId` và `insuranceCard` — điều kiện để trục nhận ra cùng một
 người khám ở hai bệnh viện (mục B.5).
@@ -660,20 +660,20 @@ người khám ở hai bệnh viện (mục B.5).
 Bộ này dựng sẵn một **EMR Cloud giả lập trong bộ nhớ**, bắt chước đúng cơ chế conditional
 update mà việc đồng nhất bệnh nhân dựa vào.
 
-| File | Kiểm điều gì |
-| --- | --- |
-| `tests/conftest.py` | EMR Cloud giả lập, mô phỏng đúng conditional update (0/1/nhiều bản khớp) |
-| `tests/test_sua_chan_doan.py` | Bác sĩ sửa/gỡ chẩn đoán đã ghi nhận, tính lại chẩn đoán chính, chặn trạng thái không hợp lệ |
-| `tests/test_nhieu_co_so.py` | Một Gateway phục vụ nhiều bệnh viện, chốt chặn mã cơ sở (B.6) |
-| `tests/test_chuyen_tuyen.py` | BV A chẩn đoán → chuyển tuyến → BV B thêm bệnh, tra bệnh sử bằng CCCD |
-| `tests/test_benh_su_toan_truc.py` | Bệnh sử đầy đủ: nội viện **cộng** mọi tuyến khác; không đếm đôi, nói đúng lý do khi rỗng |
-| `tests/test_danh_sach_lien_thong.py` | Màn hình chính phải hiện luôn chẩn đoán tuyến khác kèm nơi khám |
-| `tests/test_kiem_dinh_danh.py` | Định danh toàn quốc sai định dạng phải bị từ chối, không âm thầm tách hồ sơ |
-| `tests/test_dinh_danh_bo_sung_sau.py` | Bổ sung CCCD ở lần khám sau **không** được đổi khóa đồng nhất |
-| `tests/test_xoa_theo_co_so.py` | Xóa hàng loạt phải dừng trong phạm vi cơ sở của mình |
-| `tests/test_go_mot_chan_doan.py` | Gỡ **một** bản ghi cũng phải kiểm cơ sở — chặn xóa chéo |
-| `tests/test_ten_benh_theo_danh_muc.py` | Chẩn đoán lên trục phải mang **tên bệnh**, không phải nhãn chỗ điền tạm |
-| `tests/test_luong_nlp_khong_doi.py` | **Chốt ranh giới hai khối**: chức năng liên thông thêm vào không được đụng kết quả NLP |
+| File                                     | Kiểm điều gì                                                                                                    |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `tests/conftest.py`                    | EMR Cloud giả lập, mô phỏng đúng conditional update (0/1/nhiều bản khớp)                                   |
+| `tests/test_sua_chan_doan.py`          | Bác sĩ sửa/gỡ chẩn đoán đã ghi nhận, tính lại chẩn đoán chính, chặn trạng thái không hợp lệ   |
+| `tests/test_nhieu_co_so.py`            | Một Gateway phục vụ nhiều bệnh viện, chốt chặn mã cơ sở (B.6)                                            |
+| `tests/test_chuyen_tuyen.py`           | BV A chẩn đoán → chuyển tuyến → BV B thêm bệnh, tra bệnh sử bằng CCCD                                   |
+| `tests/test_benh_su_toan_truc.py`      | Bệnh sử đầy đủ: nội viện**cộng** mọi tuyến khác; không đếm đôi, nói đúng lý do khi rỗng |
+| `tests/test_danh_sach_lien_thong.py`   | Màn hình chính phải hiện luôn chẩn đoán tuyến khác kèm nơi khám                                       |
+| `tests/test_kiem_dinh_danh.py`         | Định danh toàn quốc sai định dạng phải bị từ chối, không âm thầm tách hồ sơ                        |
+| `tests/test_dinh_danh_bo_sung_sau.py`  | Bổ sung CCCD ở lần khám sau**không** được đổi khóa đồng nhất                                    |
+| `tests/test_xoa_theo_co_so.py`         | Xóa hàng loạt phải dừng trong phạm vi cơ sở của mình                                                      |
+| `tests/test_go_mot_chan_doan.py`       | Gỡ**một** bản ghi cũng phải kiểm cơ sở — chặn xóa chéo                                            |
+| `tests/test_ten_benh_theo_danh_muc.py` | Chẩn đoán lên trục phải mang**tên bệnh**, không phải nhãn chỗ điền tạm                         |
+| `tests/test_luong_nlp_khong_doi.py`    | **Chốt ranh giới hai khối**: chức năng liên thông thêm vào không được đụng kết quả NLP       |
 
 > `tests/test_ten_benh_theo_danh_muc.py` sinh ra từ một lỗi đo được: VNPT HIS đẩy chẩn đoán
 > kèm theo lên trục với `icd10_display` là đúng chuỗi *"Chẩn đoán kèm theo"*. Kết quả: I21.9
@@ -687,13 +687,13 @@ update mà việc đồng nhất bệnh nhân dựa vào.
 
 Kết quả của mô hình **không** được tự động ghi nhận là chẩn đoán đã xác nhận:
 
-| Độ tin cậy | `Condition.verificationStatus` | Hành vi hệ thống |
-| --- | --- | --- |
-| ≥ 85% | `provisional` (dải `auto_confirm`) | Liên thông tự động |
-| 60 – 85% | `provisional` | Dừng, chờ bác sĩ duyệt |
-| 40 – 60% | `unconfirmed` | Dừng, chờ bác sĩ duyệt |
-| < 40% | — | Từ chối sinh tài nguyên FHIR (HTTP 422) |
-| — | `confirmed` | **Chỉ** khi có thao tác duyệt/chọn mã của bác sĩ |
+| Độ tin cậy | `Condition.verificationStatus`        | Hành vi hệ thống                                             |
+| ------------- | --------------------------------------- | --------------------------------------------------------------- |
+| ≥ 85%        | `provisional` (dải `auto_confirm`) | Liên thông tự động                                         |
+| 60 – 85%     | `provisional`                         | Dừng, chờ bác sĩ duyệt                                     |
+| 40 – 60%     | `unconfirmed`                         | Dừng, chờ bác sĩ duyệt                                     |
+| < 40%         | —                                      | Từ chối sinh tài nguyên FHIR (HTTP 422)                     |
+| —            | `confirmed`                           | **Chỉ** khi có thao tác duyệt/chọn mã của bác sĩ |
 
 **Vì sao máy không bao giờ tự gán `confirmed`** (`verification_status_for()` trong
 `nlp/clinical_rules.py`). Trong đặc tả HL7 FHIR, `confirmed` nghĩa là chẩn đoán **đã được xác
@@ -817,7 +817,7 @@ NCKH/
 docker compose up -d
 ```
 
-Chờ ~60 giây rồi kiểm tra <http://127.0.0.1:8090/fhir/metadata>. Bỏ qua bước này thì mọi thao
+Chờ ~60 giây rồi kiểm tra [http://127.0.0.1:8090/fhir/metadata](http://127.0.0.1:8090/fhir/metadata). Bỏ qua bước này thì mọi thao
 tác đồng bộ báo lỗi **503**. Lần khởi động đầu chậm hơn (~90 giây) vì HAPI phải tạo schema.
 
 ### Bước 2 — SMIG Gateway
@@ -827,7 +827,7 @@ tác đồng bộ báo lỗi **503**. Lần khởi động đầu chậm hơn (~
 ```
 
 hoặc bấm đúp **`run.bat`**. Lần đầu chạy sẽ tự tạo `.venv` và cài thư viện.
-Giao diện: <http://127.0.0.1:8000>
+Giao diện: [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
 ### Bước 3 — HIS mô phỏng (tùy chọn)
 
@@ -850,6 +850,12 @@ Mỗi bệnh viện là **một bản Gateway riêng** với mã cơ sở riêng
 `-FacilityCode` của HIS **phải trùng** với `-FacilityCode` của Gateway mà nó gọi. Lệch nhau
 thì Gateway trả 403 và HIS tra cứu sai namespace mã bệnh án.
 
+> `BV-A-001` và `BV-B-002` là **mã đặt tạm cho kịch bản trình diễn**, không phải mã CSKCB.
+> `run.ps1` nhận ra chúng qua tiền tố `BV-` và tự bật `SMIG_ALLOW_DEMO_FACILITY=1` — xem
+> [Mã cơ sở khám chữa bệnh lấy ở đâu](#mã-cơ-sở-khám-chữa-bệnh-lấy-ở-đâu). Muốn diễn đúng
+> điều kiện triển khai thì thay bằng **hai mã CSKCB thật** của hai cơ sở; khi đó cả hai bản
+> Gateway chạy ở chế độ chặt và dữ liệu sinh ra đối chiếu được với cổng giám định BHYT.
+
 #### Cách nhẹ hơn: một Gateway phục vụ cả hai bệnh viện
 
 Mô hình NLP chiếm vài GB RAM nên chạy hai bản Gateway trên một máy là quá nặng. Khi chỉ thử
@@ -864,6 +870,11 @@ nghiệm cục bộ:
 Hai bản HIS Python tự động dùng **hai tệp SQLite riêng** (suy ra từ `-FacilityCode`, đổi được
 bằng `-DbPath`) — dùng chung một tệp thì hai "bệnh viện" nhìn thấy y nguyên danh sách bệnh
 nhân của nhau.
+
+Ở cách này mã cơ sở do HIS **tự khai trong từng yêu cầu**, và Gateway không kiểm dạng mã tự
+khai — cửa kiểm mã CSKCB chỉ đứng ở cấu hình lúc khởi động. Vì vậy mã đặt tạm vẫn dùng được
+kể cả khi bản Gateway đang chạy ở chế độ chặt. Siết luôn cả đường tự khai thuộc T1.4, nơi mã
+cơ sở chuyển từ lời khai sang tra ra từ khóa API đã xác thực.
 
 > **Chỉ dùng để thử nghiệm.** Mã cơ sở là *danh tính* của bên ghi hồ sơ. Để bên gọi tự khai
 > thì bệnh viện B khai mình là bệnh viện A được ngay. Triển khai thật giữ cờ này **tắt** (mặc
@@ -885,20 +896,56 @@ docker compose up -d
 
 Đọc từ biến môi trường, đều có giá trị mặc định cho môi trường demo:
 
-| Biến | Mặc định | Ý nghĩa |
-| --- | --- | --- |
-| `SMIG_FHIR_SERVER_URL` | `http://127.0.0.1:8090/fhir` | Địa chỉ EMR Cloud |
-| `SMIG_ALLOWED_ORIGINS` | `127.0.0.1:8000,8085` | Danh sách nguồn CORS |
-| `SMIG_GATEWAY_URL` | `http://127.0.0.1:8000` | Địa chỉ Gateway (dùng bởi HIS) |
-| `SMIG_FHIR_TIMEOUT` | `8` | Thời gian chờ gọi FHIR (giây) |
-| `SMIG_HIS_TIMEOUT` | `60` | Thời gian chờ HIS gọi Gateway (giây) |
-| `SMIG_FACILITY_CODE` | `BV-DEMO-01` | **Mã cơ sở khám chữa bệnh** của bản Gateway này |
-| `SMIG_FACILITY_NAME` | `Bệnh viện Demo SMIG` | Tên cơ sở, hiện trên mỗi chẩn đoán |
-| `SMIG_ALLOW_CLIENT_FACILITY` | *tắt* | Cho phép HIS tự khai mã cơ sở — **chỉ để thử nghiệm** |
+| Biến                          | Mặc định                    | Ý nghĩa                                                                                             |
+| ------------------------------ | ------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| `SMIG_FHIR_SERVER_URL`       | `http://127.0.0.1:8090/fhir` | Địa chỉ EMR Cloud                                                                                  |
+| `SMIG_ALLOWED_ORIGINS`       | `127.0.0.1:8000,8085`        | Danh sách nguồn CORS                                                                                |
+| `SMIG_GATEWAY_URL`           | `http://127.0.0.1:8000`      | Địa chỉ Gateway (dùng bởi HIS)                                                                   |
+| `SMIG_FHIR_TIMEOUT`          | `8`                          | Thời gian chờ gọi FHIR (giây)                                                                     |
+| `SMIG_HIS_TIMEOUT`           | `60`                         | Thời gian chờ HIS gọi Gateway (giây)                                                              |
+| `SMIG_FACILITY_CODE`         | `79001`                      | **Mã cơ sở khám chữa bệnh** của bản Gateway này — kiểm dạng lúc khởi động       |
+| `SMIG_FACILITY_NAME`         | `Benh vien mo phong Viettel`      | Tên cơ sở, hiện trên mỗi chẩn đoán                                                           |
+| `SMIG_ALLOW_CLIENT_FACILITY` | *tắt*                       | Cho phép HIS tự khai mã cơ sở —**chỉ để thử nghiệm**                                 |
+| `SMIG_ALLOW_DEMO_FACILITY`   | *tắt*                       | Cho phép mã cơ sở**tự đặt** thay cho mã CSKCB thật — **chỉ để trình diễn** |
 
 > **Mỗi bệnh viện triển khai một bản Gateway với `SMIG_FACILITY_CODE` riêng.** Hai bản dùng
 > trùng mã sẽ trộn hồ sơ của hai bệnh viện vào nhau (mục B.5). HIS đọc cùng biến này để tra
 > cứu đúng namespace mã bệnh án.
+
+#### Mã cơ sở khám chữa bệnh lấy ở đâu
+
+`SMIG_FACILITY_CODE` phải là **mã CSKCB do cơ quan Bảo hiểm xã hội cấp**, không phải mã tự
+đặt. Mã gồm **5 chữ số**, hai số đầu là mã tỉnh, ba số sau là số thứ tự trong tỉnh — ví dụ
+`01001`. Mã không chứa chữ cái. Đây là mã mà cơ sở đang
+dùng hằng ngày ở hai chỗ:
+
+* trường `MA_CSKCB` trong bộ XML gửi cổng tiếp nhận giám định BHYT theo **QĐ 130/QĐ-BYT**;
+* hồ sơ ký hợp đồng khám chữa bệnh BHYT với cơ quan BHXH tỉnh.
+
+Phòng Kế hoạch tổng hợp hoặc bộ phận phụ trách giám định BHYT của cơ sở nắm mã này. Danh mục
+đầy đủ do BHXH Việt Nam công bố, và phần mềm HIS đang chạy tại cơ sở cũng đã cấu hình sẵn —
+lấy đúng mã HIS đang xuất XML là chắc chắn nhất.
+
+Mã này đi vào **ba chỗ định danh** của mọi bản ghi Gateway ghi lên trục: khóa nghiệp vụ của
+`Condition`, `meta.tag`, và namespace của mã bệnh án. Đặt sai thì dữ liệu không đối chiếu
+được với bất kỳ hệ thống nhà nước nào, và sửa về sau nghĩa là phải migrate toàn bộ. Vì vậy
+Gateway **kiểm dạng ngay lúc khởi động và dừng hẳn nếu sai**, thay vì chạy tiếp:
+
+```
+Cấu hình SMIG_FACILITY_CODE không dùng được. Mã cơ sở khám chữa bệnh 'BV-DEMO-01'
+không đúng dạng: mã CSKCB do cơ quan BHXH cấp gồm 5 chữ số, hai số đầu là mã
+tỉnh, ví dụ 01001. ...
+```
+
+> **`79001` trong kho mã này là mã ví dụ đúng dạng, không trỏ tới cơ sở nào.** Tên đi kèm
+> (`Benh vien mo phong Viettel`) cũng vậy. Triển khai thật phải thay **cả hai**: mã lấy theo
+> hướng dẫn ngay trên, tên lấy đúng tên cơ sở đã đăng ký với cơ quan BHXH — tên này đi vào
+> `Organization.name` và hiện trên mọi chẩn đoán mà cơ sở ghi lên trục.
+
+Môi trường trình diễn chưa có mã thật thì đặt `SMIG_ALLOW_DEMO_FACILITY=1` để dùng mã tự đặt.
+`run.ps1` tự bật cờ này khi `-FacilityCode` bắt đầu bằng `BV-`, và **giữ chế độ chặt với mọi
+mã khác** — gõ nhầm một ký tự của mã thật thì Gateway dừng, chứ không âm thầm chạy tiếp. Trạng
+thái cờ phơi ra ở `GET /health` (`allow_demo_facility`), nhìn là biết bản đang chạy ở chế độ nào.
 
 EMR Cloud lưu dữ liệu trong PostgreSQL gắn named volume `hapi-pgdata`, nên
 `docker compose restart` hay `down` rồi `up -d` đều **không** mất dữ liệu. Chỉ
@@ -924,21 +971,20 @@ Ba bộ tách bạch theo thứ chúng kiểm:
 .venv\Scripts\python -m nlp.evaluate --dataset nlp/data/eval_holdout.json --show-errors
 ```
 
-| Bộ | Phạm vi | Cần mô hình? | Cần Docker? |
-| --- | --- | --- | --- |
-| `nlp/test_nlp.py` | Chất lượng NLP (Phần A) | Có | Không |
-| `nlp/test_rang_buoc.py` | Luật trên danh mục (Phần A) | Không | Không |
-| `tests/` | Đường liên thông (Phần B) | Không | Không |
+| Bộ                       | Phạm vi                        | Cần mô hình? | Cần Docker? |
+| ------------------------- | ------------------------------- | --------------- | ------------ |
+| `nlp/test_nlp.py`       | Chất lượng NLP (Phần A)     | Có             | Không       |
+| `nlp/test_rang_buoc.py` | Luật trên danh mục (Phần A) | Không          | Không       |
+| `tests/`                | Đường liên thông (Phần B) | Không          | Không       |
 
 ---
 
 ## H. Kịch bản trình diễn
 
-### H.1 Trên Gateway (<http://127.0.0.1:8000>) — làm nổi bật **khối NLP**
+### H.1 Trên Gateway ([http://127.0.0.1:8000](http://127.0.0.1:8000)) — làm nổi bật **khối NLP**
 
 1. Bấm nút mẫu **`ĐTĐ tuýp 2 & THA`** (hoặc gõ tay).
-2. **Bước 1 — Chuẩn hóa:** `ĐTĐ` → `đái tháo đường`, hệ thống nối thêm `không phụ thuộc
-   insuline`; các từ được thêm/đổi được bôi màu.
+2. **Bước 1 — Chuẩn hóa:** `ĐTĐ` → `đái tháo đường`, hệ thống nối thêm `không phụ thuộc insuline`; các từ được thêm/đổi được bôi màu.
 3. **Bước 2 — NER:** thực thể y khoa bôi màu ngay trong nguyên văn của bác sĩ.
 4. **Bước 3 — Ánh xạ ICD-10:** hiển thị `E11.9` kèm độ tin cậy **và lý do** ("khớp alias lâm
    sàng đã kiểm chứng", "xung đột diabetes_type…").
@@ -948,7 +994,7 @@ Ba bộ tách bạch theo thứ chúng kiểm:
 > **Điểm nên nhấn:** bấm nút **`Gõ không dấu`** để cho thấy hệ thống xử lý được
 > `hen phe quan cap tinh khong di ung` — tình huống rất thật trong bệnh án Việt Nam.
 
-### H.2 Trên HIS (<http://127.0.0.1:8085>) — làm nổi bật **khối liên thông**
+### H.2 Trên HIS ([http://127.0.0.1:8085](http://127.0.0.1:8085)) — làm nổi bật **khối liên thông**
 
 1. Bấm **Đồng bộ** ở một dòng bệnh nhân.
 2. Tab **Log chi tiết** hiện đủ 3 bước: chuẩn hóa NLP → sinh FHIR → truyền EMR.
@@ -1024,12 +1070,12 @@ hiệu tên bệnh viện đó và **không sửa được** từ đây.
 
 ## K. Tài liệu chi tiết
 
-| Tài liệu | Nội dung |
-| --- | --- |
-| `docs/cac-file-nlp-va-lien-thong.md` | Bản đồ **từng file mã nguồn** chia theo hai khối — dành cho người viết báo cáo |
-| `docs/luong-xu-ly-chan-doan.md` | Truy vết đường đi của **một câu chẩn đoán** qua từng hàm |
-| `docs/chi-tiet-ky-thuat-7-file-loi.md` | Chi tiết kỹ thuật 7 file lõi |
-| `docs/thaydoi.md` | Nhật ký thay đổi, kèm số đo trước/sau mỗi lần sửa |
-| `docs/T0.md` | Củng cố an ninh trục EMR — **đã thực hiện** |
-| `docs/T1.md` | **Kế hoạch** đưa khối liên thông khớp khung pháp lý VN: TT 13/2025/TT-BYT, QĐ 130/QĐ-BYT, VN Core IG, Luật 91/2025/QH15 |
-| `Cong_thuc_toan_hoc_NLP_ICD10.docx` | Công thức toán học của tầng tái xếp hạng và hiệu chuẩn |
+| Tài liệu                               | Nội dung                                                                                                                                  |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `docs/cac-file-nlp-va-lien-thong.md`   | Bản đồ**từng file mã nguồn** chia theo hai khối — dành cho người viết báo cáo                                          |
+| `docs/luong-xu-ly-chan-doan.md`        | Truy vết đường đi của**một câu chẩn đoán** qua từng hàm                                                                 |
+| `docs/chi-tiet-ky-thuat-7-file-loi.md` | Chi tiết kỹ thuật 7 file lõi                                                                                                           |
+| `docs/thaydoi.md`                      | Nhật ký thay đổi, kèm số đo trước/sau mỗi lần sửa                                                                              |
+| `docs/T0.md`                           | Củng cố an ninh trục EMR —**đã thực hiện**                                                                                   |
+| `docs/T1.md`                           | **Kế hoạch** đưa khối liên thông khớp khung pháp lý VN: TT 13/2025/TT-BYT, QĐ 130/QĐ-BYT, VN Core IG, Luật 91/2025/QH15 |
+| `Cong_thuc_toan_hoc_NLP_ICD10.docx`    | Công thức toán học của tầng tái xếp hạng và hiệu chuẩn                                                                         |
