@@ -36,6 +36,21 @@ if (-not (Test-Path ".venv")) {
     Exit 1
 }
 
+# Nap hospital_his\.env neu co (dang KEY=VALUE, mot dong mot bien, # la chu thich).
+# Tep nay nam trong .gitignore (*.env) - cho de khoa API, khong phai go lai moi lan.
+# Tham so dong lenh (-GatewayApiKey ...) van thang gia tri trong .env.
+$envFile = Join-Path $PSScriptRoot ".env"
+if (Test-Path $envFile) {
+    Get-Content $envFile | ForEach-Object {
+        $line = $_.Trim()
+        if ($line -and -not $line.StartsWith("#") -and $line.Contains("=")) {
+            $k, $v = $line.Split("=", 2)
+            [Environment]::SetEnvironmentVariable($k.Trim(), $v.Trim().Trim('"'), "Process")
+        }
+    }
+    Write-Host "[INFO] Da nap cau hinh tu $envFile" -ForegroundColor Green
+}
+
 $env:SMIG_GATEWAY_URL = $GatewayUrl
 $env:SMIG_FACILITY_CODE = $FacilityCode
 $env:SMIG_FACILITY_NAME = $FacilityName

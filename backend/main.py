@@ -21,7 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 
-from backend import auth #
+from backend import auth
 from backend.fhir_helper import (
     EXT_SOURCE_FACILITY,
     SYSTEM_CONDITION_KEY,

@@ -301,6 +301,12 @@ async def authenticate_caller(
 
 # --- CLI -------------------------------------------------------------------
 def _cli(argv: Optional[List[str]] = None) -> int:
+    # Console Windows mặc định cp1252 không in được tên cơ sở có dấu, và lệnh
+    # `list` vỡ ngay ở dòng đầu. Ép UTF-8 cho riêng tiến trình CLI này.
+    for luong in (sys.stdout, sys.stderr):
+        if hasattr(luong, "reconfigure"):
+            luong.reconfigure(encoding="utf-8", errors="replace")
+
     parser = argparse.ArgumentParser(
         prog="python -m backend.auth",
         description="Cấp, liệt kê, thu hồi khóa API của SMIG Gateway.")
