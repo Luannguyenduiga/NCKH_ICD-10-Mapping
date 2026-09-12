@@ -21,7 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 
-from backend import auth
+from backend import auth #
 from backend.fhir_helper import (
     EXT_SOURCE_FACILITY,
     SYSTEM_CONDITION_KEY,
@@ -129,7 +129,7 @@ async def lifespan(_: FastAPI):
     _chot_ma_co_so()
     # Cùng lý do với mã cơ sở: bắt buộc khóa mà kho trống là mọi yêu cầu liên
     # thông đều 401, phải chết lúc bật máy chứ không phải lúc HIS gọi tới.
-    print(auth.chot_cau_hinh_khoa())
+    print(auth.check_api_key_config())
     try:
         nlp_engine = NLPEngine()
     except Exception as exc:  # noqa: BLE001 - giữ server sống để /health báo lỗi rõ ràng
@@ -146,11 +146,11 @@ app = FastAPI(
     version="2.0.0",
     lifespan=lifespan,
     # Cửa xác thực đứng ở mức ứng dụng, trước mọi route: chỉ nhóm `/api/fhir/*`
-    # phải mang khóa (xem `auth.DUONG_DAN_CAN_KHOA`), các route khác đi qua
+    # phải mang khóa (xem `auth.API_KEY_PATHS`), các route khác đi qua
     # không bị hỏi. Đặt ở đây thay vì ở từng endpoint để thêm một đường liên
     # thông mới (T1.3 Encounter, T1.5 XML130) là tự động được bảo vệ, không
     # phải nhớ gắn thêm tham số.
-    dependencies=[Depends(auth.xac_thuc_ben_goi)],
+    dependencies=[Depends(auth.authenticate_caller)],
 )
 
 # CORS giới hạn theo danh sách nguồn cụ thể. Dùng "*" kèm allow_credentials=True
@@ -341,18 +341,18 @@ def resolve_facility(
     """
     code = (claimed_code or "").strip()
 
-    ben_goi = auth.ben_goi_hien_tai()
-    if ben_goi is not None:
-        if code and code != ben_goi.facility_code:
+    caller = auth.current_caller()
+    if caller is not None:
+        if code and code != caller.facility_code:
             raise HTTPException(
                 status_code=403,
                 detail=(
-                    f"Khóa API thuộc cơ sở '{ben_goi.facility_code}' "
-                    f"({ben_goi.facility_name}) nhưng yêu cầu mang mã cơ sở '{code}'. "
+                    f"Khóa API thuộc cơ sở '{caller.facility_code}' "
+                    f"({caller.facility_name}) nhưng yêu cầu mang mã cơ sở '{code}'. "
                     f"Mỗi cơ sở chỉ ghi, đọc và gỡ hồ sơ dưới danh nghĩa của chính mình."
                 ),
             )
-        return ben_goi.facility_code, ben_goi.facility_name
+        return caller.facility_code, caller.facility_name
 
     if not code or code == FACILITY_CODE:
         return FACILITY_CODE, FACILITY_NAME
@@ -518,9 +518,9 @@ def health_check():
         "allow_demo_facility": ALLOW_DEMO_FACILITY,
         # Đường liên thông có đang đòi khóa API hay không, và kho có bao nhiêu
         # khóa đang hiệu lực. Không bao giờ phơi khóa hay tiền tố ở đây.
-        "require_api_key": auth.yeu_cau_khoa(),
-        "api_keys_active": auth.kho.dang_hieu_luc(),
-        "api_key_header": auth.HEADER_KHOA,
+        "require_api_key": auth.api_key_required(),
+        "api_keys_active": auth.key_store.active_count(),
+        "api_key_header": auth.API_KEY_HEADER,
         "timestamp": time.time(),
     }
 

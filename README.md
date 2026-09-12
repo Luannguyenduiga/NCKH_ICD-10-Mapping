@@ -646,8 +646,8 @@ vậy có `GET /api/emr/condition/{id}` gọi hộ giao diện thay vì để tr
 > **Điều cần ghi trong báo cáo.** Khóa API không phải chuẩn xác thực cho trục dữ liệu y tế
 > thật — chuẩn là **OAuth2 client credentials** (SMART on FHIR / IHE IUA) hoặc mTLS. Toàn bộ
 > cơ chế nằm trong `backend/auth.py` và cắm vào ứng dụng bằng **một dependency ở mức app**;
-> thay bằng OAuth2 là thay cách lấy `BenGoi`, không đụng tầng FHIR và không đụng endpoint nào.
-> Chốt bằng `tests/test_khoa_api.py` (22 ca).
+> thay bằng OAuth2 là thay cách lấy `Caller`, không đụng tầng FHIR và không đụng endpoint nào.
+> Chốt bằng `tests/test_api_key.py` (22 ca).
 
 ## B.7 API của hai bản HIS
 
@@ -723,7 +723,7 @@ update mà việc đồng nhất bệnh nhân dựa vào.
 | `tests/test_go_mot_chan_doan.py`       | Gỡ**một** bản ghi cũng phải kiểm cơ sở — chặn xóa chéo                                            |
 | `tests/test_ten_benh_theo_danh_muc.py` | Chẩn đoán lên trục phải mang**tên bệnh**, không phải nhãn chỗ điền tạm                         |
 | `tests/test_luong_nlp_khong_doi.py`    | **Chốt ranh giới hai khối**: chức năng liên thông thêm vào không được đụng kết quả NLP       |
-| `tests/test_khoa_api.py`               | Khóa API gắn với cơ sở: 401 khi thiếu/sai khóa, khóa viện A không ghi/gỡ được hồ sơ viện B, NLP không bị hỏi khóa |
+| `tests/test_api_key.py`               | Khóa API gắn với cơ sở: 401 khi thiếu/sai khóa, khóa viện A không ghi/gỡ được hồ sơ viện B, NLP không bị hỏi khóa |
 
 > `tests/test_ten_benh_theo_danh_muc.py` sinh ra từ một lỗi đo được: VNPT HIS đẩy chẩn đoán
 > kèm theo lên trục với `icd10_display` là đúng chuỗi *"Chẩn đoán kèm theo"*. Kết quả: I21.9
@@ -936,9 +936,12 @@ Cùng một bản Gateway, nhưng danh tính lấy từ khóa chứ không từ 
 ```powershell
 .venv\Scripts\python -m backend.auth issue --facility BV-A-001 --name "Bệnh viện Đa khoa A" --allow-demo
 .venv\Scripts\python -m backend.auth issue --facility BV-B-002 --name "Bệnh viện Đa khoa B" --allow-demo
-.un.ps1 -Port 8000                     # dòng [AUTH] báo: YÊU CẦU khóa (2 khóa đang hiệu lực)
-.\hospital_hisun_his.ps1 -Port 8085 -FacilityCode "BV-A-001" -FacilityName "Bệnh viện Đa khoa A" -GatewayApiKey "<khóa A>"
-.\hospital_hisun_his.ps1 -Port 8086 -FacilityCode "BV-B-002" -FacilityName "Bệnh viện Đa khoa B" -GatewayApiKey "<khóa B>"
+.
+un.ps1 -Port 8000                     # dòng [AUTH] báo: YÊU CẦU khóa (2 khóa đang hiệu lực)
+.\hospital_his
+un_his.ps1 -Port 8085 -FacilityCode "BV-A-001" -FacilityName "Bệnh viện Đa khoa A" -GatewayApiKey "<khóa A>"
+.\hospital_his
+un_his.ps1 -Port 8086 -FacilityCode "BV-B-002" -FacilityName "Bệnh viện Đa khoa B" -GatewayApiKey "<khóa B>"
 ```
 
 VNPT HIS nhận khóa qua biến môi trường `SMIG_GATEWAY_API_KEY` (đọc vào `smig.gateway.api-key`).

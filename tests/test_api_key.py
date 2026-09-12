@@ -25,20 +25,20 @@ CHUNG = dict(patient_name="Lê Thị K", raw_clinical_note="đtđ tuýp 2",
 
 
 @pytest.fixture
-def kho(tmp_path, monkeypatch):
+def key_store(tmp_path, monkeypatch):
     """Kho khóa tạm, trỏ module `auth` vào đó và trả về chế độ mặc định (auto)."""
-    kho_tam = auth.KhoKhoa(str(tmp_path / "api_keys.json"))
-    monkeypatch.setattr(auth, "kho", kho_tam)
+    store_tmp = auth.KeyStore(str(tmp_path / "api_keys.json"))
+    monkeypatch.setattr(auth, "key_store", store_tmp)
     monkeypatch.setattr(auth, "REQUIRE_API_KEY", "auto")
-    return kho_tam
+    return store_tmp
 
 
 @pytest.fixture
-def hai_khoa(kho):
+def two_keys(key_store):
     """Một khóa cho mỗi bệnh viện demo. Mã BV-* phải qua cờ demo, như T1.1(b)."""
-    khoa_a = kho.cap("BV-A-001", "Bệnh viện Đa khoa A", "HIS A", allow_demo=True)
-    khoa_b = kho.cap("BV-B-002", "Bệnh viện Đa khoa B", "HIS B", allow_demo=True)
-    return khoa_a, khoa_b
+    key_a = key_store.issue("BV-A-001", "Bệnh viện Đa khoa A", "HIS A", allow_demo=True)
+    key_b = key_store.issue("BV-B-002", "Bệnh viện Đa khoa B", "HIS B", allow_demo=True)
+    return key_a, key_b
 
 
 @pytest.fixture
@@ -47,105 +47,105 @@ def client(gateway):
     return TestClient(gateway.app)
 
 
-def _dau(khoa):
-    return {auth.HEADER_KHOA: khoa}
+def _headers(key):
+    return {auth.API_KEY_HEADER: key}
 
 
-def _sinh(client, khoa=None, **them):
+def _sinh(client, key=None, **them):
     return client.post("/api/fhir/condition", json={"patient_id": "BN-1", **CHUNG, **them},
-                       headers=_dau(khoa) if khoa else {})
+                       headers=_headers(key) if key else {})
 
 
 # --- Kho khóa --------------------------------------------------------------
 
-def test_khoa_cap_ra_chi_luu_bam(kho, tmp_path):
-    khoa = kho.cap("01001", "Bệnh viện A")
+def test_key_cap_ra_chi_luu_bam(key_store, tmp_path):
+    key = key_store.issue("01001", "Bệnh viện A")
     tren_dia = (tmp_path / "api_keys.json").read_text(encoding="utf-8")
 
-    assert khoa.startswith("smig_")
-    assert khoa not in tren_dia, "Bản rõ của khóa không được nằm trên đĩa"
+    assert key.startswith("smig_")
+    assert key not in tren_dia, "Bản rõ của khóa không được nằm trên đĩa"
     assert json.loads(tren_dia)["keys"][0]["sha256"]
-    assert kho.tra(khoa).facility_code == "01001"
+    assert key_store.lookup(key).facility_code == "01001"
 
 
-def test_khoa_sai_mot_ky_tu_bi_tu_choi(kho):
-    khoa = kho.cap("01001", "Bệnh viện A")
-    assert kho.tra(khoa[:-1] + ("x" if khoa[-1] != "x" else "y")) is None
-    assert kho.tra("smig_00000000_khong-ton-tai") is None
-    assert kho.tra("") is None
+def test_key_sai_mot_ky_tu_bi_tu_choi(key_store):
+    key = key_store.issue("01001", "Bệnh viện A")
+    assert key_store.lookup(key[:-1] + ("x" if key[-1] != "x" else "y")) is None
+    assert key_store.lookup("smig_00000000_khong-ton-tai") is None
+    assert key_store.lookup("") is None
 
 
-def test_thu_hoi_co_hieu_luc_ngay(kho):
-    khoa = kho.cap("01001", "Bệnh viện A")
-    tien_to = auth.tien_to_cua(khoa)
+def test_thu_hoi_co_hieu_luc_ngay(key_store):
+    key = key_store.issue("01001", "Bệnh viện A")
+    tien_to = auth.key_prefix_of(key)
 
-    assert kho.thu_hoi(tien_to) is True
-    assert kho.tra(khoa) is None
-    assert kho.dang_hieu_luc() == 0
+    assert key_store.revoke(tien_to) is True
+    assert key_store.lookup(key) is None
+    assert key_store.active_count() == 0
     # Thu hồi lần hai không phải lỗi hệ thống, chỉ là "không còn gì để thu hồi".
-    assert kho.thu_hoi(tien_to) is False
+    assert key_store.revoke(tien_to) is False
 
 
-def test_cap_khoa_di_qua_cua_kiem_ma_co_so(kho):
+def test_cap_key_di_qua_cua_kiem_ma_co_so(key_store):
     """Khép lỗ hở 4.6 của T1.1: mã tự khai nay bị kiểm dạng lúc cấp khóa."""
     with pytest.raises(ValueError):
-        kho.cap("BV-A-001", "Bệnh viện A")          # mã tự đặt, chưa bật cờ demo
+        key_store.issue("BV-A-001", "Bệnh viện A")          # mã tự đặt, chưa bật cờ demo
     with pytest.raises(ValueError):
-        kho.cap("0100", "Bệnh viện A")              # thiếu một ký tự
+        key_store.issue("0100", "Bệnh viện A")              # thiếu một ký tự
     with pytest.raises(ValueError):
-        kho.cap("01001", "   ")                     # thiếu tên
-    assert kho.cap("BV-A-001", "Bệnh viện A", allow_demo=True)
+        key_store.issue("01001", "   ")                     # thiếu tên
+    assert key_store.issue("BV-A-001", "Bệnh viện A", allow_demo=True)
 
 
-def test_kho_doc_lai_khi_tep_doi(kho, tmp_path):
+def test_kho_doc_lai_khi_tep_doi(key_store, tmp_path):
     """Thu hồi bằng CLI ở cửa sổ khác phải có tác dụng với Gateway đang chạy."""
-    khoa = kho.cap("01001", "Bệnh viện A")
-    kho_khac = auth.KhoKhoa(str(tmp_path / "api_keys.json"))
-    kho_khac.thu_hoi(auth.tien_to_cua(khoa))
-    assert kho.tra(khoa) is None
+    key = key_store.issue("01001", "Bệnh viện A")
+    store_other = auth.KeyStore(str(tmp_path / "api_keys.json"))
+    store_other.revoke(auth.key_prefix_of(key))
+    assert key_store.lookup(key) is None
 
 
 # --- Chế độ ----------------------------------------------------------------
 
-def test_auto_bat_buoc_ngay_khi_co_khoa(kho):
-    assert auth.yeu_cau_khoa() is False
-    kho.cap("01001", "Bệnh viện A")
-    assert auth.yeu_cau_khoa() is True
+def test_auto_bat_buoc_ngay_khi_co_key(key_store):
+    assert auth.api_key_required() is False
+    key_store.issue("01001", "Bệnh viện A")
+    assert auth.api_key_required() is True
 
 
-def test_bat_buoc_ma_kho_trong_thi_dung_luc_khoi_dong(kho, monkeypatch):
+def test_bat_buoc_ma_kho_trong_thi_dung_luc_khoi_dong(key_store, monkeypatch):
     monkeypatch.setattr(auth, "REQUIRE_API_KEY", "1")
     with pytest.raises(RuntimeError) as loi:
-        auth.chot_cau_hinh_khoa()
+        auth.check_api_key_config()
     assert "SMIG_REQUIRE_API_KEY" in str(loi.value)
 
 
-def test_gia_tri_co_la_bi_tu_choi(kho, monkeypatch):
+def test_gia_tri_co_la_bi_tu_choi(key_store, monkeypatch):
     monkeypatch.setattr(auth, "REQUIRE_API_KEY", "co")
     with pytest.raises(RuntimeError):
-        auth.chot_cau_hinh_khoa()
+        auth.check_api_key_config()
 
 
-def test_tat_thi_khong_doi_khoa_du_kho_co_khoa(kho, monkeypatch):
-    kho.cap("01001", "Bệnh viện A")
+def test_tat_thi_khong_doi_key_du_kho_co_key(key_store, monkeypatch):
+    key_store.issue("01001", "Bệnh viện A")
     monkeypatch.setattr(auth, "REQUIRE_API_KEY", "0")
-    assert auth.yeu_cau_khoa() is False
+    assert auth.api_key_required() is False
 
 
 # --- Cửa xác thực trên HTTP -------------------------------------------------
 
-def test_thieu_khoa_bi_401(client, hai_khoa):
+def test_thieu_key_bi_401(client, two_keys):
     """Tiêu chí 10 của T1.md: gọi /api/fhir/sync thiếu khóa -> 401, không phải 200."""
     res = client.post("/api/fhir/sync", json={"resourceType": "Condition"})
     assert res.status_code == 401
-    assert auth.HEADER_KHOA in res.headers["WWW-Authenticate"]
+    assert auth.API_KEY_HEADER in res.headers["WWW-Authenticate"]
 
     assert _sinh(client).status_code == 401
     assert client.get("/api/fhir/sync").status_code == 401
     assert client.delete("/api/fhir/sync").status_code == 401
 
 
-def test_health_va_nlp_khong_bi_hoi_khoa(client, hai_khoa):
+def test_health_va_nlp_khong_bi_hoi_key(client, two_keys):
     """Khối NLP nằm ngoài phạm vi khóa; /health mở để giám sát."""
     assert client.get("/health").status_code == 200
     # Mô hình chưa nạp nên 503 - nhưng KHÔNG phải 401: cửa xác thực đã cho qua.
@@ -154,57 +154,57 @@ def test_health_va_nlp_khong_bi_hoi_khoa(client, hai_khoa):
     assert client.get("/api/icd10/E11.9").status_code == 503
 
 
-def test_health_phoi_ra_che_do(client, hai_khoa):
+def test_health_phoi_ra_che_do(client, two_keys):
     kq = client.get("/health").json()
     assert kq["require_api_key"] is True
     assert kq["api_keys_active"] == 2
-    assert kq["api_key_header"] == auth.HEADER_KHOA
+    assert kq["api_key_header"] == auth.API_KEY_HEADER
 
 
-def test_khoa_sai_bi_401_ke_ca_khi_khong_bat_buoc(client, kho, monkeypatch):
+def test_key_sai_bi_401_ke_ca_khi_khong_bat_buoc(client, key_store, monkeypatch):
     """Không bao giờ hạ một khóa sai xuống thành bên gọi nặc danh."""
     monkeypatch.setattr(auth, "REQUIRE_API_KEY", "0")
     assert _sinh(client, "smig_deadbeef_khong-co-that").status_code == 401
 
 
-def test_khoa_da_thu_hoi_bi_401(client, kho):
-    khoa = kho.cap("BV-A-001", "Bệnh viện Đa khoa A", allow_demo=True)
-    assert _sinh(client, khoa).status_code == 200
-    kho.thu_hoi(auth.tien_to_cua(khoa))
-    assert _sinh(client, khoa).status_code == 401
+def test_key_da_thu_hoi_bi_401(client, key_store):
+    key = key_store.issue("BV-A-001", "Bệnh viện Đa khoa A", allow_demo=True)
+    assert _sinh(client, key).status_code == 200
+    key_store.revoke(auth.key_prefix_of(key))
+    assert _sinh(client, key).status_code == 401
 
 
 # --- Cơ sở là cơ sở của khóa ------------------------------------------------
 
-def test_co_so_lay_tu_khoa_khong_can_co_nhieu_co_so(client, gateway, hai_khoa):
+def test_co_so_lay_tu_key_khong_can_co_nhieu_co_so(client, gateway, two_keys):
     """
     Gateway cấu hình BV-A-001, cờ nhiều cơ sở TẮT. Khóa của viện B vẫn ghi được
     dưới tên viện B: danh tính đã xác thực thì không cần cờ nào cho phép nữa.
     """
-    _, khoa_b = hai_khoa
+    _, key_b = two_keys
     assert gateway.ALLOW_CLIENT_FACILITY is False
 
-    res = _sinh(client, khoa_b)
+    res = _sinh(client, key_b)
     assert res.status_code == 200
     assert res.json()["meta"]["tag"][0]["code"] == "BV-B-002"
     # Cùng khóa, tự khai đúng mã của mình thì vẫn hợp lệ.
-    assert _sinh(client, khoa_b, facility_code="BV-B-002").status_code == 200
+    assert _sinh(client, key_b, facility_code="BV-B-002").status_code == 200
 
 
-def test_khoa_vien_a_khong_ghi_duoc_ma_vien_b(client, gateway, hai_khoa, monkeypatch):
+def test_key_vien_a_khong_ghi_duoc_ma_vien_b(client, gateway, two_keys, monkeypatch):
     """Tiêu chí 11 của T1.md - và cờ nhiều cơ sở không mở được lối đi vòng."""
-    khoa_a, _ = hai_khoa
+    key_a, _ = two_keys
     for co in (False, True):
         monkeypatch.setattr(gateway, "ALLOW_CLIENT_FACILITY", co)
-        res = _sinh(client, khoa_a, facility_code="BV-B-002", facility_name="Viện B")
+        res = _sinh(client, key_a, facility_code="BV-B-002", facility_name="Viện B")
         assert res.status_code == 403
         assert "BV-A-001" in res.json()["detail"]
 
 
-def test_dong_bo_va_go_theo_dung_co_so_cua_khoa(client, emr, hai_khoa):
-    khoa_a, khoa_b = hai_khoa
-    condition = _sinh(client, khoa_b).json()
-    kq = client.post("/api/fhir/sync", headers=_dau(khoa_b), json={
+def test_dong_bo_va_go_theo_dung_co_so_cua_key(client, emr, two_keys):
+    key_a, key_b = two_keys
+    condition = _sinh(client, key_b).json()
+    kq = client.post("/api/fhir/sync", headers=_headers(key_b), json={
         "condition": condition, "patient": {"id": "BN-1", "name": "Lê Thị K"}})
     assert kq.status_code == 200, kq.text
     assert kq.json()["facility_code"] == "BV-B-002"
@@ -212,41 +212,41 @@ def test_dong_bo_va_go_theo_dung_co_so_cua_khoa(client, emr, hai_khoa):
 
     cid = kq.json()["condition_id"]
     # Viện A cầm id của viện B: gỡ bị chặn, và không cần khai gì thêm để bị chặn.
-    assert client.delete(f"/api/fhir/condition/{cid}", headers=_dau(khoa_a)).status_code == 403
+    assert client.delete(f"/api/fhir/condition/{cid}", headers=_headers(key_a)).status_code == 403
     assert emr.facilities() == ["BV-B-002"]
     # Viện B gỡ bản của mình thì được.
-    assert client.delete(f"/api/fhir/condition/{cid}", headers=_dau(khoa_b)).status_code == 200
+    assert client.delete(f"/api/fhir/condition/{cid}", headers=_headers(key_b)).status_code == 200
     assert emr.facilities() == []
 
 
-def test_dong_bo_tai_nguyen_mang_ma_la_bi_403(client, hai_khoa):
+def test_dong_bo_tai_nguyen_mang_ma_la_bi_403(client, two_keys):
     """Đường /api/fhir/sync đọc mã cơ sở từ chính tài nguyên - vẫn phải khớp khóa."""
-    khoa_a, khoa_b = hai_khoa
-    cua_b = _sinh(client, khoa_b).json()
-    res = client.post("/api/fhir/sync", headers=_dau(khoa_a), json={"condition": cua_b})
+    key_a, key_b = two_keys
+    cua_b = _sinh(client, key_b).json()
+    res = client.post("/api/fhir/sync", headers=_headers(key_a), json={"condition": cua_b})
     assert res.status_code == 403
 
 
-def test_xoa_hang_loat_chi_trong_pham_vi_khoa(client, emr, hai_khoa):
-    khoa_a, khoa_b = hai_khoa
-    for khoa, ma_ba in ((khoa_a, "BN-A"), (khoa_b, "BN-B")):
-        cond = client.post("/api/fhir/condition", headers=_dau(khoa),
+def test_xoa_hang_loat_chi_trong_pham_vi_key(client, emr, two_keys):
+    key_a, key_b = two_keys
+    for key, ma_ba in ((key_a, "BN-A"), (key_b, "BN-B")):
+        cond = client.post("/api/fhir/condition", headers=_headers(key),
                            json={"patient_id": ma_ba, **CHUNG}).json()
-        assert client.post("/api/fhir/sync", headers=_dau(khoa),
+        assert client.post("/api/fhir/sync", headers=_headers(key),
                            json={"condition": cond}).status_code == 200
     assert emr.facilities() == ["BV-A-001", "BV-B-002"]
 
-    kq = client.delete("/api/fhir/sync", headers=_dau(khoa_a)).json()
+    kq = client.delete("/api/fhir/sync", headers=_headers(key_a)).json()
     assert kq["deleted"] == 1
     assert emr.facilities() == ["BV-B-002"]
     # Khai `facility=BV-B-002` kèm khóa A cũng không được.
     assert client.delete("/api/fhir/sync?facility=BV-B-002",
-                         headers=_dau(khoa_a)).status_code == 403
+                         headers=_headers(key_a)).status_code == 403
 
 
 # --- Đường cũ vẫn nguyên khi chưa bắt buộc ---------------------------------
 
-def test_khong_khoa_khi_chua_bat_buoc_di_dung_duong_cu(client, kho, gateway, monkeypatch):
+def test_khong_key_khi_chua_bat_buoc_di_dung_duong_cu(client, key_store, gateway, monkeypatch):
     monkeypatch.setattr(auth, "REQUIRE_API_KEY", "0")
     # Không khai gì: mã cấu hình của Gateway.
     assert _sinh(client).json()["meta"]["tag"][0]["code"] == "BV-A-001"
@@ -259,16 +259,16 @@ def test_khong_khoa_khi_chua_bat_buoc_di_dung_duong_cu(client, kho, gateway, mon
     assert _sinh(client, facility_code="BV-B-002").json()["meta"]["tag"][0]["code"] == "BV-B-002"
 
 
-def test_danh_tinh_khong_ro_ri_sang_yeu_cau_sau(client, kho, monkeypatch):
+def test_danh_tinh_khong_ro_ri_sang_yeu_cau_sau(client, key_store, monkeypatch):
     """Yêu cầu có khóa B rồi yêu cầu nặc danh: yêu cầu sau phải về mã cấu hình."""
     monkeypatch.setattr(auth, "REQUIRE_API_KEY", "0")
-    khoa_b = kho.cap("BV-B-002", "Bệnh viện Đa khoa B", allow_demo=True)
-    assert _sinh(client, khoa_b).json()["meta"]["tag"][0]["code"] == "BV-B-002"
+    key_b = key_store.issue("BV-B-002", "Bệnh viện Đa khoa B", allow_demo=True)
+    assert _sinh(client, key_b).json()["meta"]["tag"][0]["code"] == "BV-B-002"
     assert _sinh(client).json()["meta"]["tag"][0]["code"] == "BV-A-001"
 
 
-def test_goi_thang_ham_khong_qua_http_khong_co_danh_tinh(gateway, hai_khoa):
+def test_goi_thang_ham_khong_qua_http_khong_co_danh_tinh(gateway, two_keys):
     """Bộ test cũ gọi thẳng endpoint; đường đó không có bên gọi và hành vi y nguyên."""
-    assert auth.ben_goi_hien_tai() is None
+    assert auth.current_caller() is None
     cond = gateway.convert_to_fhir(gateway.FHIRConvertRequest(patient_id="BN-1", **CHUNG))
     assert cond["meta"]["tag"][0]["code"] == "BV-A-001"

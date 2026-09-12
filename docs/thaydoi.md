@@ -23,9 +23,9 @@ Một module mới, [`backend/auth.py`](../backend/auth.py), không import gì t
 
 | Thành phần | Việc |
 | --- | --- |
-| `KhoKhoa` | Kho khóa trên đĩa (`backend/data/api_keys.json`, đã vào `.gitignore`). Lưu **băm SHA-256**, tiền tố để tra cứu/thu hồi, cơ sở, nhãn, thời điểm cấp và thu hồi. Đọc lại khi tệp đổi, nên thu hồi có hiệu lực ngay |
-| `xac_thuc_ben_goi` | Dependency `async` gắn ở **mức ứng dụng** (`FastAPI(dependencies=[...])`). Chỉ hỏi khóa với đường bắt đầu bằng `/api/fhir/`. Đặt danh tính vào một `ContextVar` |
-| `ben_goi_hien_tai` | `resolve_facility()` hỏi danh tính ở đây. Có khóa → cơ sở của khóa là danh tính; lời khai trong thân yêu cầu phải trùng, khác là 403 kể cả khi cờ nhiều cơ sở bật |
+| `KeyStore` | Kho khóa trên đĩa (`backend/data/api_keys.json`, đã vào `.gitignore`). Lưu **băm SHA-256**, tiền tố để tra cứu/thu hồi, cơ sở, nhãn, thời điểm cấp và thu hồi. Đọc lại khi tệp đổi, nên thu hồi có hiệu lực ngay |
+| `authenticate_caller` | Dependency `async` gắn ở **mức ứng dụng** (`FastAPI(dependencies=[...])`). Chỉ hỏi khóa với đường bắt đầu bằng `/api/fhir/`. Đặt danh tính vào một `ContextVar` |
+| `current_caller` | `resolve_facility()` hỏi danh tính ở đây. Có khóa → cơ sở của khóa là danh tính; lời khai trong thân yêu cầu phải trùng, khác là 403 kể cả khi cờ nhiều cơ sở bật |
 | CLI `python -m backend.auth` | `issue`, `list`, `revoke`. Bản rõ hiện đúng một lần lúc cấp |
 
 Khóa dạng `smig_<8 hex>_<48 hex>`: toàn hex nên chỉ có đúng hai dấu gạch dưới, tách tiền tố
@@ -70,7 +70,7 @@ Payload của cả ba **không đổi một trường nào** — đúng nghĩa "
 
 ## 5. Test
 
-[`tests/test_khoa_api.py`](../tests/test_khoa_api.py), 22 ca, đi qua `TestClient` thật để
+[`tests/test_api_key.py`](../tests/test_api_key.py), 22 ca, đi qua `TestClient` thật để
 chốt đúng cửa HTTP: kho chỉ lưu băm, sai một ký tự bị từ chối, thu hồi có hiệu lực ngay và
 qua cả tiến trình khác; ba chế độ; `/health` và `/api/standardize` không bị hỏi khóa (503
 vì chưa nạp mô hình, **không phải 401**); tiêu chí 10 và 11 của T1.md trên cả đường ghi,
@@ -83,7 +83,7 @@ Hai fake trong test cũ (`test_luong_nlp_khong_doi`, `test_sua_chan_doan`) nhậ
 
 | Việc | Ghi chú |
 | --- | --- |
-| **T1.4(b) `AuditEvent`** | Danh tính đã có (`BenGoi`), nên "ai" đã xác định được; còn "làm gì, trên ai, lúc nào" |
+| **T1.4(b) `AuditEvent`** | Danh tính đã có (`Caller`), nên "ai" đã xác định được; còn "làm gì, trên ai, lúc nào" |
 | T1.2, T1.3, T1.5 | Không bị ảnh hưởng: đường mới dưới `/api/fhir/*` tự động được bảo vệ |
 | Kiểm dạng mã HIS tự khai khi **không** có khóa | Vẫn hở như 4.6, nhưng nay chỉ tồn tại ở chế độ không bắt buộc khóa |
 | Xoay khóa | Cấp khóa mới rồi thu hồi khóa cũ; chưa có lệnh `rotate` gộp hai bước |

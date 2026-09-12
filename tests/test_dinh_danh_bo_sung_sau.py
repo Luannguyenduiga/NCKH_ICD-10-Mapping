@@ -55,7 +55,7 @@ def test_lan_kham_thu_ba_van_dong_bo_duoc(kham, emr):
     assert len(emr.store["Patient"]) == 1
 
 
-def test_khoa_condition_khong_doi_khi_bo_sung_cccd(kham, emr):
+def test_key_condition_khong_doi_khi_bo_sung_cccd(kham, emr):
     """
     Cùng người, cùng bệnh, cùng ngày, cùng viện thì phải là MỘT chẩn đoán. Khóa
     nghiệp vụ bám theo định danh nào cũng được, miễn là định danh đó không đổi
