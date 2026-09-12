@@ -81,6 +81,10 @@ if ($AllowClientFacility) {
 }
 Write-Host "[INFO] Dia chi: http://127.0.0.1:$Port" -ForegroundColor Green
 Write-Host "[INFO] Lan chay dau tien can ~30 giay de nap mo hinh NLP." -ForegroundColor Green
+# Khoa API cho duong lien thong /api/fhir/*: Gateway tu bat khi kho khoa co it
+# nhat mot khoa (backend/data/api_keys.json). Cap khoa cho tung HIS bang:
+#   .venv\Scripts\python -m backend.auth issue --facility <ma CSKCB> --name "<ten>"
+# Dong [AUTH] luc khoi dong cho biet dang o che do nao.
 Write-Host ""
 
 & .venv\Scripts\python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port $Port

@@ -101,7 +101,7 @@ def test_bhyt_ca_hai_mau_deu_hop_le(gateway, the):
     assert "bhyt" in dinh_danh["system"]
 
 
-def test_bhyt_mau_moi_van_dung_lam_khoa_dong_nhat(gateway):
+def test_bhyt_mau_moi_van_dung_lam_key_dong_nhat(gateway):
     """
     Thẻ mẫu mới trùng mã số BHXH nên vẫn là định danh toàn quốc: thiếu CCCD thì
     nó phải đứng ra làm khóa, KHÔNG được lùi về mã bệnh án nội viện - lùi là mất

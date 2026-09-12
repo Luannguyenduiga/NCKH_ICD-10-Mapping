@@ -1026,12 +1026,14 @@ document.addEventListener("DOMContentLoaded", () => {
      * Đọc lại tài nguyên đã liên thông để đối chiếu.
      * Đi vòng qua Gateway thay vì gọi thẳng HAPI FHIR ở cổng 8090: tránh phụ thuộc
      * cấu hình CORS của máy chủ FHIR, và dùng đúng id mà EMR Cloud đã xác nhận.
+     * Từ T1.4 đường liên thông của Gateway đòi khóa API, mà khóa nằm ở máy chủ
+     * HIS chứ không xuống trình duyệt - nên gọi qua HIS (/api/emr/condition).
      */
     async function loadAndDisplayFhirResource(conditionId) {
         if (!conditionId) return;
         try {
             addLog(`Đang truy vấn lại tài nguyên FHIR từ EMR Cloud: Condition/${conditionId}`, "info");
-            const response = await fetch(`${GATEWAY_BASE}/api/fhir/condition/${encodeURIComponent(conditionId)}`);
+            const response = await fetch(`/api/emr/condition/${encodeURIComponent(conditionId)}`);
             if (!response.ok) throw new Error(`EMR Cloud trả về HTTP ${response.status}`);
 
             currentFhirPayload = await response.json();

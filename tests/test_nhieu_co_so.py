@@ -23,7 +23,7 @@ def _co_so(tai_nguyen):
     return tai_nguyen["meta"]["tag"][0]["code"]
 
 
-def _khoa(tai_nguyen):
+def _key(tai_nguyen):
     return tai_nguyen["identifier"][0]["value"]
 
 
@@ -56,7 +56,7 @@ def test_hai_vien_trung_ma_benh_an_khong_bi_tron(gateway, monkeypatch):
 
     # Hai người KHÁC nhau tình cờ trùng mã bệnh án thì không được gộp làm một.
     assert a["subject"]["identifier"] != b["subject"]["identifier"]
-    assert _khoa(a) != _khoa(b)
+    assert _key(a) != _key(b)
     assert (_co_so(a), _co_so(b)) == ("BV-A-001", "BV-B-002")
 
 
@@ -67,7 +67,7 @@ def test_cung_cccd_thi_quy_ve_mot_nguoi(gateway, monkeypatch):
 
     assert a["subject"]["identifier"] == b["subject"]["identifier"]
     # Nhưng vẫn là hai chẩn đoán riêng, ghi đúng tên từng nơi lập.
-    assert _khoa(a) != _khoa(b)
+    assert _key(a) != _key(b)
     assert _co_so(a) != _co_so(b)
 
 

@@ -1,3 +1,106 @@
+# Nhật ký thay đổi — 12/09/2026 (T1.4a)
+
+Khóa API gắn với cơ sở khám chữa bệnh, mục (a) của T1.4 trong [`docs/T1.md`](T1.md).
+Nhánh `feat/t1-4a-khoa-api-theo-co-so`. **Chưa merge** — dừng ở bước đẩy lên để người
+dùng duyệt. Bộ `tests/` từ 99 lên **121 ca, tất cả xanh**; `nlp/` không có dòng nào đổi.
+
+Yêu cầu của người dùng đặt ra phạm vi: *"phần api liên thông tạo API key cho các HIS gọi
+tới, HIS đỡ phải viết lại từ đầu; phần NLP đừng sửa thêm."* Hai câu đó quyết định hai điều
+làm khác kế hoạch ban đầu (mục 3).
+
+---
+
+## 1. Vấn đề
+
+Mã cơ sở là **lời khai** trong thân yêu cầu. `SMIG_ALLOW_CLIENT_FACILITY` chỉ chọn giữa
+"tin" và "không tin" lời khai đó, và trong kịch bản một Gateway phục vụ hai HIS thì phải
+chọn "tin" — tức bất kỳ ai gọi được cổng 8000 đều tự nhận mình là bệnh viện bất kỳ. Mục 4.6
+của nhật ký T1.1 còn ghi thêm: mã tự khai **không bị kiểm dạng** CSKCB.
+
+## 2. Cách làm
+
+Một module mới, [`backend/auth.py`](../backend/auth.py), không import gì từ `main.py`:
+
+| Thành phần | Việc |
+| --- | --- |
+| `KeyStore` | Kho khóa trên đĩa (`backend/data/api_keys.json`, đã vào `.gitignore`). Lưu **băm SHA-256**, tiền tố để tra cứu/thu hồi, cơ sở, nhãn, thời điểm cấp và thu hồi. Đọc lại khi tệp đổi, nên thu hồi có hiệu lực ngay |
+| `authenticate_caller` | Dependency `async` gắn ở **mức ứng dụng** (`FastAPI(dependencies=[...])`). Chỉ hỏi khóa với đường bắt đầu bằng `/api/fhir/`. Đặt danh tính vào một `ContextVar` |
+| `current_caller` | `resolve_facility()` hỏi danh tính ở đây. Có khóa → cơ sở của khóa là danh tính; lời khai trong thân yêu cầu phải trùng, khác là 403 kể cả khi cờ nhiều cơ sở bật |
+| CLI `python -m backend.auth` | `issue`, `list`, `revoke`. Bản rõ hiện đúng một lần lúc cấp |
+
+Khóa dạng `smig_<8 hex>_<48 hex>`: toàn hex nên chỉ có đúng hai dấu gạch dưới, tách tiền tố
+bằng mắt hay bằng mã đều không nhầm (bản đầu dùng `token_urlsafe` và một test đã bắt được
+chuyện tiền tố tách sai vì bí mật chứa `_`). So băm bằng `hmac.compare_digest`.
+
+**Vì sao ContextVar chứ không phải tham số endpoint.** Bộ test cũ gọi thẳng hàm endpoint
+(`gateway.convert_to_fhir(...)`), và T1.3/T1.5 sẽ thêm endpoint mới. Thêm tham số
+`Depends` vào từng endpoint là phá cả hai. Với ContextVar, chữ ký không đổi, gọi thẳng hàm
+thì không có bên gọi và hành vi y nguyên — `test_goi_thang_ham_khong_qua_http_khong_co_danh_tinh`
+chốt điều đó, `test_danh_tinh_khong_ro_ri_sang_yeu_cau_sau` chốt không rò rỉ giữa hai yêu cầu.
+
+**Chế độ.** `SMIG_REQUIRE_API_KEY` = `1` / `0` / `auto` (mặc định). `auto` bắt buộc ngay khi
+kho có ít nhất một khóa: cấp khóa là hành động quyết định "từ nay phải xác thực"; máy chưa
+cấp khóa nào là môi trường trình diễn, chạy thẳng được. `1` mà kho trống thì Gateway **dừng
+lúc khởi động** (đã thử thật với uvicorn, cùng kiểu với `_chot_ma_co_so`). Khóa sai hoặc đã
+thu hồi bị 401 ở **mọi** chế độ.
+
+**Cấp khóa đi qua `validate_facility_code`** của T1.1(b) — khép lỗ 4.6. Mã demo `BV-*` cần
+`--allow-demo`, cùng quy ước với `SMIG_ALLOW_DEMO_FACILITY`.
+
+## 3. Hai điểm khác kế hoạch, có chủ ý
+
+| Kế hoạch T1.md viết | Làm | Vì sao |
+| --- | --- | --- |
+| Áp khóa cả `/api/standardize` | **Chỉ `/api/fhir/*`** | Người dùng: khối NLP không sửa thêm. Endpoint đó là tra cứu văn bản → mã, không mang danh tính bệnh nhân hay cơ sở. HIS chỉ thêm header vào lời gọi liên thông |
+| Giao diện demo cùng nguồn không áp khóa | **Không có ngoại lệ theo nguồn** | Ngoại lệ đó giả mạo được bằng một header `Origin`/`Sec-Fetch-Site`. Giao diện Gateway nay là một bên gọi như HIS: có ô nhập khóa trên thanh đầu trang (localStorage), chỉ hiện khi `/health` báo `require_api_key` |
+
+`SMIG_ALLOW_CLIENT_FACILITY` **giữ lại** theo phương án hai của tiêu chí xong: chỉ còn tác
+dụng với bên gọi không mang khóa.
+
+## 4. Ba client
+
+| Client | Sửa |
+| --- | --- |
+| HIS Python | `SMIG_GATEWAY_API_KEY` → header trên `/api/fhir/condition`, `/api/fhir/sync`, `DELETE /api/fhir/condition/{id}`. **Không** gửi sang `/api/standardize`. Thêm `GET /api/emr/condition/{id}` gọi hộ giao diện — khóa là bí mật của máy chủ, không xuống trình duyệt. `run_his.ps1 -GatewayApiKey` |
+| VNPT HIS | `smig.gateway.api-key=${SMIG_GATEWAY_API_KEY:}`; `GatewayService` gửi `HttpEntity` kèm header cho hai lời gọi liên thông |
+| Giao diện Gateway | `fhirHeaders()` cho bốn lời gọi `/api/fhir/*`; `/api/standardize` giữ nguyên |
+
+Payload của cả ba **không đổi một trường nào** — đúng nghĩa "HIS đỡ phải viết lại từ đầu".
+`test_payload_sinh_fhir_khong_doi` vẫn xanh.
+
+## 5. Test
+
+[`tests/test_api_key.py`](../tests/test_api_key.py), 22 ca, đi qua `TestClient` thật để
+chốt đúng cửa HTTP: kho chỉ lưu băm, sai một ký tự bị từ chối, thu hồi có hiệu lực ngay và
+qua cả tiến trình khác; ba chế độ; `/health` và `/api/standardize` không bị hỏi khóa (503
+vì chưa nạp mô hình, **không phải 401**); tiêu chí 10 và 11 của T1.md trên cả đường ghi,
+đồng bộ, gỡ một bản và xóa hàng loạt; đường cũ y nguyên khi chưa bắt buộc.
+
+Hai fake trong test cũ (`test_luong_nlp_khong_doi`, `test_sua_chan_doan`) nhận thêm tham số
+`headers` vì HIS nay gửi header — không đổi điều test kiểm.
+
+## 6. Việc còn lại
+
+| Việc | Ghi chú |
+| --- | --- |
+| **T1.4(b) `AuditEvent`** | Danh tính đã có (`Caller`), nên "ai" đã xác định được; còn "làm gì, trên ai, lúc nào" |
+| T1.2, T1.3, T1.5 | Không bị ảnh hưởng: đường mới dưới `/api/fhir/*` tự động được bảo vệ |
+| Kiểm dạng mã HIS tự khai khi **không** có khóa | Vẫn hở như 4.6, nhưng nay chỉ tồn tại ở chế độ không bắt buộc khóa |
+| Xoay khóa | Cấp khóa mới rồi thu hồi khóa cũ; chưa có lệnh `rotate` gộp hai bước |
+
+## 7. Cách kiểm chứng
+
+```powershell
+.venv\Scripts\python -m pytest tests/ -q                                            # 121 ca
+.venv\Scripts\python -m backend.auth issue --facility 01001 --name "Bệnh viện A"    # in bản rõ một lần
+.venv\Scripts\python -m backend.auth list; .venv\Scripts\python -m backend.auth revoke smig_xxxxxxxx
+$env:SMIG_REQUIRE_API_KEY="1"; $env:SMIG_API_KEY_FILE="C:\khong\co.json"; .venv\Scripts\python -m uvicorn backend.main:app   # phải dừng ngay
+curl -X POST http://127.0.0.1:8000/api/fhir/sync -d "{}"                              # 401 khi đã có khóa
+```
+
+---
+---
+
 # Nhật ký thay đổi — 10–11/09/2026 (T1.1)
 
 Mục đầu tiên của kế hoạch [`docs/T1.md`](T1.md): **định danh phải khớp thực tế

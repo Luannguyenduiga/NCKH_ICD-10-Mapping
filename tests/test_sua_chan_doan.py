@@ -19,7 +19,7 @@ class GatewayGia:
         self.da_goi = []
         self._seq = 0
 
-    def post(self, url, json=None, timeout=None):
+    def post(self, url, json=None, headers=None, timeout=None):
         self.da_goi.append(("POST", url, json))
         if url.endswith("/api/standardize"):
             return FakeResponse({"diagnoses": [{
@@ -35,7 +35,7 @@ class GatewayGia:
         self._seq += 1
         return FakeResponse({"condition_id": f"cond-{self._seq}"})
 
-    def delete(self, url, params=None, timeout=None):
+    def delete(self, url, params=None, headers=None, timeout=None):
         # Ghi lại `params` chứ không bỏ đi: mã cơ sở đi trong tham số truy vấn,
         # và Gateway dựa vào nó để biết ai đang gỡ.
         self.da_goi.append(("DELETE", url, params))

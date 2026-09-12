@@ -48,7 +48,7 @@ PAYLOAD_GOC = {
 def da_dong_bo(make_his):
     da_goi = []
 
-    def post(url, json=None, timeout=None):
+    def post(url, json=None, headers=None, timeout=None):
         da_goi.append((url, json))
         if url.endswith("/api/standardize"):
             return FakeResponse(CHUAN_HOA)

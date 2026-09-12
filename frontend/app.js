@@ -1,6 +1,26 @@
 // API Configuration
 const API_BASE = window.location.origin;
 
+// Khóa API cho đường liên thông. Giao diện này là một bên gọi như mọi HIS
+// khác: Gateway đã cấp khóa thì /api/fhir/* đòi khóa, không có ngoại lệ cho
+// trang cùng nguồn - ngoại lệ đó giả mạo được bằng một header. Nhóm NLP
+// (/api/standardize) không cần khóa nên không gửi.
+const API_KEY_STORAGE = 'smig_api_key';
+const elApiKeyBox = document.getElementById('api-key-box');
+const elApiKeyInput = document.getElementById('api-key-input');
+
+function apiKey() {
+    try { return (localStorage.getItem(API_KEY_STORAGE) || '').trim(); } catch (e) { return ''; }
+}
+
+function fhirHeaders(json = false) {
+    const headers = {};
+    if (json) headers['Content-Type'] = 'application/json';
+    const key = apiKey();
+    if (key) headers['X-SMIG-Api-Key'] = key;
+    return headers;
+}
+
 // Global state variables
 let selectedPrediction = null;
 let currentFhirPayload = null;
@@ -53,6 +73,13 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupEventListeners() {
+    if (elApiKeyInput) {
+        elApiKeyInput.value = apiKey();
+        elApiKeyInput.addEventListener('change', () => {
+            try { localStorage.setItem(API_KEY_STORAGE, elApiKeyInput.value.trim()); } catch (e) { /* bỏ qua */ }
+            fetchSyncedHistory();
+        });
+    }
     elBtnAnalyze.addEventListener('click', analyzeText);
     elBtnClear.addEventListener('click', clearForm);
     elBtnCopyFhir.addEventListener('click', copyFhirToClipboard);
@@ -74,6 +101,9 @@ async function checkApiStatus() {
     try {
         const response = await fetch(`${API_BASE}/health`);
         const data = await response.json();
+
+        // Gateway đang đòi khóa thì mở ô nhập; không thì giấu đi cho gọn.
+        if (response.ok && elApiKeyBox) elApiKeyBox.hidden = !data.require_api_key;
 
         if (response.ok && data.model_loaded) {
             apiOnline = true;
@@ -317,7 +347,7 @@ async function generateFhirResource(prediction) {
     try {
         const response = await fetch(`${API_BASE}/api/fhir/condition`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: fhirHeaders(true),
             body: JSON.stringify({
                 patient_id: patientId,
                 patient_name: patientName,
@@ -361,7 +391,7 @@ async function syncToEmrCloud() {
     try {
         const response = await fetch(`${API_BASE}/api/fhir/sync`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: fhirHeaders(true),
             body: JSON.stringify({
                 condition: currentFhirPayload,
                 patient: {
@@ -399,7 +429,11 @@ async function syncToEmrCloud() {
 // 5. Fetch synced records
 async function fetchSyncedHistory() {
     try {
-        const response = await fetch(`${API_BASE}/api/fhir/sync`);
+        const response = await fetch(`${API_BASE}/api/fhir/sync`, { headers: fhirHeaders() });
+        if (response.status === 401) {
+            renderSyncedHistory([]);
+            throw new Error('Gateway yêu cầu khóa API cho đường liên thông. Nhập khóa ở ô đầu trang.');
+        }
         if (!response.ok) throw new Error('Không thể tải lịch sử liên thông.');
         renderSyncedHistory(await response.json());
     } catch (error) {
@@ -457,7 +491,7 @@ async function clearSyncedHistory() {
     if (!confirm('Xóa các bệnh án do cơ sở này đã liên thông lên EMR Cloud?\n\nChẩn đoán do cơ sở khác lập sẽ được giữ nguyên.')) return;
 
     try {
-        const response = await fetch(`${API_BASE}/api/fhir/sync`, { method: 'DELETE' });
+        const response = await fetch(`${API_BASE}/api/fhir/sync`, { method: 'DELETE', headers: fhirHeaders() });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.detail || 'Không thể xóa lịch sử.');
 

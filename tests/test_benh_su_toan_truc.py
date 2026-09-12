@@ -31,9 +31,9 @@ class EmrGia:
             raise requests.ConnectionError("EMR Cloud offline")
         params = params or {}
         if "/Patient" in url:
-            khoa = params.get("identifier", "")
-            self.da_hoi.append(khoa)
-            hit = self.patients.get(khoa)
+            key = params.get("identifier", "")
+            self.da_hoi.append(key)
+            hit = self.patients.get(key)
             return FakeResponse({"entry": [{"resource": hit}] if hit else []})
         if "/Condition" in url:
             return FakeResponse({"entry": [{"resource": c} for c in self.conditions]})

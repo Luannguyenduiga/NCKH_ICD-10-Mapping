@@ -446,7 +446,7 @@ Chín endpoint, chia đúng theo hai khối:
 
 | Endpoint                            | Khối                  | Việc làm                                                                               |
 | ----------------------------------- | ---------------------- | ---------------------------------------------------------------------------------------- |
-| `GET /health`                     | —                     | Trạng thái mô hình, chính sách tin cậy, mã cơ sở, cờ `allow_client_facility` và `allow_demo_facility` |
+| `GET /health`                     | —                     | Trạng thái mô hình, chính sách tin cậy, mã cơ sở, cờ `allow_client_facility`, `allow_demo_facility`, `require_api_key` |
 | `POST /api/standardize`           | **NLP**          | Chuẩn hóa câu chẩn đoán → danh sách mã ICD-10 (mục A.7)                        |
 | `GET /api/icd10/{code}`           | **NLP**          | Tra tên bệnh theo mã trong danh mục 12 137 mã                                       |
 | `POST /api/fhir/condition`        | **Liên thông** | Sinh tài nguyên FHIR Condition từ một mã                                            |
@@ -455,6 +455,10 @@ Chín endpoint, chia đúng theo hai khối:
 | `GET /api/fhir/condition/{id}`    | **Liên thông** | Đọc lại một Condition để đối chiếu                                              |
 | `DELETE /api/fhir/condition/{id}` | **Liên thông** | Gỡ một Condition —**chỉ trong phạm vi cơ sở của mình**                    |
 | `DELETE /api/fhir/sync`           | **Liên thông** | Dọn dữ liệu demo — cũng chỉ trong phạm vi cơ sở của mình                      |
+
+> **Nhóm Liên thông (`/api/fhir/*`) yêu cầu header `X-SMIG-Api-Key`** khi Gateway đã cấp
+> ít nhất một khóa — xem [B.6](#b6-mã-cơ-sở-là-danh-tính-không-phải-tham-số). Nhóm NLP và
+> `GET /health` không đòi khóa.
 
 ### `POST /api/fhir/condition` — hợp đồng dữ liệu
 
@@ -600,6 +604,51 @@ Chốt chặn này áp cho **cả đường ghi lẫn đường xóa**:
 > dữ liệu demo" xóa mất bệnh án của viện khác thì hậu quả nặng hơn ghi nhầm, vì **không phục
 > hồi được**. Chốt bằng `tests/test_xoa_theo_co_so.py` và `tests/test_go_mot_chan_doan.py`.
 
+### Khóa API gắn với cơ sở (T1.4a)
+
+Cờ `SMIG_ALLOW_CLIENT_FACILITY` chỉ trả lời câu *"có tin lời khai không"*. Từ T1.4a, bên gọi
+có thể **chứng minh** mình là ai: mỗi HIS được cấp một khóa API, và khóa **tra ra** mã cơ sở.
+`resolve_facility()` khi thấy khóa sẽ lấy cơ sở của khóa làm danh tính; `facility_code` trong
+thân yêu cầu, nếu có, phải trùng — khác là **403**, kể cả khi cờ nhiều cơ sở đang bật.
+
+```powershell
+# Cấp khóa cho một cơ sở (bản rõ chỉ hiện MỘT lần, kho chỉ giữ băm SHA-256)
+.venv\Scripts\python -m backend.auth issue --facility 01001 --name "Bệnh viện Đa khoa A" --label "HIS Python"
+.venv\Scripts\python -m backend.auth list
+.venv\Scripts\python -m backend.auth revoke smig_3f9a1c2e      # có hiệu lực ngay, không cần khởi động lại
+```
+
+| Áp khóa                              | Không áp khóa                                         |
+| ------------------------------------ | ----------------------------------------------------- |
+| `POST/GET/DELETE /api/fhir/*`        | `GET /health`                                         |
+|                                      | `POST /api/standardize`, `GET /api/icd10/{code}` — khối NLP, tra cứu văn bản → mã, không mang danh tính |
+
+Ba quy tắc:
+
+* **Khóa sai hoặc đã thu hồi → 401 ở mọi chế độ.** Không bao giờ hạ xuống thành bên gọi nặc danh.
+* **Thiếu khóa → 401** khi Gateway đang bắt buộc khóa. Mặc định (`SMIG_REQUIRE_API_KEY=auto`)
+  là bắt buộc **ngay khi kho có ít nhất một khóa**: cấp khóa là hành động quyết định "từ nay
+  phải xác thực". Máy chưa cấp khóa nào vẫn chạy như trước — đó là môi trường trình diễn.
+* **Mã cơ sở của khóa đi qua đúng cửa kiểm dạng CSKCB** của T1.1(b) lúc cấp (`--allow-demo`
+  cho mã tạm kiểu `BV-A-001`). Lỗ hở "mã tự khai không bị kiểm dạng" khép ở đây.
+
+**Tích hợp HIS: chỉ thêm một header.** HIS không phải viết lại gì — mọi payload giữ nguyên,
+chỉ gắn `X-SMIG-Api-Key` vào các lời gọi `/api/fhir/*`:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/fhir/sync      -H "Content-Type: application/json"      -H "X-SMIG-Api-Key: smig_3f9a1c2e_..."      -d @condition.json
+```
+
+Khóa đi trong **header, không đi trong query string**: URL nằm trong access log, Referer và
+log của proxy. Khóa là bí mật của **máy chủ** HIS, không đưa xuống trình duyệt — HIS Python vì
+vậy có `GET /api/emr/condition/{id}` gọi hộ giao diện thay vì để trang web cầm khóa.
+
+> **Điều cần ghi trong báo cáo.** Khóa API không phải chuẩn xác thực cho trục dữ liệu y tế
+> thật — chuẩn là **OAuth2 client credentials** (SMART on FHIR / IHE IUA) hoặc mTLS. Toàn bộ
+> cơ chế nằm trong `backend/auth.py` và cắm vào ứng dụng bằng **một dependency ở mức app**;
+> thay bằng OAuth2 là thay cách lấy `Caller`, không đụng tầng FHIR và không đụng endpoint nào.
+> Chốt bằng `tests/test_api_key.py` (22 ca).
+
 ## B.7 API của hai bản HIS
 
 ### HIS mô phỏng — Python (`hospital_his/server.py`, cổng 8085)
@@ -674,6 +723,7 @@ update mà việc đồng nhất bệnh nhân dựa vào.
 | `tests/test_go_mot_chan_doan.py`       | Gỡ**một** bản ghi cũng phải kiểm cơ sở — chặn xóa chéo                                            |
 | `tests/test_ten_benh_theo_danh_muc.py` | Chẩn đoán lên trục phải mang**tên bệnh**, không phải nhãn chỗ điền tạm                         |
 | `tests/test_luong_nlp_khong_doi.py`    | **Chốt ranh giới hai khối**: chức năng liên thông thêm vào không được đụng kết quả NLP       |
+| `tests/test_api_key.py`               | Khóa API gắn với cơ sở: 401 khi thiếu/sai khóa, khóa viện A không ghi/gỡ được hồ sơ viện B, NLP không bị hỏi khóa |
 
 > `tests/test_ten_benh_theo_danh_muc.py` sinh ra từ một lỗi đo được: VNPT HIS đẩy chẩn đoán
 > kèm theo lên trục với `icd10_display` là đúng chuỗi *"Chẩn đoán kèm theo"*. Kết quả: I21.9
@@ -871,15 +921,32 @@ Hai bản HIS Python tự động dùng **hai tệp SQLite riêng** (suy ra từ
 bằng `-DbPath`) — dùng chung một tệp thì hai "bệnh viện" nhìn thấy y nguyên danh sách bệnh
 nhân của nhau.
 
-Ở cách này mã cơ sở do HIS **tự khai trong từng yêu cầu**, và Gateway không kiểm dạng mã tự
-khai — cửa kiểm mã CSKCB chỉ đứng ở cấu hình lúc khởi động. Vì vậy mã đặt tạm vẫn dùng được
-kể cả khi bản Gateway đang chạy ở chế độ chặt. Siết luôn cả đường tự khai thuộc T1.4, nơi mã
-cơ sở chuyển từ lời khai sang tra ra từ khóa API đã xác thực.
+Ở cách này mã cơ sở do HIS **tự khai trong từng yêu cầu**. Nó chỉ còn tác dụng với bên gọi
+**không mang khóa**, tức khi Gateway chưa cấp khóa nào (hoặc đặt `SMIG_REQUIRE_API_KEY=0`).
 
 > **Chỉ dùng để thử nghiệm.** Mã cơ sở là *danh tính* của bên ghi hồ sơ. Để bên gọi tự khai
-> thì bệnh viện B khai mình là bệnh viện A được ngay. Triển khai thật giữ cờ này **tắt** (mặc
-> định) và mỗi bệnh viện chạy một bản Gateway riêng. Gateway đang bật chế độ này báo
+> thì bệnh viện B khai mình là bệnh viện A được ngay. Gateway đang bật chế độ này báo
 > `allow_client_facility: true` ở `/health`.
+
+#### Cách đúng hơn: một Gateway, mỗi HIS một khóa API
+
+Cùng một bản Gateway, nhưng danh tính lấy từ khóa chứ không từ lời khai — không cần
+`-AllowClientFacility`, và khóa của viện A không ghi được hồ sơ mang mã viện B:
+
+```powershell
+.venv\Scripts\python -m backend.auth issue --facility BV-A-001 --name "Bệnh viện Đa khoa A" --allow-demo
+.venv\Scripts\python -m backend.auth issue --facility BV-B-002 --name "Bệnh viện Đa khoa B" --allow-demo
+.
+un.ps1 -Port 8000                     # dòng [AUTH] báo: YÊU CẦU khóa (2 khóa đang hiệu lực)
+.\hospital_his
+un_his.ps1 -Port 8085 -FacilityCode "BV-A-001" -FacilityName "Bệnh viện Đa khoa A" -GatewayApiKey "<khóa A>"
+.\hospital_his
+un_his.ps1 -Port 8086 -FacilityCode "BV-B-002" -FacilityName "Bệnh viện Đa khoa B" -GatewayApiKey "<khóa B>"
+```
+
+VNPT HIS nhận khóa qua biến môi trường `SMIG_GATEWAY_API_KEY` (đọc vào `smig.gateway.api-key`).
+Giao diện Gateway ở cổng 8000 cũng là một bên gọi: khi Gateway đòi khóa, thanh đầu trang hiện
+ô nhập khóa. Chi tiết ở [B.6](#b6-mã-cơ-sở-là-danh-tính-không-phải-tham-số).
 
 ### Chạy nhanh trên một máy
 
@@ -907,6 +974,9 @@ docker compose up -d
 | `SMIG_FACILITY_NAME`         | `Benh vien mo phong Viettel`      | Tên cơ sở, hiện trên mỗi chẩn đoán                                                           |
 | `SMIG_ALLOW_CLIENT_FACILITY` | *tắt*                       | Cho phép HIS tự khai mã cơ sở —**chỉ để thử nghiệm**                                 |
 | `SMIG_ALLOW_DEMO_FACILITY`   | *tắt*                       | Cho phép mã cơ sở**tự đặt** thay cho mã CSKCB thật — **chỉ để trình diễn** |
+| `SMIG_API_KEY_FILE`          | `backend/data/api_keys.json` | Kho khóa API (băm SHA-256, không có bản rõ); nằm trong `.gitignore`                    |
+| `SMIG_REQUIRE_API_KEY`       | `auto`                       | `1` bắt buộc khóa trên `/api/fhir/*`; `0` không; `auto` = bắt buộc khi kho có khóa     |
+| `SMIG_GATEWAY_API_KEY`       | *trống*                      | Khóa mà HIS (Python và VNPT) gửi kèm header `X-SMIG-Api-Key`                          |
 
 > **Mỗi bệnh viện triển khai một bản Gateway với `SMIG_FACILITY_CODE` riêng.** Hai bản dùng
 > trùng mã sẽ trộn hồ sơ của hai bệnh viện vào nhau (mục B.5). HIS đọc cùng biến này để tra
@@ -1035,17 +1105,19 @@ hiệu tên bệnh viện đó và **không sửa được** từ đây.
 * **Một chẩn đoán → một Condition trên đường Gateway.** `query_composite()` đã tách được
   nhiều bệnh và HIS Python đã sinh nhiều Condition, nhưng luồng demo trên giao diện Gateway
   vẫn dừng ở một Condition mỗi lần.
-* **Không có xác thực.** Mọi endpoint đều mở. Cả ba dịch vụ chỉ nghe trên `127.0.0.1` nên
-  phạm vi rủi ro giới hạn ở máy chạy demo, nhưng triển khai thật với dữ liệu y tế **bắt buộc**
-  phải có OAuth2 / SMART on FHIR. **Không** đưa cụm này ra Internet (kể cả qua ngrok hay
-  Cloudflare Tunnel) ở trạng thái hiện tại.
+* **Xác thực mới ở mức khóa API tại biên Gateway** (T1.4a), và chỉ trên đường liên thông
+  `/api/fhir/*`. Trục HAPI FHIR ở cổng 8090 vẫn **không** có xác thực; chưa có `AuditEvent`.
+  Cả ba dịch vụ chỉ nghe trên `127.0.0.1` nên phạm vi rủi ro giới hạn ở máy chạy demo, nhưng
+  triển khai thật với dữ liệu y tế **bắt buộc** phải có OAuth2 / SMART on FHIR và mTLS tới
+  trục. **Không** đưa cụm này ra Internet (kể cả qua ngrok hay Cloudflare Tunnel).
 * **Đồng bộ cập nhật theo khóa nghiệp vụ.** Đồng bộ lại cùng một chẩn đoán **trong cùng ngày**
   sẽ cập nhật bản ghi cũ thay vì tạo bản mới — đánh đổi để bảo đảm idempotent (mục B.4).
 * **Đồng nhất bệnh nhân dựa hoàn toàn vào định danh khai báo.** Không có CCCD/BHYT thì hệ
   thống chỉ quy được hồ sơ trong phạm vi một bệnh viện. Hệ thống **không** đối sánh xác suất
   theo họ tên/ngày sinh — đó là bài toán riêng, cần dữ liệu thật và thẩm định lâm sàng.
 * **Chưa có `Encounter`, `Practitioner`, `AuditEvent`** và chưa phân biệt chẩn đoán chính /
-  kèm theo ở tầng FHIR — xem kế hoạch `docs/T1.md`.
+  kèm theo ở tầng FHIR — xem kế hoạch `docs/T1.md`. Khóa API gắn ở mức ứng dụng nên đường
+  liên thông mới thêm sau này (T1.3, T1.5) tự động được bảo vệ, không phải sửa tầng xác thực.
 * **Mật khẩu PostgreSQL `hapi/hapi`** trong `docker-compose.yml` chỉ dành cho demo cục bộ.
 
 ---
@@ -1063,7 +1135,8 @@ hiệu tên bệnh viện đó và **không sửa được** từ đây.
 
 4. Sinh **nhiều FHIR Condition** cho câu chẩn đoán chứa nhiều bệnh trên toàn bộ các đường vào.
 5. Bổ sung `Encounter`, `Practitioner`, phân biệt chẩn đoán chính/kèm theo (`docs/T1.md` T1.3).
-6. **Xác thực client + `AuditEvent`** thay cho cơ chế lời khai hiện tại (T1.4).
+6. **`AuditEvent`** cho mỗi lần đọc/ghi bệnh sử (T1.4b); khóa API theo cơ sở đã xong (T1.4a),
+   triển khai thật thay bằng OAuth2 client credentials — chỉ đụng `backend/auth.py`.
 7. Ánh xạ hệ định danh theo **VN Core IG** và đường vào theo **XML QĐ 130/QĐ-BYT** (T1.2, T1.5).
 
 ---

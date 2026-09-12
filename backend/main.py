@@ -16,11 +16,12 @@ from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import quote
 
 import requests
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 
+from backend import auth
 from backend.fhir_helper import (
     EXT_SOURCE_FACILITY,
     SYSTEM_CONDITION_KEY,
@@ -126,6 +127,9 @@ async def lifespan(_: FastAPI):
     # Gateway còn dùng được phần không cần NLP, còn mã cơ sở sai thì không có
     # đường đi nào là đúng cả.
     _chot_ma_co_so()
+    # Cùng lý do với mã cơ sở: bắt buộc khóa mà kho trống là mọi yêu cầu liên
+    # thông đều 401, phải chết lúc bật máy chứ không phải lúc HIS gọi tới.
+    print(auth.check_api_key_config())
     try:
         nlp_engine = NLPEngine()
     except Exception as exc:  # noqa: BLE001 - giữ server sống để /health báo lỗi rõ ràng
@@ -141,6 +145,12 @@ app = FastAPI(
     description="NLP-powered ICD-10 standardization and HL7 FHIR converter",
     version="2.0.0",
     lifespan=lifespan,
+    # Cửa xác thực đứng ở mức ứng dụng, trước mọi route: chỉ nhóm `/api/fhir/*`
+    # phải mang khóa (xem `auth.API_KEY_PATHS`), các route khác đi qua
+    # không bị hỏi. Đặt ở đây thay vì ở từng endpoint để thêm một đường liên
+    # thông mới (T1.3 Encounter, T1.5 XML130) là tự động được bảo vệ, không
+    # phải nhớ gắn thêm tham số.
+    dependencies=[Depends(auth.authenticate_caller)],
 )
 
 # CORS giới hạn theo danh sách nguồn cụ thể. Dùng "*" kèm allow_credentials=True
@@ -321,8 +331,29 @@ def resolve_facility(
     viện khác và ghi hồ sơ dưới danh nghĩa nơi đó. Từ chối thẳng chứ không âm
     thầm lấy mã của Gateway: sai cấu hình mà vẫn chạy thì hồ sơ của bệnh viện B
     nằm trên trục dưới tên bệnh viện A, và không ai phát hiện ra.
+
+    **Bên gọi mang khóa API** (T1.4a) thì cơ sở là cơ sở gắn với khóa - danh
+    tính đã xác thực, không phải lời khai. Lời khai trong thân yêu cầu, nếu có,
+    phải trùng với nó; khác là 403, kể cả khi Gateway đang bật cờ nhiều cơ sở.
+    Nhờ vậy một bản Gateway phục vụ nhiều bệnh viện mà không cần cờ: mỗi HIS
+    một khóa, và `SMIG_ALLOW_CLIENT_FACILITY` chỉ còn tác dụng với bên gọi
+    không mang khóa.
     """
     code = (claimed_code or "").strip()
+
+    caller = auth.current_caller()
+    if caller is not None:
+        if code and code != caller.facility_code:
+            raise HTTPException(
+                status_code=403,
+                detail=(
+                    f"Khóa API thuộc cơ sở '{caller.facility_code}' "
+                    f"({caller.facility_name}) nhưng yêu cầu mang mã cơ sở '{code}'. "
+                    f"Mỗi cơ sở chỉ ghi, đọc và gỡ hồ sơ dưới danh nghĩa của chính mình."
+                ),
+            )
+        return caller.facility_code, caller.facility_name
+
     if not code or code == FACILITY_CODE:
         return FACILITY_CODE, FACILITY_NAME
     if not ALLOW_CLIENT_FACILITY:
@@ -485,6 +516,11 @@ def health_check():
         # KHÔNG đối chiếu được với cổng giám định BHYT. Nhìn hai cờ này là biết
         # bản Gateway đang chạy ở chế độ trình diễn hay chế độ triển khai.
         "allow_demo_facility": ALLOW_DEMO_FACILITY,
+        # Đường liên thông có đang đòi khóa API hay không, và kho có bao nhiêu
+        # khóa đang hiệu lực. Không bao giờ phơi khóa hay tiền tố ở đây.
+        "require_api_key": auth.api_key_required(),
+        "api_keys_active": auth.key_store.active_count(),
+        "api_key_header": auth.API_KEY_HEADER,
         "timestamp": time.time(),
     }
 
