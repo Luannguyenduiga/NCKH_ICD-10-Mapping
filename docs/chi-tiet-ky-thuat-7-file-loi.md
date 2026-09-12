@@ -995,8 +995,10 @@ File này **hiện đang để rỗng, có lý do** — và đây là một ví 
 | `SMIG_FACILITY_CODE` | `79001` | **Mã cơ sở của bản Gateway này** — kiểm dạng CSKCB lúc khởi động |
 | `SMIG_ALLOW_DEMO_FACILITY` | *tắt* | Cho phép mã cơ sở tự đặt thay cho mã CSKCB thật |
 | `SMIG_FACILITY_NAME` | `Benh vien mo phong Viettel` | Tên cơ sở |
-| `SMIG_ALLOW_CLIENT_FACILITY` | `0` (tắt) | Cho HIS tự khai mã cơ sở |
+| `SMIG_ALLOW_CLIENT_FACILITY` | `0` (tắt) | Cho HIS tự khai mã cơ sở — chỉ còn tác dụng với bên gọi không mang khóa |
 | `SMIG_ALLOWED_ORIGINS` | 4 origin localhost | Danh sách CORS |
+| `SMIG_API_KEY_FILE` | `backend/data/api_keys.json` | Kho khóa API theo cơ sở (băm SHA-256), đọc bởi `backend/auth.py` |
+| `SMIG_REQUIRE_API_KEY` | `auto` | Bắt buộc khóa trên `/api/fhir/*`: `1`, `0`, hoặc `auto` (bắt buộc khi kho có khóa) |
 
 CORS dùng **danh sách nguồn cụ thể**, không dùng `"*"`. Comment dòng 100–101: `"*"` kèm
 `allow_credentials=True` là cấu hình **không hợp lệ** theo đặc tả CORS và bị trình duyệt từ

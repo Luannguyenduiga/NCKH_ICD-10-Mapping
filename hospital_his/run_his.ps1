@@ -13,6 +13,10 @@ param(
     [string]$GatewayUrl = "http://127.0.0.1:8000",
     [string]$FacilityCode = "79001",
     [string]$FacilityName = "Benh vien mo phong Viettel",
+    # Khoa API do Gateway cap cho co so nay (python -m backend.auth issue ...).
+    # Bat buoc khi Gateway da co khoa; bo trong thi Gateway tra 401 cho moi
+    # thao tac lien thong. Co the dat san bien moi truong SMIG_GATEWAY_API_KEY.
+    [string]$GatewayApiKey = "",
     # Benh an cuc bo cua RIENG benh vien nay. Bo trong thi suy ra tu -FacilityCode,
     # nen chay hai ban HIS tren cung mot may la moi ban tu co tep rieng - khong
     # con canh hai "benh vien" nhin thay y nguyen danh sach benh nhan cua nhau.
@@ -36,6 +40,7 @@ $env:SMIG_GATEWAY_URL = $GatewayUrl
 $env:SMIG_FACILITY_CODE = $FacilityCode
 $env:SMIG_FACILITY_NAME = $FacilityName
 $env:SMIG_HIS_ALLOWED_ORIGINS = "http://127.0.0.1:$Port,http://localhost:$Port"
+if ($GatewayApiKey) { $env:SMIG_GATEWAY_API_KEY = $GatewayApiKey }
 
 if ($DbPath) {
     $env:SMIG_HIS_DB = $DbPath
@@ -50,6 +55,12 @@ Write-Host "[INFO] Starting Mock HIS server..." -ForegroundColor Green
 Write-Host "[INFO] HIS will be available at http://127.0.0.1:$Port" -ForegroundColor Green
 Write-Host "[INFO] Co so kham chua benh: $FacilityCode" -ForegroundColor Green
 Write-Host "[INFO] Gateway: $GatewayUrl" -ForegroundColor Green
+if ($env:SMIG_GATEWAY_API_KEY) {
+    Write-Host "[INFO] Khoa API Gateway: da dat (khong hien)" -ForegroundColor Green
+} else {
+    Write-Host "[WARN] Chua dat khoa API Gateway. Neu Gateway da cap khoa, moi thao tac" -ForegroundColor Yellow
+    Write-Host "       lien thong se bi 401. Dung -GatewayApiKey <khoa>." -ForegroundColor Yellow
+}
 if ($env:SMIG_HIS_DB) {
     Write-Host "[INFO] Benh an cuc bo: $($env:SMIG_HIS_DB)" -ForegroundColor Green
 }

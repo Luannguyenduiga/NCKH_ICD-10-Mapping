@@ -35,6 +35,11 @@ app = FastAPI(
 )
 
 GATEWAY_URL = os.getenv("SMIG_GATEWAY_URL", "http://127.0.0.1:8000")
+# Khóa API do Gateway cấp cho cơ sở này (T1.4a). Gateway tra khóa ra mã cơ sở,
+# nên khi có khóa thì `facility_code` gửi kèm chỉ còn là lời khai phải TRÙNG với
+# khóa, không phải thứ Gateway tin. Bỏ trống thì HIS gọi như trước - chỉ chạy
+# được khi Gateway chưa bắt buộc khóa. Lấy khóa: `python -m backend.auth issue`.
+GATEWAY_API_KEY = os.getenv("SMIG_GATEWAY_API_KEY", "").strip()
 FHIR_SERVER_URL = os.getenv("SMIG_FHIR_SERVER_URL", "http://127.0.0.1:8090/fhir")
 # Bệnh án cục bộ của RIÊNG bệnh viện này. Chạy hai bản HIS trên cùng một máy để
 # demo liên thông thì mỗi bản phải có tệp riêng, nếu không hai "bệnh viện" cùng
@@ -72,6 +77,16 @@ def _to_fhir_id(value: str) -> str:
     cleaned = re.sub(r"[^A-Za-z0-9.\-]", "-", (value or "").strip())
     cleaned = re.sub(r"-{2,}", "-", cleaned).strip("-")
     return (cleaned or "khong-ro-co-so")[:64]
+
+
+def _gateway_headers() -> dict:
+    """
+    Header cho các lời gọi tới đường liên thông của Gateway.
+
+    Chỉ nhóm `/api/fhir/*` cần khóa; `/api/standardize` thuộc khối NLP, để mở,
+    nên không gửi khóa sang đó cho khỏi rải bí mật ra chỗ không cần.
+    """
+    return {"X-SMIG-Api-Key": GATEWAY_API_KEY} if GATEWAY_API_KEY else {}
 
 
 FHIR_MRN_SYSTEM = f"https://smig.nckh.vn/fhir/identifier/mrn/{_to_fhir_id(FACILITY_CODE)}"
@@ -242,7 +257,37 @@ def get_config():
         "facility_code": FACILITY_CODE,
         "facility_name": FACILITY_NAME,
         "fhir_server": FHIR_SERVER_URL,
+        # Chỉ báo CÓ hay KHÔNG, không bao giờ đưa khóa xuống trình duyệt.
+        "gateway_api_key_set": bool(GATEWAY_API_KEY),
     }
+
+
+@app.get("/api/emr/condition/{condition_id}")
+def doc_lai_condition_tren_truc(condition_id: str):
+    """
+    Đọc lại một Condition trên EMR Cloud, đi qua Gateway bằng khóa của HIS.
+
+    Trước đây giao diện gọi thẳng `GET {gateway}/api/fhir/condition/{id}` từ
+    trình duyệt. Đường đó nay đòi khóa, mà khóa là bí mật của máy chủ HIS: đưa
+    xuống trình duyệt là mọi người mở được trang này đều cầm khóa của bệnh viện.
+    Nên máy chủ HIS gọi hộ.
+    """
+    try:
+        resp = requests.get(
+            f"{GATEWAY_URL}/api/fhir/condition/{condition_id}",
+            headers=_gateway_headers(), timeout=REQUEST_TIMEOUT)
+    except requests.RequestException as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Không thể kết nối Gateway tại {GATEWAY_URL}: {exc}") from exc
+    if resp.status_code != 200:
+        detail = resp.text[:300]
+        try:
+            detail = resp.json().get("detail", detail)
+        except ValueError:
+            pass
+        raise HTTPException(status_code=resp.status_code, detail=detail)
+    return resp.json()
 
 
 @app.get("/api/patients")
@@ -638,7 +683,8 @@ def _retire_on_emr(condition_id: str) -> Optional[str]:
         # gỡ đúng bản ghi của mình.
         resp = requests.delete(
             f"{GATEWAY_URL}/api/fhir/condition/{condition_id}",
-            params={"facility": FACILITY_CODE}, timeout=REQUEST_TIMEOUT)
+            params={"facility": FACILITY_CODE}, headers=_gateway_headers(),
+            timeout=REQUEST_TIMEOUT)
         resp.raise_for_status()
         return None
     except requests.RequestException as exc:
@@ -785,6 +831,7 @@ def _push_condition(patient: dict, diagnosis: dict) -> str:
             "facility_code": FACILITY_CODE,
             "facility_name": FACILITY_NAME,
         },
+        headers=_gateway_headers(),
         timeout=REQUEST_TIMEOUT,
     )
     fhir_resp.raise_for_status()
@@ -801,6 +848,7 @@ def _push_condition(patient: dict, diagnosis: dict) -> str:
                 "insurance_card": patient.get("insurance_card"),
             },
         },
+        headers=_gateway_headers(),
         timeout=REQUEST_TIMEOUT,
     )
     sync_resp.raise_for_status()

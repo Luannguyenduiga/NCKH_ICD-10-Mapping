@@ -27,6 +27,15 @@
                 </div>
             </div>
             <div class="header-status">
+                <!-- Khóa API cho đường liên thông /api/fhir/*. Giao diện này chỉ là
+                     một bên gọi như HIS: khi Gateway đã cấp khóa thì phải mang khóa,
+                     không có lối đi riêng cho "cùng nguồn". Chỉ hiện khi Gateway
+                     báo require_api_key. Lưu trong localStorage của trình duyệt. -->
+                <span class="status-badge api-key-box" id="api-key-box" hidden>
+                    <i class="fa-solid fa-key"></i>
+                    <input type="password" id="api-key-input" placeholder="X-SMIG-Api-Key"
+                           autocomplete="off" spellcheck="false" title="Khóa API do Gateway cấp cho cơ sở này">
+                </span>
                 <span class="status-badge" id="api-status">
                     <span class="status-dot"></span>
                     <span id="api-status-text">Đang kết nối API...</span>

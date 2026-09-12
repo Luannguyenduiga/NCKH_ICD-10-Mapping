@@ -911,3 +911,11 @@ body {
     border: 1px solid rgba(255, 167, 38, 0.28);
     border-radius: 8px;
 }
+
+/* Ô khóa API trên thanh đầu trang - cùng cỡ với huy hiệu trạng thái. */
+.api-key-box { gap: 8px; margin-right: 8px; }
+.api-key-box input {
+    border: none; background: transparent; color: inherit; font: inherit;
+    width: 200px; outline: none;
+}
+.api-key-box input::placeholder { color: inherit; opacity: 0.6; }

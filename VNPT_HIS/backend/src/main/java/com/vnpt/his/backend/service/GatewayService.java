@@ -2,6 +2,9 @@ package com.vnpt.his.backend.service;
 
 import com.vnpt.his.backend.model.Patient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -27,6 +30,26 @@ public class GatewayService {
 
     @Value("${smig.facility.name:Benh vien VNPT}")
     private String facilityName;
+
+    /**
+     * Khóa API do Gateway cấp cho cơ sở này (T1.4a).
+     *
+     * Gateway tra khóa ra mã cơ sở, nên {@code facilityCode} gửi kèm phải trùng
+     * với cơ sở của khóa - khác là 403. Chỉ đường liên thông {@code /api/fhir/*}
+     * cần khóa; {@code /api/standardize} thuộc khối NLP, để mở, không gửi khóa.
+     */
+    @Value("${smig.gateway.api-key:}")
+    private String gatewayApiKey;
+
+    /** Thân JSON kèm header khóa cho các lời gọi tới đường liên thông. */
+    private HttpEntity<Map<String, Object>> fhirRequest(Map<String, Object> body) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        if (gatewayApiKey != null && !gatewayApiKey.trim().isEmpty()) {
+            headers.set("X-SMIG-Api-Key", gatewayApiKey.trim());
+        }
+        return new HttpEntity<>(body, headers);
+    }
 
     private final RestTemplate restTemplate = buildRestTemplate();
 
@@ -190,7 +213,7 @@ public class GatewayService {
             putIfPresent(condReq, "facility_code", facilityCode);
             putIfPresent(condReq, "facility_name", facilityName);
 
-            Map<String, Object> fhirCondition = restTemplate.postForObject(conditionUrl, condReq, Map.class);
+            Map<String, Object> fhirCondition = restTemplate.postForObject(conditionUrl, fhirRequest(condReq), Map.class);
             if (fhirCondition == null) {
                 return null;
             }
@@ -211,7 +234,7 @@ public class GatewayService {
             putIfPresent(patientMap, "insurance_card", patient.getInsuranceCard());
             syncReq.put("patient", patientMap);
 
-            Map<String, Object> syncResp = restTemplate.postForObject(syncUrl, syncReq, Map.class);
+            Map<String, Object> syncResp = restTemplate.postForObject(syncUrl, fhirRequest(syncReq), Map.class);
             if (syncResp != null && syncResp.containsKey("condition_id")) {
                 return syncResp.get("condition_id").toString();
             }

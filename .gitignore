@@ -22,6 +22,8 @@ nlp/data/alias_embeddings_*.npy
 
 hospital_his/his_db.sqlite
 backend/data/synced_records.json
+# Kho khóa API: băm SHA-256 và mã cơ sở thật, không thuộc kho mã nguồn.
+backend/data/api_keys.json
 
 ~$*.xlsx
 ~$*.docx
