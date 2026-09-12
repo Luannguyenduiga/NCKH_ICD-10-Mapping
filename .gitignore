@@ -36,3 +36,5 @@ Thumbs.db
 .idea/
 
 docs/T1.md
+# Tài liệu vận hành nội bộ: cách cấp khóa API, không đưa lên kho.
+docs/cap-khoa-api.md
