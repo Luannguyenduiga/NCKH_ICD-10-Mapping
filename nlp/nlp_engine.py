@@ -142,7 +142,11 @@ def code_no_dot(code: str) -> str:
 class NLPEngine:
     """Tự động dùng mô hình cục bộ nếu có, nếu không thì tải mô hình online."""
 
-    def __init__(self, db_path: str = None, model_name: str = None):
+    def __init__(self, db_path: str = None, model_name: str = None,
+                 use_nli: bool = True, nli_model: Optional[str] = None,
+                 nli_weight: float = 0.20, nli_top_k: int = 4,
+                 nli_template: str = "bare", nli_contradiction_only: bool = True,
+                 nli_contradiction_floor: float = 0.5):
         if db_path is None:
             db_path = os.path.join(os.path.dirname(__file__), "data", "icd10_db.json")
 
@@ -177,6 +181,35 @@ class NLPEngine:
         self._apply_data_fixes()
         self._prepare_alias_embeddings()
         self._build_lookup_tables()
+
+        # Tín hiệu NLI - MẶC ĐỊNH BẬT: đo trên eval_holdout.json cho Top-1
+        # 72,5% -> 78,4%, MRR và ECE đều tốt hơn (xem nlp/README.md). Truyền
+        # use_nli=False để tắt (vd. muốn độ trễ thấp nhất, hoặc đo baseline
+        # không NLI để so sánh). Xem nlp/nli_reranker.py để biết chi tiết và
+        # hạn chế đã biết của tín hiệu này.
+        self.use_nli = use_nli
+        self.nli_weight = nli_weight
+        self.nli_top_k = nli_top_k
+        self.nli_template = nli_template
+        self.nli_contradiction_only = nli_contradiction_only
+        self.nli_contradiction_floor = nli_contradiction_floor
+        self._nli = None
+        if use_nli:
+            # Nạp có phòng hộ: NLI là tín hiệu BỔ SUNG, không phải lõi hệ
+            # thống. Model này tải từ HuggingFace Hub - máy không có mạng lúc
+            # tải lần đầu, hết dung lượng đĩa, hay Hub tạm lỗi đều không được
+            # phép làm SẬP toàn bộ NLPEngine (kể cả phần truy hồi ICD-10 vốn
+            # chẳng liên quan gì tới NLI). Lỗi thì tắt NLI, chạy tiếp như
+            # use_nli=False - đúng hành vi trước khi tính năng này tồn tại.
+            try:
+                from nlp.nli_reranker import NLIReranker
+                print(f"Đang nạp mô hình NLI (tín hiệu bổ sung, top-{nli_top_k} ứng viên)...")
+                self._nli = NLIReranker(model_name=nli_model or None) if nli_model else NLIReranker()
+            except Exception as e:
+                print(f"CẢNH BÁO: không nạp được model NLI ({e}). "
+                      f"Tiếp tục chạy không có tín hiệu NLI (như use_nli=False).")
+                self.use_nli = False
+
         print(f"NLP Engine initialized successfully! "
               f"({len(self.reference_entries)} vector tham chiếu, {len(self.db)} mã ICD-10)")
 
@@ -1044,6 +1077,25 @@ class NLPEngine:
                 }
 
         ranked = sorted(best.items(), key=lambda kv: kv[1]["score"], reverse=True)
+
+        # Tín hiệu NLI (tùy chọn, tắt mặc định) - mô hình thứ hai đánh giá lại
+        # top ứng viên sau tái xếp hạng. Đây là tầng THUẦN MÔ HÌNH: không có
+        # danh sách loại trừ hay điều kiện viết tay nào ở đây - mọi tinh chỉnh
+        # (trọng số, ngưỡng, phạm vi top-k, cách diễn đạt câu hỏi cho NLI) đều
+        # là tham số của chính cơ chế AI này, không phải tri thức lâm sàng cài
+        # cứng. Xem nlp/nli_reranker.py.
+        if self.use_nli and self._nli is not None and ranked:
+            from nlp.nli_reranker import apply_nli_rerank
+            candidates = [(code, self.db_index[code]["name_vi"]) for code, _ in ranked]
+            deltas = apply_nli_rerank(
+                self._nli, expanded, candidates,
+                weight=self.nli_weight, template=self.nli_template, top_k=self.nli_top_k,
+                contradiction_only=self.nli_contradiction_only,
+                contradiction_floor=self.nli_contradiction_floor)
+            for code, (delta, delta_notes) in deltas.items():
+                best[code]["score"] += delta
+                best[code]["notes"].extend(delta_notes)
+            ranked = sorted(best.items(), key=lambda kv: kv[1]["score"], reverse=True)
 
         # Chuẩn hóa softmax trên nhóm dẫn đầu để lấy xác suất tương đối.
         scope = ranked[:SOFTMAX_SCOPE]
