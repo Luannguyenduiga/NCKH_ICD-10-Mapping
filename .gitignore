@@ -20,6 +20,10 @@ nlp/data/embeddings_*.npy
 nlp/data/entries_*.json
 nlp/data/alias_embeddings_*.npy
 
+# Kết quả benchmark (nlp/bench.py) - gắn với model đang có trên máy chạy thử,
+# không phải số liệu chính thức của model đã fine-tune. Đo lại khi có model.
+runs/
+
 
 hospital_his/his_db.sqlite
 backend/data/synced_records.json
