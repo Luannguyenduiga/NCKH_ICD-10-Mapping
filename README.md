@@ -326,38 +326,61 @@ vì tên bệnh — lỗi này đã xảy ra thật và được chốt bằng `
 .venv\Scripts\python -m nlp.evaluate --json ket_qua.json
 ```
 
-### Kết quả hiện tại
+### Kết quả hiện tại (đo ngày 14/09/2026)
 
-| Chỉ số              | Tập phát triển (110 ca) | **Tập kiểm tra độc lập (51 ca)** |
-| --------------------- | -------------------------- | ------------------------------------------- |
-| Top-1 accuracy        | 100,0%                     | **70,6%**                             |
-| Top-3 accuracy        | 100,0%                     | 88,2%                                       |
-| Top-5 accuracy        | 100,0%                     | 92,2%                                       |
-| MRR                   | 1,000                      | 0,796                                       |
-| Độ trễ trung bình | 60 ms                      | 59 ms                                       |
+Đo bằng `nlp/bench.py` và `nlp/evaluate.py`, GPU, mô hình fine-tune trong `nlp/my_medical_nlp_model/`.
+Từ PR #6, `NLPEngine()` **mặc định bật tín hiệu NLI** (mô hình thứ hai tái xếp hạng top-4 ứng viên,
+xem `nlp/README.md`), nên Gateway đang chạy với cột **có NLI**. Cột không NLI là baseline để đối chiếu.
+
+| Chỉ số (tập kiểm tra độc lập, 51 ca) | Không NLI          | **Có NLI (mặc định)**       |
+| ------------------------------------- | ------------------ | --------------------------- |
+| Top-1 accuracy                        | 72,5% (37/51)      | **78,4% (40/51)**           |
+| Top-3 accuracy                        | 86,3% (44/51)      | 84,3% (43/51)               |
+| Top-5 accuracy                        | 86,3% (44/51)      | 86,3% (44/51)               |
+| MRR                                   | 0,788              | **0,815**                   |
+| ECE (hiệu chuẩn, càng thấp càng tốt) | 0,116              | **0,096**                   |
+| Khoảng tin cậy 95% của Top-1 (Wilson) | 59,1% – 82,9%      | 65,4% – 87,5%               |
+| Độ trễ trung bình mỗi câu             | 17 ms              | 36 ms                       |
+| Bộ nhớ GPU                            | 666 MB             | 1 214 MB                    |
+
+| Chỉ số (tập phát triển, 110 ca) | Không NLI | Có NLI (mặc định) |
+| -------------------------------- | --------- | ----------------- |
+| Top-1 accuracy                   | 99,1%     | 98,2%             |
+| Top-3 / Top-5 accuracy           | 100% / 100% | 99,1% / 99,1%   |
 
 > **Cách đọc bảng này.** Tập phát triển (`eval_set.json`) đã được dùng để hiệu chỉnh luật,
-> alias và trọng số, nên con số 100% trên đó **không** phản ánh năng lực tổng quát hóa — chỉ
-> chứng tỏ các luật đã được cài đúng. Con số cần trích dẫn trong báo cáo khoa học là cột
+> alias và trọng số, nên con số gần 100% trên đó **không** phản ánh năng lực tổng quát hóa — chỉ
+> chứng tỏ các luật đã được cài đúng. Con số cần trích dẫn trong báo cáo khoa học là
 > **tập kiểm tra độc lập** (`eval_holdout.json`), soạn sau khi hoàn tất tinh chỉnh.
 >
-> Lần đo đầu trên tập độc lập cho Top-1 62,7% / Top-5 86,3%. Phân tích lỗi phát hiện bốn
-> khiếm khuyết hệ thống (mục A.4), khắc phục xong đạt 70,6% / 92,2%. Vì đã nhìn vào lỗi của
-> tập này nên nó **không còn hoàn toàn "sạch"**; lần báo cáo tiếp theo cần một tập độc lập mới.
+> **NLI được gì, mất gì.** Trên tập độc lập NLI đưa 4 ca lên vị trí 1 và kéo 1 ca từ ngoài Top-5
+> vào vị trí 4, nhưng đẩy 1 ca đang đúng ("chấn thương sọ não kín") ra ngoài Top-5; trên tập
+> phát triển 1 ca nhóm nhiễu rơi khỏi Top-5. Mọi chênh lệch đều là 1–3 ca trên 51 ca, nằm trong
+> khoảng nhiễu thống kê (hai khoảng tin cậy chồng lấn gần hết). Cái chắc chắn là chi phí: độ trễ và
+> bộ nhớ GPU gấp đôi. Tắt bằng `NLPEngine(use_nli=False)`.
+>
+> **Lịch sử số đo.** Lần đo đầu trên tập độc lập cho Top-1 62,7% / Top-5 86,3%; sau khi khắc phục
+> bốn khiếm khuyết hệ thống (mục A.4) đạt 72,5% / 86,3% (không NLI). Các con số 88,2% / 92,2% từng
+> ghi ở đây **chưa lần nào đo lại được** và đã được gỡ; chốt hồi quy trong `nlp/test_nlp.py` cũng đã
+> hạ về 0,86 (commit 28/08). Vì đã nhìn vào lỗi của tập này nên nó **không còn hoàn toàn "sạch"**;
+> lần báo cáo tiếp theo cần một tập độc lập mới, khoảng 150–200 ca, để khoảng tin cậy thu về ±5 điểm.
 
-### Diễn giải theo nhóm đầu vào (tập độc lập)
+### Diễn giải theo nhóm đầu vào (tập độc lập, cấu hình mặc định có NLI)
 
-| Nhóm                         | Số ca | Top-1  | Top-5  |
-| ----------------------------- | ------ | ------ | ------ |
-| Có viết tắt lâm sàng     | 4      | 100,0% | 100,0% |
-| Gõ không dấu               | 4      | 75,0%  | 75,0%  |
-| Chẩn đoán viết đầy đủ | 32     | 71,9%  | 90,6%  |
-| Có tiền tố hành văn      | 3      | 66,7%  | 100,0% |
-| Cặp đối lập ngữ nghĩa   | 4      | 50,0%  | 100,0% |
-| Chọn mức chi tiết của mã | 4      | 50,0%  | 100,0% |
+| Nhóm                         | Số ca | Top-1  | Top-5  | Không NLI (Top-1 / Top-5) |
+| ----------------------------- | ------ | ------ | ------ | ------------------------- |
+| Có viết tắt lâm sàng         | 4      | 100,0% | 100,0% | 100,0% / 100,0%           |
+| Cặp đối lập ngữ nghĩa        | 4      | 100,0% | 100,0% | 50,0% / 100,0%            |
+| Chọn mức chi tiết của mã     | 4      | 75,0%  | 100,0% | 50,0% / 100,0%            |
+| Chẩn đoán viết đầy đủ        | 32     | 75,0%  | 84,4%  | 75,0% / 84,4%             |
+| Gõ không dấu                  | 4      | 75,0%  | 75,0%  | 75,0% / 75,0%             |
+| Có tiền tố hành văn           | 3      | 66,7%  | 66,7%  | 66,7% / 66,7%             |
 
-Hai nhóm yếu nhất (đối lập ngữ nghĩa, mức chi tiết) đều đạt **Top-5 = 100%** — mã đúng luôn
-nằm trong danh sách gợi ý, phù hợp với thiết kế *"máy gợi ý, bác sĩ chọn"*.
+NLI giúp rõ nhất ở hai nhóm nó được thiết kế cho: đối lập ngữ nghĩa và mức chi tiết của mã, cả hai
+đều đạt **Top-5 = 100%** — mã đúng luôn nằm trong danh sách gợi ý, phù hợp với thiết kế *"máy gợi
+ý, bác sĩ chọn"*. Hai nhóm yếu nhất hiện nay là gõ không dấu và có tiền tố hành văn: ở đó mã đúng
+nằm ngoài Top-5 ở 1/4 và 1/3 số ca, và NLI không đổi được gì vì nó chỉ chấm lại các ứng viên đã
+được truy hồi.
 
 ## A.9 Kiểm thử khối NLP
 
@@ -1095,6 +1118,10 @@ hiệu tên bệnh viện đó và **không sửa được** từ đây.
   lấy từ bệnh án thật.
 * **Tập kiểm tra độc lập không còn hoàn toàn "sạch"** — đã dùng lỗi của nó để sửa bốn khiếm
   khuyết hệ thống (mục A.4). Lần báo cáo tiếp theo cần soạn tập độc lập mới.
+* **Tín hiệu NLI mặc định bật kéo theo tải mô hình thứ hai lúc khởi động** (558 MB từ Hugging Face
+  Hub, lần đầu). Trên máy thử ngày 14/09/2026 phần tải này treo ở 0 byte qua giao thức xet của
+  `huggingface_hub`; tải thẳng HTTP thì xong trong ~100 giây. Nếu gặp, đặt `HF_HUB_DISABLE_XET=1`
+  hoặc tắt NLI bằng `NLPEngine(use_nli=False)`. Không tải được thì engine tự chạy không NLI.
 * **Cache embedding phụ thuộc mô hình và danh mục.** Đổi một trong hai phải mã hóa lại toàn
   bộ danh mục (15–40 phút trên CPU); hệ thống có in cảnh báo trước khi chạy.
 * **Luật hậu xử lý, không phải mô hình học được ranh giới.** Trục đối lập và cổng chương là
