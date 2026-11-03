@@ -146,6 +146,40 @@ def test_abbreviation_expansion(engine):
     assert "không phụ thuộc insuline" in expanded
 
 
+@pytest.mark.parametrize("query, expected", [
+    ("K vú", "ung thư vú"),
+    ("K đại tràng", "ung thư đại tràng"),
+    ("K phổi", "ung thư phổi"),
+    ("TĐ tuýp 2", "đái tháo đường tuýp 2"),
+    ("RLTCH", "rối loạn chuyển hóa"),
+    ("RLLP", "rối loạn lipid máu"),
+    ("RLM", "rối loạn lipid máu"),
+    ("VĐD-TT", "viêm dạ dày tá tràng"),
+    ("VĐD – TT", "viêm dạ dày tá tràng"),
+    ("VDD/TT", "viêm dạ dày tá tràng"),
+    ("VQP", "viêm phế quản"),
+    ("SXH Dengue", "sốt xuất huyết dengue"),
+    ("BMV", "bệnh mạch vành"),
+    ("XG", "xơ gan"),
+    ("VRT cấp", "viêm ruột thừa cấp"),
+    ("TVĐĐ", "thoát vị đĩa đệm"),
+    ("RLTV", "rối loạn thần kinh thực vật"),
+    ("RLTKTV", "rối loạn thần kinh thực vật"),
+    ("HCTĐ", "hội chứng tiền đình"),
+    ("NĐTP", "ngộ độc thực phẩm"),
+    ("NĐ", "nhiễm độc"),
+    ("NTH", "nhiễm trùng huyết"),
+])
+def test_added_abbreviations(engine, query, expected):
+    assert engine.expand_query(query, with_bridges=False) == expected
+
+
+@pytest.mark.parametrize("query", ["RLTT", "CSCL", "VKBN", "ST", "k", "k máu"])
+def test_ambiguous_abbreviations_not_forced(engine, query):
+    expanded = engine.expand_query(query, with_bridges=False)
+    assert expanded == query.lower()
+
+
 def test_diacritic_restoration(engine):
     """Văn bản gõ không dấu phải được khôi phục dấu trước khi truy hồi."""
     assert "nhồi máu cơ tim" in engine.expand_query("nhoi mau co tim cap")

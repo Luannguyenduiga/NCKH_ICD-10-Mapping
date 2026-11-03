@@ -52,6 +52,30 @@ ABBREVIATIONS = {
 # Bộ mở rộng - CHỈ áp dụng cho câu truy vấn của bác sĩ, không đụng tới embedding
 # cache. Thêm viết tắt mới vào đây là an toàn.
 QUERY_ABBREVIATIONS = {
+    # Bổ sung từ danh sách viết tắt của người dùng. Chỉ mở rộng tên bệnh,
+    # không tự thêm thể cấp/mạn, nguyên nhân hay mã ICD-10 chi tiết.
+    # K chỉ nhận trước các vị trí đã nêu, tránh đổi chữ k trong ngữ cảnh khác.
+    r"\bk\s+(?=(?:vú|đại tràng|phổi)\b)": "ung thư ",
+    r"\btđ\b": "đái tháo đường",
+    r"\brltch\b": "rối loạn chuyển hóa",
+    r"\brllp\b": "rối loạn lipid máu",
+    r"\brlm\b": "rối loạn lipid máu",
+    # Đặt cụm dạ dày - tá tràng trước VDD và chấp nhận các dấu nối thường gặp.
+    r"\bv(?:đd|dd)(?:\s*[-/]\s*|\s+)tt\b": "viêm dạ dày tá tràng",
+    r"\bvqp\b": "viêm phế quản",
+    r"\bsxh\b": "sốt xuất huyết",
+    r"\bbmv\b": "bệnh mạch vành",
+    r"\bxg\b": "xơ gan",
+    r"\bvrt\b": "viêm ruột thừa",
+    r"\btvđđ\b": "thoát vị đĩa đệm",
+    r"\brltktv\b": "rối loạn thần kinh thực vật",
+    r"\brltv\b": "rối loạn thần kinh thực vật",
+    r"\bhctđ\b": "hội chứng tiền đình",
+    r"\bnđtp\b": "ngộ độc thực phẩm",
+    r"\bnđ\b": "nhiễm độc",
+    r"\bnth\b": "nhiễm trùng huyết",
+    # Chưa mở rộng RLTT, CSCL, VKBN và các ký hiệu ngắn/không thống nhất
+    # (BTM/BNM/BMT, ĐCK, TNA, TMTN/TĐN, TN/TMT, ST, VTH): cần xác nhận ngữ cảnh.
     r"\bt1\b": "tuýp 1",
     r"\btype 1\b": "tuýp 1",
     r"\btyp 1\b": "tuýp 1",
