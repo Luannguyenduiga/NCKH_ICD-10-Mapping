@@ -42,3 +42,6 @@ Thumbs.db
 docs/T1.md
 Check Report
 docs
+
+# Dữ liệu bệnh án thử của HIS mô phỏng theo từng cơ sở (his_db_<mã cơ sở>.sqlite)
+hospital_his/his_db_*.sqlite

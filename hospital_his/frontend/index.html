@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hệ thống Quản lý Bệnh viện - HIS Demo</title>
-    <!-- Google Fonts: Outfit -->
+    <!-- Google Fonts: Nunito Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome for medical icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Stylesheet -->
@@ -61,6 +61,15 @@
                     </button>
                 </div>
             </header>
+
+            <div class="page-body">
+            <!-- Dải thống kê: đếm trên dữ liệu đang hiển thị -->
+            <section class="stat-strip" aria-label="Tóm tắt">
+                <div class="stat"><span class="stat-label">Bệnh nhân tại viện</span><strong id="stat-total">0</strong></div>
+                <div class="stat synced"><span class="stat-label">Đã liên thông lên trục</span><strong id="stat-synced">0</strong></div>
+                <div class="stat review"><span class="stat-label">Chờ bác sĩ duyệt</span><strong id="stat-review">0</strong></div>
+                <div class="stat external"><span class="stat-label">Chẩn đoán từ tuyến khác</span><strong id="stat-external">0</strong></div>
+            </section>
 
             <!-- Grid Layout: Table & JSON Viewer -->
             <div class="content-grid">
@@ -129,12 +138,13 @@
                     </div>
                 </section>
             </div>
+            </div>
         </main>
     </div>
 
     <!-- Add Patient Modal Dialog -->
     <div class="modal" id="add-patient-modal">
-        <div class="modal-content glass-card">
+        <div class="modal-content">
             <div class="modal-header">
                 <h3>Thêm hồ sơ bệnh án mới</h3>
                 <span class="close-modal" id="close-modal-btn">&times;</span>

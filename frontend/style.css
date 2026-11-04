@@ -1,921 +1,645 @@
-/* Root variables for consistent design language */
+/* SMIG Gateway: giao diện kỹ thuật, nền sáng trung tính.
+   Màu nhấn là xanh lam đậm (tích hợp y tế), chữ hệ thống là IBM Plex Sans,
+   chữ mono chỉ dành cho dữ liệu: mã ICD, JSON, mã định danh. */
+
 :root {
-    --bg-gradient: radial-gradient(circle at 50% 50%, #161b33 0%, #0d0f1d 100%);
-    --panel-bg: rgba(22, 27, 51, 0.65);
-    --panel-border: rgba(255, 255, 255, 0.06);
-    --card-bg: rgba(11, 14, 28, 0.75);
-    --card-border: rgba(255, 255, 255, 0.04);
-    
-    --text-primary: #f1f3f9;
-    --text-secondary: #9aa0b9;
-    --text-muted: #646b85;
-    
-    --color-primary: #38ef7d;
-    --color-primary-glow: rgba(56, 239, 125, 0.35);
-    --color-accent: #00f2fe;
-    --color-accent-glow: rgba(0, 242, 254, 0.3);
-    --color-purple: #c471ed;
-    --color-purple-glow: rgba(196, 113, 237, 0.35);
-    
-    --status-online: #00e676;
-    --status-offline: #ff1744;
-    
-    --font-heading: 'Outfit', sans-serif;
-    --font-body: 'Inter', sans-serif;
-    
-    --radius-lg: 16px;
-    --radius-md: 10px;
-    --radius-sm: 6px;
-    
-    --transition-fast: 0.2s ease;
-    --transition-normal: 0.3s ease;
+    --ground: #EEF5F7;
+    --surface: #FFFFFF;
+    --ink: #1C3340;
+    --ink-2: #486270;
+    --ink-3: #7A929C;
+    --line: #D2E0E6;
+    --line-soft: #E4EEF2;
+
+    --accent: #3D7F92;
+    --accent-hover: #2F6B7D;
+    --accent-soft: #DDEEF3;
+
+    --high: #2B6B4C;
+    --high-soft: #D6EFE3;
+    --med: #7A5514;
+    --med-soft: #F8E8C8;
+    --low: #8C3A33;
+    --low-soft: #F5D9D6;
+
+    --font-ui: 'IBM Plex Sans', system-ui, sans-serif;
+    --font-data: 'IBM Plex Mono', ui-monospace, monospace;
+
+    --r-xs: 3px;
+    --r-sm: 6px;
+    --r-md: 10px;
 }
 
-/* Global Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    background: var(--bg-gradient);
-    font-family: var(--font-body);
-    color: var(--text-primary);
-    min-height: 100vh;
-    overflow-x: hidden;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: 15px;
     line-height: 1.5;
+    min-height: 100vh;
 }
 
-/* Scrollbar Customization */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-::-webkit-scrollbar-track {
-    background: rgba(13, 15, 29, 0.3);
-}
-::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-sm);
-}
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.25);
-}
+h1, h2, h3 { font-weight: 600; letter-spacing: -0.01em; }
+button, input, textarea, select { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
 
-/* Main Layout Container */
+/* ---------- Khung ---------- */
+
 .app-container {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    padding: 1.5rem;
-    gap: 1.5rem;
+    min-height: 100vh;
 }
 
-/* App Header Styling */
 .app-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--panel-bg);
-    border: 1px solid var(--panel-border);
-    border-radius: var(--radius-lg);
-    padding: 1rem 2rem;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    gap: 1rem;
+    padding: 0.9rem 1.75rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
 }
 
-.header-logo {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
+.header-logo { display: flex; align-items: center; gap: 0.85rem; }
 
 .logo-icon {
-    font-size: 2rem;
-    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-purple) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 8px var(--color-accent-glow));
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    background: var(--accent);
+    color: #fff;
+    border-radius: var(--r-sm);
+    font-size: 1rem;
 }
 
-.logo-text h1 {
-    font-family: var(--font-heading);
-    font-size: 1.25rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    color: var(--text-primary);
-}
+.logo-text h1 { font-size: 1.05rem; }
+.logo-text span { font-size: 0.8rem; color: var(--ink-3); }
 
-.logo-text span {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    letter-spacing: 0.2px;
-}
+.header-status { display: flex; align-items: center; gap: 0.6rem; }
 
-/* Connection status badge */
 .status-badge {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background: rgba(11, 14, 28, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 0.4rem 0.8rem;
-    border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: 500;
+    font-size: 0.82rem;
+    color: var(--ink-2);
+    padding: 0.35rem 0.7rem;
+    border: 1px solid var(--line);
+    border-radius: var(--r-xs);
+    background: var(--surface);
 }
+
+.status-badge.online { color: var(--high); border-color: #BFE0CF; }
 
 .status-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: var(--status-offline);
-    box-shadow: 0 0 8px var(--status-offline);
-    transition: all 0.5s ease;
+    background: var(--ink-3);
 }
 
-.status-badge.online .status-dot {
-    background-color: var(--status-online);
-    box-shadow: 0 0 8px var(--status-online);
+.status-badge.online .status-dot { background: var(--high); }
+
+.api-key-box input {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 150px;
+    font-family: var(--font-data);
+    font-size: 0.8rem;
 }
 
-/* Workspace Grid Layout */
-.app-main {
-    flex: 1;
-    min-height: 0; /* Important for grid inner-scrolling */
-}
+.app-main { flex: 1; padding: 1.5rem 1.75rem 2rem; }
 
 .dashboard-grid {
     display: grid;
-    grid-template-columns: 1.1fr 1fr 1.1fr;
-    gap: 1.5rem;
-    height: 100%;
+    grid-template-columns: minmax(340px, 0.9fr) minmax(360px, 1.1fr) minmax(380px, 1fr);
+    gap: 1.25rem;
+    align-items: start;
 }
 
-/* Grid Panel (Column container) */
+/* Thẻ: một lớp viền, không đổ bóng. Mức nhấn do khoảng trắng và tiêu đề quyết định. */
 .grid-panel {
-    display: flex;
-    flex-direction: column;
-    background: var(--panel-bg);
-    border: 1px solid var(--panel-border);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-    min-height: 0; /* Crucial for inner scroll */
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 1.25rem 1.3rem;
+    min-width: 0;
 }
 
 .panel-header {
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    align-items: baseline;
+    gap: 0.6rem;
+    padding-bottom: 0.9rem;
+    margin-bottom: 1.1rem;
+    border-bottom: 1px solid var(--line-soft);
 }
 
-.panel-icon {
-    font-size: 1.2rem;
-    color: var(--color-accent);
-    filter: drop-shadow(0 0 6px var(--color-accent-glow));
-}
+.panel-icon { color: var(--accent); font-size: 0.95rem; }
+.panel-header h2 { font-size: 1rem; }
 
-.panel-header h2 {
-    font-family: var(--font-heading);
-    font-size: 1.1rem;
+/* ---------- Cột 1: nhập liệu ---------- */
+
+.patient-card,
+.diagnosis-card { margin-bottom: 1.25rem; }
+
+.patient-card h3,
+.diagnosis-card > h3 {
+    font-size: 0.78rem;
     font-weight: 600;
-    color: var(--text-primary);
-}
-
-/* Sub-cards inside Panels */
-.patient-card, .diagnosis-card, .presets-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: var(--radius-md);
-    padding: 1rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.patient-card h3, .diagnosis-card h3, .presets-card h3 {
-    font-size: 0.8rem;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: var(--text-secondary);
-    margin-bottom: 0.75rem;
-    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+    margin-bottom: 0.7rem;
 }
 
-/* Form Styles */
-.form-group-row {
-    display: flex;
+.form-group-row,
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
 }
 
-.form-group {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    margin-bottom: 0.75rem;
-}
+.form-group { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.75rem; min-width: 0; }
 
 .form-group label {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-.form-group input, .form-group textarea {
-    background: rgba(13, 16, 32, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: var(--radius-sm);
-    color: var(--text-primary);
-    padding: 0.6rem 0.8rem;
-    font-family: var(--font-body);
-    font-size: 0.85rem;
-    outline: none;
-    transition: var(--transition-fast);
-}
-
-.form-group input:focus, .form-group textarea:focus {
-    border-color: var(--color-accent);
-    box-shadow: 0 0 6px var(--color-accent-glow);
-}
-
-.form-group textarea {
-    resize: none;
-}
-
-/* Buttons */
-.button-group {
+    font-size: 0.82rem;
+    color: var(--ink-2);
     display: flex;
-    gap: 0.75rem;
-    margin-top: 0.5rem;
+    align-items: center;
+    gap: 0.4rem;
 }
+
+.form-group label i { color: var(--ink-3); font-size: 0.75rem; }
+
+input[type="text"],
+textarea {
+    width: 100%;
+    padding: 0.55rem 0.7rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+textarea { resize: vertical; line-height: 1.55; }
+
+.sample-group { margin: 0.25rem 0 1rem; }
+.sample-group > label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    color: var(--ink-2);
+    margin-bottom: 0.5rem;
+}
+
+.sample-buttons { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+.btn-sample {
+    padding: 0.32rem 0.65rem;
+    background: var(--surface);
+    border: 1px dashed #B8C3CE;
+    border-radius: var(--r-xs);
+    font-size: 0.8rem;
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-sample:hover { border-style: solid; border-color: var(--accent); color: var(--accent); }
+
+.button-group { display: flex; gap: 0.6rem; margin-top: 0.5rem; }
 
 .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    padding: 0.6rem 1.2rem;
-    font-family: var(--font-heading);
-    font-size: 0.85rem;
-    font-weight: 600;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    outline: none;
-    border: none;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    color: #0c1020;
-    box-shadow: 0 3px 12px var(--color-primary-glow);
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px var(--color-primary-glow);
-    filter: brightness(1.1);
-}
-
-.btn-secondary {
-    background: rgba(255, 255, 255, 0.06);
-    color: var(--text-primary);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.12);
-    transform: translateY(-2px);
-}
-
-.btn-accent {
-    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-purple) 100%);
-    color: #0d0f1d;
-    box-shadow: 0 4px 15px rgba(0, 242, 254, 0.25);
-}
-
-.btn-accent:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 22px rgba(0, 242, 254, 0.4);
-    filter: brightness(1.1);
-}
-
-.btn-accent:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    box-shadow: none;
-}
-
-.btn-full {
-    width: 100%;
-    padding: 0.8rem;
-    font-size: 0.95rem;
-}
-
-/* Preset Buttons Grid */
-.presets-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    max-height: 160px;
-    overflow-y: auto;
-    padding-right: 0.25rem;
-}
-
-.preset-btn {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.03);
-    border-radius: var(--radius-sm);
-    padding: 0.5rem 0.75rem;
-    text-align: left;
-    cursor: pointer;
-    transition: var(--transition-fast);
-    outline: none;
-}
-
-.preset-btn:hover {
-    background: rgba(0, 242, 254, 0.08);
-    border-color: rgba(0, 242, 254, 0.2);
-    transform: translateX(3px);
-}
-
-.preset-title {
-    font-size: 0.75rem;
+    padding: 0.6rem 1rem;
+    border-radius: var(--r-sm);
+    border: 1px solid transparent;
+    font-size: 0.88rem;
     font-weight: 500;
-    color: var(--text-primary);
-    display: block;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-/* Column 2: Pipeline Steps Visualizer */
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-full { width: 100%; }
+
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+
+.btn-secondary { background: var(--surface); color: var(--ink-2); border-color: var(--line); }
+.btn-secondary:hover:not(:disabled) { border-color: var(--ink-3); color: var(--ink); }
+
+.btn-accent { background: var(--ink); color: #fff; padding: 0.8rem 1rem; }
+.btn-accent:hover:not(:disabled) { background: #2A3B47; }
+
+.btn-copy,
+.btn-clear-history {
+    background: none;
+    border: none;
+    color: var(--ink-3);
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+    border-radius: var(--r-xs);
+}
+
+.btn-copy:hover,
+.btn-clear-history:hover { color: var(--accent); background: var(--accent-soft); }
+
+/* ---------- Cột 2: luồng xử lý NLP ---------- */
+
 .pipeline-flow {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
-    flex: 1;
-    overflow-y: auto;
+    gap: 1.1rem;
+}
+
+/* Đường nối các bước: một vạch mảnh, không phải thẻ bo góc. */
+.pipeline-flow::before {
+    content: "";
+    position: absolute;
+    left: 13px;
+    top: 28px;
+    bottom: 28px;
+    width: 1px;
+    background: var(--line);
 }
 
 .pipeline-step {
-    display: flex;
-    gap: 1rem;
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: var(--radius-md);
-    padding: 1rem;
-    transition: var(--transition-normal);
-}
-
-.pipeline-step:hover {
-    border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    position: relative;
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 0.9rem;
 }
 
 .step-badge {
-    flex-shrink: 0;
-    width: 24px;
-    height: 24px;
+    position: relative;
+    z-index: 1;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-purple) 100%);
-    color: #0d0f1d;
-    font-weight: 700;
+    font-family: var(--font-data);
     font-size: 0.8rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 6px var(--color-accent-glow);
+    color: var(--ink-3);
 }
 
-.step-content {
-    flex: 1;
+.pipeline-step.done .step-badge { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.step-content h3 {
+    font-size: 0.92rem;
+    margin: 0.2rem 0 0.55rem;
+    color: var(--ink);
+}
+
+.step-result-box,
+.predictions-list {
+    min-height: 56px;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
 
-.step-content h3 {
-    font-family: var(--font-heading);
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-
-.step-result-box {
-    background: rgba(10, 12, 24, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.03);
-    border-radius: var(--radius-sm);
-    padding: 0.6rem;
-    font-size: 0.85rem;
-    min-height: 40px;
-    color: var(--text-primary);
-}
-
 .placeholder-text {
-    color: var(--text-muted);
-    font-style: italic;
-    font-size: 0.8rem;
+    color: var(--ink-3);
+    font-size: 0.85rem;
 }
 
-/* Highlighted Entities in NER Output */
-.entity-highlight {
-    background: rgba(196, 113, 237, 0.15);
-    border-bottom: 2px solid var(--color-purple);
-    color: var(--color-purple);
-    padding: 0.1rem 0.3rem;
-    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-    font-weight: 500;
-    cursor: help;
-    position: relative;
+.norm-result,
+.norm-text {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--ink-2);
 }
 
-.entity-highlight::after {
-    content: attr(data-code);
-    font-size: 0.6rem;
-    font-weight: 700;
-    background: var(--color-purple);
-    color: #0d0f1d;
-    padding: 0.05rem 0.2rem;
-    border-radius: 3px;
-    margin-left: 0.25rem;
-    vertical-align: middle;
-}
-
-/* Normalized text result styling */
 .norm-word-match {
-    color: var(--color-accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 0 0.2rem;
+    border-radius: var(--r-xs);
     font-weight: 500;
 }
 
-/* Predictions list mapping results */
-.predictions-list {
+.entity-highlight {
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 1px;
+    color: var(--ink);
+    font-weight: 500;
+}
+
+.latency-indicator {
+    margin-top: 1.25rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--line-soft);
+    font-size: 0.8rem;
+    color: var(--ink-3);
     display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-data);
 }
 
+/* Kết quả một mã ICD-10 */
 .pred-item {
-    background: rgba(10, 12, 24, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.03);
-    border-radius: var(--radius-md);
-    padding: 0.75rem;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--r-sm);
+    padding: 0.75rem 0.85rem;
+    background: var(--surface);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.pred-item:hover {
-    border-color: var(--color-accent);
-    box-shadow: 0 4px 12px rgba(0, 242, 254, 0.1);
-    transform: scale(1.01);
-}
-
-.pred-item.selected {
-    border-color: var(--color-primary);
-    background: rgba(56, 239, 125, 0.05);
-    box-shadow: 0 4px 15px rgba(56, 239, 125, 0.15);
-}
+.pred-item:hover { background: #F7FAFB; }
+.pred-item.selected { border-color: var(--accent); background: var(--accent-soft); }
 
 .pred-header {
     display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+}
+
+.pred-code,
+.pred-code-nodot {
+    font-family: var(--font-data);
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--ink);
+}
+
+.pred-code-nodot { color: var(--ink-3); font-size: 0.78rem; margin-left: 0.4rem; }
+
+.pred-confidence {
+    font-family: var(--font-data);
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 0.15rem 0.45rem;
+    border-radius: var(--r-xs);
+}
+
+.conf-high { color: var(--high); background: var(--high-soft); }
+.conf-med { color: var(--med); background: var(--med-soft); }
+.conf-low { color: var(--low); background: var(--low-soft); }
+
+.pred-name { font-size: 0.88rem; color: var(--ink); margin-top: 0.25rem; }
+
+.pred-match-meta,
+.pred-explain,
+.pred-details {
+    font-size: 0.8rem;
+    color: var(--ink-2);
+    margin-top: 0.35rem;
+}
+
+.pred-explain { line-height: 1.5; }
+
+.confidence-bar-bg {
+    height: 4px;
+    background: var(--line-soft);
+    border-radius: 2px;
+    margin-top: 0.55rem;
+    overflow: hidden;
+}
+
+.confidence-bar-fill { height: 100%; border-radius: 2px; }
+.confidence-bar-fill.conf-high-bg { background: var(--high); }
+.confidence-bar-fill.conf-med-bg { background: #C49A3A; }
+.confidence-bar-fill.conf-low-bg { background: var(--low); }
+
+.pred-review-flag {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    color: var(--med);
+    margin-top: 0.45rem;
+}
+
+/* ---------- Cột 3: FHIR và liên thông ---------- */
+
+.fhir-view-container {
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    overflow: hidden;
+}
+
+.fhir-header {
+    display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.4rem;
+    padding: 0.45rem 0.7rem;
+    background: #F4F9FA;
+    border-bottom: 1px solid var(--line);
 }
 
-.pred-code {
-    font-family: var(--font-heading);
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #0d0f1d;
-    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-purple) 100%);
-    padding: 0.1rem 0.5rem;
-    border-radius: 4px;
-}
-
-/* Khi một dòng bệnh án chứa nhiều bệnh, các mã phải được nhóm theo từng chẩn
-   đoán, nếu không bác sĩ sẽ đọc chúng như các phương án loại trừ nhau. */
-.diagnosis-notice {
+.fhir-format-label {
+    font-family: var(--font-data);
     font-size: 0.78rem;
-    color: var(--color-accent);
-    background: rgba(0, 212, 255, 0.08);
-    border: 1px solid rgba(0, 212, 255, 0.25);
-    border-radius: 6px;
-    padding: 0.4rem 0.6rem;
-    margin-bottom: 0.6rem;
+    color: var(--ink-2);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
 }
+
+.fhir-code-box {
+    margin: 0;
+    padding: 0.9rem 1rem;
+    height: 360px;
+    overflow: auto;
+    background: var(--surface);
+    font-family: var(--font-data);
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: var(--ink);
+}
+
+.json-placeholder { color: var(--ink-3); }
+
+.sync-action-box { margin: 1rem 0 1.25rem; }
+
+/* Trục liên thông: danh sách bản ghi, không phải bảng màu. */
+.emr-mock-portal {
+    border-top: 1px solid var(--line-soft);
+    padding-top: 1rem;
+}
+
+.portal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.7rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+}
+
+.portal-header > span { display: flex; align-items: center; gap: 0.45rem; }
+
+#sync-latency-box {
+    font-family: var(--font-data);
+    font-size: 0.72rem;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--high) !important;
+}
+
+.portal-status-idle {
+    font-size: 0.85rem;
+    color: var(--ink-3);
+    padding: 1rem;
+    border: 1px dashed var(--line);
+    border-radius: var(--r-sm);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.portal-records-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.portal-record {
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    padding: 0.65rem 0.8rem;
+    font-size: 0.85rem;
+}
+
+.record-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--ink-2);
+}
+
+.record-row strong { font-weight: 500; color: var(--ink); }
+
+.record-badge {
+    font-size: 0.72rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: var(--r-xs);
+    background: var(--high-soft);
+    color: var(--high);
+    font-weight: 500;
+}
+
+.code-pill {
+    font-family: var(--font-data);
+    font-size: 0.78rem;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 0.1rem 0.4rem;
+    border-radius: var(--r-xs);
+}
+
+/* ---------- Thông báo nhỏ ---------- */
+
+.text-center { text-align: center; }
+
+@media (max-width: 1180px) {
+    .dashboard-grid { grid-template-columns: 1fr 1fr; }
+    .panel-fhir { grid-column: 1 / -1; }
+}
+
+@media (max-width: 760px) {
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .app-header { flex-direction: column; align-items: flex-start; }
+    .app-main { padding: 1rem; }
+    .form-group-row, .form-row { grid-template-columns: 1fr; }
+}
+
+/* Danh sách mã đề xuất: cuộn trong khung cố định, không đẩy cả trang xuống. */
+#predictions-output {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.pred-more {
+    margin-top: 0.1rem;
+}
+
+.pred-more summary {
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--accent);
+    padding: 0.4rem 0.2rem;
+    list-style: none;
+}
+
+.pred-more summary::-webkit-details-marker { display: none; }
+.pred-more summary:hover { text-decoration: underline; }
+
+.pred-more[open] > summary { color: var(--ink-2); }
+.pred-more .pred-item { margin-top: 0.5rem; }
 
 .diagnosis-group-header {
     display: flex;
     align-items: baseline;
-    gap: 0.5rem;
-    margin: 0.7rem 0 0.35rem;
-    padding-bottom: 0.25rem;
-    border-bottom: 1px solid rgba(139, 144, 168, 0.25);
-}
-
-.diagnosis-index {
-    font-family: var(--font-heading);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--color-accent);
-}
-
-.diagnosis-fragment {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    font-style: italic;
-}
-
-/* Mã không dấu chấm chỉ là dạng phụ trợ cho phần mềm viện: để viền mờ, không
-   tô nền gradient như mã chuẩn để bác sĩ không nhầm hai mã với nhau. */
-.pred-code-nodot {
-    font-family: var(--font-heading);
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    border: 1px dashed rgba(139, 144, 168, 0.45);
-    padding: 0.1rem 0.45rem;
-    border-radius: 4px;
-    /* .pred-header là flex space-between: margin-right tự động giữ nhãn này nằm
-       sát mã chuẩn, để phần trăm độ tin cậy vẫn dạt về mép phải như trước. */
-    margin-left: 0.4rem;
-    margin-right: auto;
-}
-
-.pred-item.selected .pred-code {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-}
-
-.pred-confidence {
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-/* Dynamic color for confidence levels */
-.conf-high { color: var(--color-primary); }
-.conf-med { color: #ffa726; }
-.conf-low { color: #ef5350; }
-
-.pred-details {
-    font-size: 0.8rem;
-    color: var(--text-primary);
-    font-weight: 500;
-    margin-bottom: 0.4rem;
-}
-
-.pred-match-meta {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    display: flex;
-    justify-content: space-between;
-}
-
-/* Confidence Bar visualization */
-.confidence-bar-bg {
-    width: 100%;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 5px;
-    overflow: hidden;
-    margin-top: 0.25rem;
-}
-
-.confidence-bar-fill {
-    height: 100%;
-    width: 0%;
-    transition: width 0.6s cubic-bezier(0.1, 0.8, 0.2, 1);
-}
-
-.conf-high-bg { background: linear-gradient(to right, #11998e, #38ef7d); }
-.conf-med-bg { background: linear-gradient(to right, #f2994a, #f2c94c); }
-.conf-low-bg { background: linear-gradient(to right, #eb5757, #000000); }
-
-/* Latency box indicator */
-.latency-indicator {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    align-self: flex-end;
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    margin-top: 0.75rem;
-}
-
-/* Column 3: HL7 FHIR View & Cloud Sync */
-.fhir-view-container {
-    flex: none;
-    height: 450px;
-    display: flex;
-    flex-direction: column;
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    margin-bottom: 1rem;
-}
-
-.fhir-header {
-    background: rgba(14, 18, 36, 0.95);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    padding: 0.5rem 0.75rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.fhir-format-label {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-}
-
-.btn-copy {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 0.7rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: var(--radius-sm);
-    transition: var(--transition-fast);
-}
-
-.btn-copy:hover {
-    color: var(--color-accent);
-    background: rgba(255, 255, 255, 0.04);
-}
-
-.fhir-code-box {
-    flex: 1;
-    padding: 0.8rem;
-    overflow-y: auto;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 0.75rem;
-    background: rgb(5, 7, 15);
-    color: #a6accd;
-    text-align: left;
-}
-
-.json-placeholder {
-    color: var(--text-muted);
-    font-style: italic;
-}
-
-/* Syntax Highlight classes for JSON */
-.json-key { color: #ff5370; }
-.json-string { color: #c3e88d; }
-.json-number { color: #f78c6c; }
-.json-boolean { color: #ffcb6b; }
-.json-null { color: #ff5370; }
-
-.sync-action-box {
-    margin-bottom: 1rem;
-}
-
-/* EMR Cloud Portal Mock */
-.emr-mock-portal {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    background: rgba(11, 14, 28, 0.9);
-    border: 1px solid var(--card-border);
-    border-radius: var(--radius-md);
-    padding: 0.75rem;
-}
-
-.portal-header {
-    font-family: var(--font-heading);
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-muted);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.75rem;
-    width: 100%;
-}
-
-.btn-clear-history {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    font-size: 0.7rem;
-    font-family: var(--font-body);
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: var(--radius-sm);
-    transition: var(--transition-fast);
-}
-
-.btn-clear-history:hover {
-    color: var(--status-offline);
-    background: rgba(255, 23, 68, 0.08);
-}
-
-.portal-status-idle {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    text-align: center;
-    padding: 1.5rem 0.5rem;
-    border: 1px dashed rgba(255, 255, 255, 0.04);
-    border-radius: var(--radius-sm);
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-}
-
-.portal-status-idle i {
-    font-size: 1.25rem;
-    color: var(--text-muted);
-}
-
-.portal-records-list {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    padding-right: 0.25rem;
-}
-
-.portal-record {
-    background: rgba(56, 239, 125, 0.02);
-    border: 1px solid rgba(56, 239, 125, 0.15);
-    border-radius: var(--radius-sm);
-    padding: 0.6rem 0.75rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    position: relative;
-    animation: slideIn 0.3s ease-out, pulseGlow 2s infinite alternate;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-8px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.record-badge {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: var(--color-primary);
-    background: rgba(56, 239, 125, 0.1);
-    padding: 0.1rem 0.4rem;
-    border-radius: 50px;
-}
-
-.record-row {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-}
-
-.record-row strong {
-    color: var(--text-muted);
-}
-
-.code-pill {
-    font-family: var(--font-heading);
-    font-weight: 700;
-    font-size: 0.7rem;
-    color: #0c1020;
-    background: var(--color-primary);
-    padding: 0.05rem 0.3rem;
-    border-radius: 3px;
-    margin-left: 0.25rem;
-}
-
-/* Animations */
-@keyframes pulseGlow {
-    from {
-        box-shadow: 0 0 4px rgba(56, 239, 125, 0.05);
-        border-color: rgba(56, 239, 125, 0.15);
-    }
-    to {
-        box-shadow: 0 0 10px rgba(56, 239, 125, 0.2);
-        border-color: rgba(56, 239, 125, 0.35);
-    }
-}
-
-/* Media Queries for Responsiveness */
-@media (max-width: 1200px) {
-    .dashboard-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-    .panel-fhir {
-        grid-column: span 2;
-    }
-}
-
-@media (max-width: 800px) {
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-    }
-    .panel-fhir {
-        grid-column: span 1;
-    }
-    .app-container {
-        height: auto;
-        overflow-y: auto;
-    }
-    .grid-panel {
-        min-height: 400px;
-    }
-    .fhir-view-container {
-        max-height: 350px;
-    }
-}
-
-/* ---- Mẫu chẩn đoán nhanh ---- */
-.sample-group {
-    margin-top: 0.9rem;
-}
-
-.sample-group > label {
-    display: block;
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
-    color: var(--text-secondary, #9aa6b2);
-    margin-bottom: 0.5rem;
-}
-
-.sample-buttons {
-    display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
+    gap: 0.5rem;
+    margin: 0.3rem 0 0.1rem;
+    font-size: 0.85rem;
 }
 
-.btn-sample {
-    padding: 0.35rem 0.7rem;
-    font-size: 0.74rem;
-    font-weight: 600;
-    color: var(--text-primary, #e6edf3);
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 100px;
-    cursor: pointer;
-    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+.diagnosis-index { font-weight: 600; color: var(--ink); }
+.diagnosis-fragment { color: var(--ink-3); font-style: italic; }
+
+.diagnosis-notice {
+    font-size: 0.8rem;
+    color: var(--med);
+    background: var(--med-soft);
+    border-radius: var(--r-xs);
+    padding: 0.45rem 0.6rem;
 }
 
-.btn-sample:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: var(--color-primary, #38ef7d);
-    transform: translateY(-1px);
+/* Tiêu đề chẩn đoán dính ở đầu khung cuộn; mã bên dưới cuộn qua nó. */
+/* Danh sách mã của một chẩn đoán: cuộn riêng trong khung cố định. */
+.diag-codes {
+    max-height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-right: 0.35rem;
 }
 
-/* ---- Giải thích và cảnh báo của mô hình ---- */
-.pred-explain {
-    margin-top: 0.5rem;
-    font-size: 0.7rem;
-    line-height: 1.5;
-    color: var(--text-secondary, #9aa6b2);
+/* Tên bệnh được chẩn đoán: nhấn mạnh bằng nền nhạt và chữ đậm. */
+.diagnosis-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    background: var(--accent);
+    padding: 0.3rem 0.7rem;
+    border-radius: var(--r-xs);
+    line-height: 1.35;
 }
-
-.pred-review-flag {
-    margin-top: 0.45rem;
-    padding: 0.35rem 0.55rem;
-    font-size: 0.7rem;
-    font-weight: 600;
-    line-height: 1.4;
-    color: #ffb74d;
-    background: rgba(255, 167, 38, 0.1);
-    border: 1px solid rgba(255, 167, 38, 0.28);
-    border-radius: 8px;
-}
-
-/* Ô khóa API trên thanh đầu trang - cùng cỡ với huy hiệu trạng thái. */
-.api-key-box { gap: 8px; margin-right: 8px; }
-.api-key-box input {
-    border: none; background: transparent; color: inherit; font: inherit;
-    width: 200px; outline: none;
-}
-.api-key-box input::placeholder { color: inherit; opacity: 0.6; }
