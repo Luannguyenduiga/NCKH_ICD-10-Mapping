@@ -205,12 +205,27 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- Render Table ---
+    // Bốn con số tóm tắt đếm trên đúng danh sách đang hiển thị, không tự suy diễn.
+    function renderStats(patients) {
+        const dem = (id, so) => { document.getElementById(id).innerText = so; };
+        dem("stat-total", patients.length);
+        dem("stat-synced", patients.filter(p => p.sync_status === "Synced").length);
+        dem("stat-review", patients.filter(p => p.sync_status === "Needs Review").length);
+        dem("stat-external", patients.reduce((tong, p) => tong + (p.so_chan_doan_ngoai_vien || 0), 0));
+    }
+
     function renderPatientTable(patients) {
         patientCountBadge.innerText = `${patients.length} bệnh nhân`;
+        renderStats(patients);
 
         if (patients.length === 0) {
             patientTableBody.innerHTML = `
-                <tr><td colspan="9" class="text-center text-muted">Không tìm thấy bệnh nhân nào.</td></tr>
+                <tr><td colspan="9">
+                    <div class="empty-state">
+                        <strong>Chưa có bệnh nhân nào</strong>
+                        Bấm "Thêm Bệnh nhân mới" để nhập hồ sơ và thử liên thông.
+                    </div>
+                </td></tr>
             `;
             return;
         }

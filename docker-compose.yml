@@ -19,6 +19,9 @@ services:
       # là một lỗ ghi đè. Tính idempotent do conditional update theo `identifier`
       # đảm nhiệm (xem backend/main.py::sync_fhir_record).
       - hapi.fhir.client_id_strategy=NOT_ALLOWED
+      # HAPI mặc định giữ kết quả tìm kiếm trong 60 giây. Nếu một tra cứu rỗng được
+      # lưu trước khi đồng bộ, tra cứu ngay sau đó vẫn ra rỗng và bác sĩ tưởng là lỗi.
+      - hapi.fhir.reuse_cached_search_results_millis=0
       # Lưu trữ bền vững thay cho H2 in-memory: `docker compose restart` không
       # còn xóa sạch dữ liệu đã liên thông.
       - spring.datasource.url=jdbc:postgresql://db:5432/hapi
@@ -27,7 +30,10 @@ services:
       - spring.datasource.driverClassName=org.postgresql.Driver
       - spring.jpa.properties.hibernate.dialect=ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgresDialect
     depends_on:
-      - db
+      db:
+        # HAPI chỉ khởi động khi PostgreSQL đã nhận kết nối. Nếu không chờ, HAPI thoát
+        # với 'database system is starting up' rồi bị restart, làm EMR lên chậm vài phút.
+        condition: service_healthy
     restart: unless-stopped
 
   db:
@@ -45,6 +51,13 @@ services:
       - POSTGRES_PASSWORD=hapi
     volumes:
       - hapi-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hapi -d hapi"]
+      interval: 3s
+      timeout: 3s
+      # Lần khởi động sau khi tắt không sạch phải khôi phục dữ liệu (fsync), có thể mất vài phút.
+      start_period: 300s
+      retries: 10
     restart: unless-stopped
 
 volumes:

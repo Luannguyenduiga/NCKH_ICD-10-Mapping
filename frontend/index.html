@@ -7,7 +7,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom Style CSS -->
@@ -23,7 +23,7 @@
                 </div>
                 <div class="logo-text">
                     <h1>SMIG Gateway</h1>
-                    <span>Smart Medical Interoperability Gateway</span>
+                    <span>Chuẩn hóa chẩn đoán sang ICD-10 và HL7 FHIR</span>
                 </div>
             </div>
             <div class="header-status">
@@ -49,7 +49,7 @@
             <div class="dashboard-grid">
                 
                 <!-- Panel 1: Clinician Input & Patient Details -->
-                <section class="grid-panel panel-input glassmorphic">
+                <section class="grid-panel panel-input">
                     <div class="panel-header">
                         <div class="panel-icon"><i class="fa-solid fa-user-doctor"></i></div>
                         <h2>Thông tin khám lâm sàng</h2>
@@ -60,7 +60,7 @@
                         <h3>Thông tin hành chính bệnh nhân</h3>
                         <div class="form-group-row">
                             <div class="form-group">
-                                <label for="patient-id"><i class="fa-solid fa-id-card"></i> Số CCCD / Mã HS</label>
+                                <label for="patient-id"><i class="fa-solid fa-id-card"></i> Mã bệnh án (MRN)</label>
                                 <input type="text" id="patient-id" value="037098001234" placeholder="Nhập số định danh/CCCD">
                             </div>
                             <div class="form-group">
@@ -79,7 +79,7 @@
                         </div>
 
                         <div class="sample-group">
-                            <label><i class="fa-solid fa-flask-vial"></i> Mẫu chẩn đoán nhanh</label>
+                            <label><i class="fa-solid fa-flask-vial"></i> Ca mẫu</label>
                             <div class="sample-buttons" id="sample-buttons">
                                 <button type="button" class="btn-sample"
                                     data-sample="Bệnh nhân ĐTĐ typ 2 không biến chứng kèm theo cao huyết áp nhẹ">
@@ -118,7 +118,7 @@
                 </section>
 
                 <!-- Panel 2: NLP Pipeline Steps -->
-                <section class="grid-panel panel-nlp glassmorphic">
+                <section class="grid-panel panel-nlp">
                     <div class="panel-header">
                         <div class="panel-icon"><i class="fa-solid fa-diagram-project"></i></div>
                         <h2>Tiến trình xử lý NLP</h2>
@@ -131,7 +131,7 @@
                             <div class="step-content">
                                 <h3>Chuẩn hóa văn bản & Viết tắt</h3>
                                 <div class="step-result-box" id="norm-output">
-                                    <span class="placeholder-text">Chờ phân tích dữ liệu lâm sàng...</span>
+                                    <span class="placeholder-text">Chưa có chẩn đoán để phân tích.</span>
                                 </div>
                             </div>
                         </div>
@@ -142,7 +142,7 @@
                             <div class="step-content">
                                 <h3>Nhận diện thực thể y khoa (NER)</h3>
                                 <div class="step-result-box" id="ner-output">
-                                    <span class="placeholder-text">Chờ nhận dạng thực thể y tế...</span>
+                                    <span class="placeholder-text">Chưa có thực thể để hiển thị.</span>
                                 </div>
                             </div>
                         </div>
@@ -153,7 +153,7 @@
                             <div class="step-content">
                                 <h3>Ánh xạ ngữ nghĩa mã ICD-10 (Top 4)</h3>
                                 <div class="predictions-list" id="predictions-output">
-                                    <span class="placeholder-text">Chờ kết quả so khớp tương đồng...</span>
+                                    <span class="placeholder-text">Chưa có mã ICD-10 nào được đề xuất.</span>
                                 </div>
                             </div>
                         </div>
@@ -165,7 +165,7 @@
                 </section>
 
                 <!-- Panel 3: HL7 FHIR & Sync -->
-                <section class="grid-panel panel-fhir glassmorphic">
+                <section class="grid-panel panel-fhir">
                     <div class="panel-header">
                         <div class="panel-icon"><i class="fa-solid fa-code"></i></div>
                         <h2>Đầu ra HL7 FHIR Condition</h2>
@@ -179,8 +179,8 @@
                             </button>
                         </div>
                         <pre class="fhir-code-box"><code id="fhir-output" class="language-json">{
-  <span class="json-placeholder">// Sau khi chọn mã ICD-10 ở cột 2</span>
-  <span class="json-placeholder">// Bản ghi FHIR Condition Resource sẽ hiển thị tại đây</span>
+  <span class="json-placeholder">// Chọn một mã ICD-10 ở bước 3 để xem bản ghi</span>
+  <span class="json-placeholder">// Tài nguyên Condition sẽ hiện tại đây</span>
 }</code></pre>
                     </div>
 
@@ -204,7 +204,7 @@
                             </div>
                         </div>
                         <div class="portal-status-idle" id="portal-status">
-                            <i class="fa-solid fa-database-lock"></i> Chưa có bệnh án nào được liên thông.
+                            <i class="fa-solid fa-database-lock"></i> Chưa có bản ghi nào trên trục liên thông.
                         </div>
                         <div class="portal-records-list" id="portal-records-list" style="display:none;">
                             <!-- Dynamic record cards will be appended here -->

@@ -167,9 +167,9 @@ async function analyzeText() {
         renderPredictions(data.predictions, data.diagnoses);
     } catch (error) {
         console.error(error);
-        elNormOutput.innerHTML = `<span style="color:var(--status-offline)"><i class="fa-solid fa-circle-exclamation"></i> Lỗi: ${esc(error.message)}</span>`;
-        elNerOutput.innerHTML = `<span style="color:var(--status-offline)">Lỗi tải dữ liệu.</span>`;
-        elPredictionsOutput.innerHTML = `<span style="color:var(--status-offline)">Lỗi tải dữ liệu.</span>`;
+        elNormOutput.innerHTML = `<span style="color:var(--low)"><i class="fa-solid fa-circle-exclamation"></i> Lỗi: ${esc(error.message)}</span>`;
+        elNerOutput.innerHTML = `<span style="color:var(--low)">Lỗi tải dữ liệu.</span>`;
+        elPredictionsOutput.innerHTML = `<span style="color:var(--low)">Lỗi tải dữ liệu.</span>`;
     } finally {
         elBtnAnalyze.disabled = false;
         elBtnAnalyze.innerHTML = '<i class="fa-solid fa-microchip-ai"></i> Phân tích với NLP';
@@ -309,15 +309,24 @@ function renderPredictions(predictions, diagnoses) {
         : '';
 
     groups.forEach((group, groupIndex) => {
+        // Mỗi chẩn đoán gồm hai phần: tiêu đề đứng yên, và danh sách mã cuộn riêng.
+        // Cuộn danh sách của chẩn đoán này không làm tiêu đề hay chẩn đoán khác nhúc nhích.
         if (group.fragment) {
+            // Tên bệnh của mã xếp đầu tiên là điều bác sĩ cần đọc nhất, nên được nhấn mạnh;
+            // câu gốc của bác sĩ đi kèm bên dưới, nhỏ hơn.
+            const dau = (group.predictions || [])[0];
+            const tenBenh = dau ? dau.name_vi : '';
             html += `<div class="diagnosis-group-header">`
                 + `<span class="diagnosis-index">Chẩn đoán ${groupIndex + 1}</span>`
+                + `<span class="diagnosis-name">${esc(tenBenh)}</span>`
                 + `<span class="diagnosis-fragment">"${esc(group.fragment)}"</span></div>`;
         }
-        html += (group.predictions || []).map(pred => {
+        const cards = (group.predictions || []).map(pred => {
             ordered.push(pred);
             return predictionCard(pred, ordered.length - 1);
-        }).join('');
+        });
+        const khungMa = cards.join('');
+        html += `<div class="diag-codes">${khungMa}</div>`;
     });
 
     elPredictionsOutput.innerHTML = html;
@@ -361,7 +370,11 @@ async function generateFhirResource(prediction) {
 
         if (!response.ok) {
             const err = await response.json().catch(() => ({}));
-            throw new Error(err.detail || 'Không thể khởi tạo FHIR Resource.');
+            // FastAPI trả detail dạng danh sách khi lỗi kiểm dữ liệu (422), cần ghép lại thành chữ.
+            const chiTiet = Array.isArray(err.detail)
+                ? err.detail.map(d => d.msg || JSON.stringify(d)).join('; ')
+                : err.detail;
+            throw new Error(chiTiet || 'Không thể khởi tạo FHIR Resource.');
         }
 
         currentFhirPayload = await response.json();
@@ -369,7 +382,7 @@ async function generateFhirResource(prediction) {
         elBtnSync.disabled = false;
     } catch (error) {
         console.error(error);
-        elFhirOutput.innerHTML = `<span style="color:var(--status-offline)">Lỗi: ${esc(error.message)}</span>`;
+        elFhirOutput.innerHTML = `<span style="color:var(--low)">Lỗi: ${esc(error.message)}</span>`;
     }
 }
 

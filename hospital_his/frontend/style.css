@@ -1,1114 +1,726 @@
-/* Global Reset & Base Styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
+/* HIS mô phỏng: tông lạnh pastel.
+   Nền sương xanh nhạt, sidebar xanh bạc hà nhạt, nhấn xanh cổ vịt dịu.
+   Trạng thái dùng nền pastel kèm chữ đậm để vẫn đọc được. Font Nunito Sans. */
 
 :root {
-    --bg-gradient-start: #080d16;
-    --bg-gradient-end: #111a2e;
-    --card-bg: rgba(18, 30, 49, 0.65);
-    --border-color: rgba(255, 255, 255, 0.08);
-    --text-primary: #f1f5f9;
-    --text-muted: #94a3b8;
-    --accent-blue: #0ea5e9;
-    --accent-blue-hover: #38bdf8;
-    --accent-teal: #14b8a6;
-    --status-synced: #10b981;
-    --status-unsynced: #f59e0b;
-    --status-failed: #ef4444;
+    --sidebar: #DCEAF0;
+    --sidebar-hover: #CDE2EA;
+    --sidebar-active: #FFFFFF;
+    --sidebar-ink: #2C4654;
+    --sidebar-muted: #5F7B89;
+
+    --ground: #EEF4F6;
+    --surface: #FFFFFF;
+    --ink: #1F3441;
+    --ink-2: #4C6370;
+    --ink-3: #7A929D;
+    --line: #D3E0E6;
+    --line-soft: #E6EEF2;
+
+    --accent: #3C7F93;
+    --accent-hover: #2F6A7C;
+    --accent-soft: #E1F0F4;
+
+    --ok-ink: #2B6B4C;
+    --ok-bg: #D6EFE3;
+    --warn-ink: #7A5514;
+    --warn-bg: #F8E8C8;
+    --bad-ink: #8C3A33;
+    --bad-bg: #F5D9D6;
+    --idle-ink: #5E7480;
+    --idle-bg: #E8EDF0;
+
+    --tile-total: #DDEBF2;
+    --tile-synced: #D6EFE3;
+    --tile-review: #F8E8C8;
+    --tile-external: #E4EAF3;
+
+    --font: 'Nunito Sans', system-ui, sans-serif;
+    --mono: 'Consolas', 'IBM Plex Mono', ui-monospace, monospace;
+    --r-xs: 4px;
+    --r-sm: 8px;
+    --r-md: 14px;
 }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-    background-attachment: fixed;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.55;
     min-height: 100vh;
-    color: var(--text-primary);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    overflow-x: hidden;
 }
 
-/* Glass App Frame */
-.glass-app {
-    width: 100%;
-    max-width: 1600px;
-    height: 90vh;
-    min-height: 750px;
-    background: var(--card-bg);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    display: flex;
-    overflow: hidden;
-}
+h1, h2, h3 { font-weight: 700; letter-spacing: -0.005em; }
+button, input, textarea, select { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
+.text-center { text-align: center; }
+.text-muted { color: var(--ink-3); }
 
-/* Sidebar Styling */
+/* ---------- Khung ---------- */
+
+.glass-app { display: flex; min-height: 100vh; }
+
 .sidebar {
-    width: 280px;
-    border-right: 1px solid var(--border-color);
+    width: 252px;
+    flex-shrink: 0;
+    background: var(--sidebar);
+    color: var(--sidebar-ink);
     display: flex;
     flex-direction: column;
-    padding: 24px;
-    background: rgba(8, 14, 24, 0.4);
+    padding: 1.6rem 1.1rem 1.2rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
 }
 
 .logo-area {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 40px;
+    gap: 0.8rem;
+    padding: 0 0.5rem 1.4rem;
 }
 
 .logo-icon {
-    font-size: 2rem;
-    color: var(--accent-blue);
-    filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.4));
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    background: var(--surface);
+    color: var(--accent);
+    border-radius: var(--r-sm);
+    font-size: 1.15rem;
 }
 
-.logo-text h1 {
-    font-size: 1.25rem;
+.logo-text h1 { font-size: 1.1rem; color: var(--sidebar-ink); }
+.logo-text span { font-size: 0.78rem; color: var(--sidebar-muted); }
+
+.nav-section-label {
+    font-size: 0.7rem;
     font-weight: 700;
-    letter-spacing: -0.5px;
-    background: linear-gradient(to right, var(--text-primary), var(--accent-blue));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--sidebar-muted);
+    padding: 1rem 0.6rem 0.4rem;
 }
 
-.logo-text span {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    display: block;
-}
-
-.nav-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    flex-grow: 1;
-}
+.nav-menu { display: flex; flex-direction: column; gap: 3px; }
 
 .nav-menu a {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    color: var(--text-muted);
+    gap: 0.75rem;
+    padding: 0.62rem 0.8rem;
+    color: var(--sidebar-ink);
     text-decoration: none;
-    font-weight: 500;
-    border-radius: 10px;
-    transition: all 0.3s ease;
+    border-radius: var(--r-sm);
+    font-size: 0.93rem;
+    font-weight: 600;
+    transition: background-color 0.15s ease;
 }
 
-.nav-menu a:hover, .nav-menu a.active {
-    color: var(--text-primary);
-    background: rgba(14, 165, 233, 0.15);
-    box-shadow: inset 0 0 0 1px rgba(14, 165, 233, 0.2);
-}
+.nav-menu a i { width: 18px; text-align: center; color: var(--accent); }
+.nav-menu a:hover { background: var(--sidebar-hover); }
+.nav-menu a.active { background: var(--sidebar-active); box-shadow: 0 1px 2px rgba(31, 52, 65, 0.08); }
 
-.nav-menu a i {
-    font-size: 1.1rem;
-    width: 20px;
-}
-
-/* Connection Status Card */
 .connection-status-box {
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 16px;
     margin-top: auto;
+    padding: 0.95rem 1rem;
+    background: var(--surface);
+    border-radius: var(--r-sm);
+    font-size: 0.82rem;
 }
 
-.status-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-}
+.status-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem; }
+.status-title { font-weight: 700; color: var(--ink); }
+.connection-status-box p { color: var(--ink-2); margin-bottom: 0.65rem; }
 
 .status-dot {
-    width: 8px;
-    height: 8px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
-    display: inline-block;
+    background: var(--ink-3);
+    flex-shrink: 0;
 }
+.status-dot.connected { background: #5DBB8A; }
+.status-dot.disconnected { background: #D9776B; }
 
-.status-dot.connected {
-    background-color: var(--status-synced);
-    box-shadow: 0 0 8px var(--status-synced);
-}
-
-.status-dot.disconnected {
-    background-color: var(--status-failed);
-    box-shadow: 0 0 8px var(--status-failed);
-}
-
-.status-title {
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-.connection-status-box p {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-bottom: 12px;
-    line-height: 1.4;
-}
-
-.gateway-btn {
-    display: block;
-    width: 100%;
-    text-align: center;
-    padding: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: var(--text-primary);
-    text-decoration: none;
-    font-size: 0.8rem;
-    font-weight: 500;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-}
-
-.gateway-btn:hover {
-    background: rgba(14, 165, 233, 0.15);
-    border-color: rgba(14, 165, 233, 0.3);
-}
-
-/* Main Content Area */
-.main-content {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-/* Top Header */
-.top-header {
-    height: 80px;
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
+.gateway-link a {
+    display: inline-flex;
     align-items: center;
+    gap: 0.4rem;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.82rem;
+}
+.gateway-link a:hover { text-decoration: underline; }
+
+.main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.top-header {
+    display: flex;
     justify-content: space-between;
-    padding: 0 32px;
-    background: rgba(8, 14, 24, 0.2);
+    align-items: center;
+    gap: 1rem;
+    padding: 1.1rem 2rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
 }
 
 .header-search {
-    position: relative;
-    width: 400px;
-}
-
-.header-search i {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-}
-
-.header-search input {
-    width: 100%;
-    padding: 12px 16px 12px 48px;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--border-color);
-    border-radius: 30px;
-    color: var(--text-primary);
-    outline: none;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-}
-
-.header-search input:focus {
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 10px rgba(14, 165, 233, 0.15);
-}
-
-.header-actions {
+    flex: 1;
+    max-width: 640px;
     display: flex;
-    gap: 12px;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.9rem;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--ground);
 }
 
-/* Buttons System */
+.header-search i { color: var(--ink-3); }
+.header-search input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 0.92rem;
+}
+.header-search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+
+.header-actions { display: flex; gap: 0.6rem; }
+
+.page-body { padding: 1.6rem 2rem 2.2rem; display: flex; flex-direction: column; gap: 1.3rem; }
+
+/* Dải thống kê: bốn ô, mỗi ô một sắc pastel theo ý nghĩa, số lớn để đọc từ xa. */
+.stat-strip {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.9rem;
+}
+
+.stat {
+    padding: 1rem 1.15rem;
+    border-radius: var(--r-md);
+    background: var(--tile-total);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.stat-label { font-size: 0.82rem; color: var(--ink-2); font-weight: 600; }
+.stat strong {
+    font-size: 1.9rem;
+    font-weight: 800;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+}
+
+.stat.synced { background: var(--tile-synced); }
+.stat.review { background: var(--tile-review); }
+.stat.external { background: var(--tile-external); }
+
+/* Bảng bệnh nhân cần đủ bề ngang cho cột chẩn đoán và mã ICD, nên khung FHIR nằm dưới. */
+.content-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+}
+
+/* ---------- Nút ---------- */
+
 .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 10px 20px;
-    font-weight: 500;
-    font-size: 0.9rem;
-    border-radius: 8px;
-    cursor: pointer;
+    gap: 0.5rem;
+    padding: 0.6rem 1.05rem;
+    border-radius: var(--r-sm);
     border: 1px solid transparent;
-    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-.btn-primary {
-    background: var(--accent-blue);
-    color: white;
-}
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-.btn-primary:hover {
-    background: var(--accent-blue-hover);
-    box-shadow: 0 0 15px rgba(14, 165, 233, 0.3);
-}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
 
-.btn-secondary {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
-}
+.btn-secondary { background: var(--surface); border-color: var(--line); color: var(--ink-2); }
+.btn-secondary:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
 
-.btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-}
+.btn-outline { background: transparent; border-color: var(--line); color: var(--ink-2); }
+.btn-outline:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
 
-.btn-outline {
-    background: transparent;
-    border-color: rgba(255, 255, 255, 0.15);
-    color: var(--text-primary);
-}
+.btn-sm { padding: 0.3rem 0.65rem; font-size: 0.8rem; }
 
-.btn-outline:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.3);
-}
+.btn-edit { background: var(--surface); border-color: var(--line); color: var(--ink-2); }
+.btn-edit:hover { border-color: var(--accent); color: var(--accent); }
 
-.btn-outline:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
+.btn-delete { background: var(--surface); border-color: #E9C9C4; color: var(--bad-ink); }
+.btn-delete:hover { background: var(--bad-bg); }
 
-.btn-sm {
-    padding: 6px 12px;
-    font-size: 0.8rem;
-}
+.btn-diagnose { background: var(--ok-bg); border-color: #BFE2D0; color: var(--ok-ink); }
+.btn-diagnose:hover { background: #C6E8D7; }
 
-.btn-sync {
-    background: linear-gradient(135deg, var(--accent-teal), #0d9488);
-    color: white;
-    box-shadow: 0 4px 6px -1px rgba(20, 184, 166, 0.1);
-}
+/* ---------- Bảng bệnh nhân ---------- */
 
-.btn-sync:hover {
-    filter: brightness(1.1);
-    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
-}
-
-.btn-diagnose {
-    background: linear-gradient(135deg, #6366f1, #4338ca);
-    color: white;
-    box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.1);
-}
-
-.btn-diagnose:hover {
-    filter: brightness(1.1);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-}
-
-/* Sửa chẩn đoán đã ghi nhận: hành động chỉnh sửa, không phải hành động phá hủy,
-   nên để tông hổ phách - tách khỏi màu đỏ của nút Xóa ngay bên cạnh. */
-.btn-edit {
-    background: linear-gradient(135deg, #f59e0b, #b45309);
-    color: white;
-    box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.1);
-}
-
-.btn-edit:hover:not(:disabled) {
-    filter: brightness(1.1);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-}
-
-.btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    box-shadow: none;
-}
-
-.btn-delete {
-    background: linear-gradient(135deg, var(--status-failed), #b91c1c);
-    color: white;
-    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.1);
-}
-
-.btn-delete:hover {
-    filter: brightness(1.1);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-}
-
-.action-buttons {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    /* Bốn thao tác trên một dòng sẽ tràn ở màn hình hẹp; cho xuống dòng thay vì
-       đẩy cột Thao tác nở ra và bóp mất cột chẩn đoán. */
-    flex-wrap: wrap;
-}
-
-/* Grid Layout */
-.content-grid {
-    flex-grow: 1;
-    display: grid;
-    grid-template-columns: 1fr 400px;
-    height: calc(100% - 80px);
-    background: rgba(8, 14, 24, 0.1);
-}
-
-/* Left Section: Table Container */
-.table-container {
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+.table-container,
+.inspector-container {
+    background: var(--surface);
+    border-radius: var(--r-md);
+    padding: 1.25rem 1.3rem;
+    min-width: 0;
 }
 
 .container-header {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 0.9rem;
+    margin-bottom: 0.9rem;
+    border-bottom: 1px solid var(--line-soft);
 }
 
-.container-header h2 {
-    font-size: 1.2rem;
-    font-weight: 600;
-}
+.container-header h2 { font-size: 1.08rem; }
 
 .badge {
-    background: rgba(14, 165, 233, 0.15);
-    border: 1px solid rgba(14, 165, 233, 0.25);
-    color: var(--accent-blue);
-    padding: 4px 10px;
-    font-size: 0.75rem;
-    border-radius: 20px;
+    font-size: 0.8rem;
     font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    white-space: nowrap;
 }
 
-.table-wrapper {
-    flex-grow: 1;
-    overflow-y: auto;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    background: rgba(0, 0, 0, 0.15);
-}
+.table-wrapper { overflow-x: auto; }
 
-/* Custom Table Design */
 .his-table {
     width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-    font-size: 0.9rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.88rem;
 }
 
 .his-table th {
-    background: rgba(14, 22, 38, 0.8);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    padding: 16px;
-    font-weight: 600;
-    color: var(--text-muted);
-    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--ink-3);
+    padding: 0.55rem 0.7rem;
+    background: var(--ground);
+    white-space: nowrap;
 }
+
+.his-table th:first-child { border-radius: var(--r-xs) 0 0 var(--r-xs); }
+.his-table th:last-child { border-radius: 0 var(--r-xs) var(--r-xs) 0; }
 
 .his-table td {
-    padding: 16px;
-    border-bottom: 1px solid var(--border-color);
-    vertical-align: middle;
+    padding: 0.8rem 0.7rem;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
 }
 
-.his-table tbody tr {
-    transition: background 0.2s ease;
-}
+.his-table tbody tr:hover td { background: #F7FAFB; }
+.his-table td.loading-row { color: var(--ink-3); padding: 1.5rem; }
 
-.his-table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.02);
-}
-
-.text-center {
+.empty-state {
+    padding: 2rem 1rem;
     text-align: center;
+    color: var(--ink-2);
 }
+.empty-state strong { display: block; color: var(--ink); font-size: 1rem; margin-bottom: 0.2rem; }
 
-.loading-row {
-    padding: 40px;
-    color: var(--text-muted);
-    font-size: 1rem;
-}
-
-/* Patient ID and Info styles */
-.mrn-text {
-    font-family: monospace;
-    color: var(--accent-blue);
-    font-weight: 600;
-}
-
-.patient-name {
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.diagnosis-text {
-    max-width: 250px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    cursor: help;
-}
+.mrn-text { font-family: var(--mono); font-size: 0.82rem; color: var(--ink-2); }
+.patient-name { font-weight: 700; color: var(--ink); }
 
 .icd-code-badge {
-    background: rgba(20, 184, 166, 0.12);
-    border: 1px solid rgba(20, 184, 166, 0.25);
-    color: var(--accent-teal);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: monospace;
+    font-family: var(--mono);
     font-weight: 700;
     font-size: 0.8rem;
+    color: var(--accent-hover);
+    background: var(--accent-soft);
+    padding: 0.1rem 0.45rem;
+    border-radius: var(--r-xs);
+}
+
+.icd-code-nodot { font-family: var(--mono); font-size: 0.78rem; color: var(--ink-3); }
+
+.clinical-badge {
     display: inline-block;
+    font-size: 0.76rem;
+    font-weight: 600;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    background: var(--idle-bg);
+    color: var(--idle-ink);
+}
+.clinical-badge.on { background: var(--ok-bg); color: var(--ok-ink); }
+
+.facility-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--ink-2);
+    background: var(--ground);
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    margin-left: 0.3rem;
 }
 
-/* Mỗi chẩn đoán một dòng: hồ sơ nhiều bệnh phải đọc được từng mã tách bạch
-   thay vì dính thành một khối chữ. */
-.icd-line {
-    display: block;
-    margin-bottom: 4px;
-}
-
-.icd-line:last-child {
-    margin-bottom: 0;
-}
-
-/* Mã không dấu chấm là dạng phụ trợ, để nhạt hơn mã chuẩn để không ai nhầm
-   nó với mã dùng liên thông FHIR. */
-.icd-code-nodot {
-    background: rgba(148, 163, 184, 0.12);
-    border: 1px solid rgba(148, 163, 184, 0.25);
-    color: var(--text-muted);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: monospace;
-    font-weight: 700;
-    font-size: 0.8rem;
+.pending-badge {
     display: inline-block;
-}
-
-.icd-desc-text {
     font-size: 0.75rem;
-    color: var(--text-muted);
-    display: block;
-    max-width: 150px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    font-weight: 600;
+    color: var(--warn-ink);
+    background: var(--warn-bg);
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    margin-left: 0.3rem;
 }
 
-/* Sync status pills */
+/* Trạng thái liên thông: có nhãn chữ, không chỉ dựa vào màu. */
 .status-pill {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    border-radius: 100px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    border: 1px solid transparent;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    white-space: nowrap;
 }
 
-.status-pill.synced {
-    background: rgba(16, 185, 129, 0.12);
-    border-color: rgba(16, 185, 129, 0.25);
-    color: var(--status-synced);
-}
-
-.status-pill.unsynced {
-    background: rgba(245, 158, 11, 0.12);
-    border-color: rgba(245, 158, 11, 0.25);
-    color: var(--status-unsynced);
-}
-
-.status-pill.failed {
-    background: rgba(239, 68, 68, 0.12);
-    border-color: rgba(239, 68, 68, 0.25);
-    color: var(--status-failed);
-}
-
-/* Hồ sơ có mã ICD-10 độ tin cậy thấp, dừng chờ bác sĩ xác nhận */
-.status-pill.review {
-    background: rgba(99, 102, 241, 0.14);
-    border-color: rgba(99, 102, 241, 0.3);
-    color: #818cf8;
-}
+.status-pill.synced { color: var(--ok-ink); background: var(--ok-bg); }
+.status-pill.failed { color: var(--bad-ink); background: var(--bad-bg); }
+.status-pill.review { color: var(--warn-ink); background: var(--warn-bg); }
+.status-pill.unsynced { color: var(--idle-ink); background: var(--idle-bg); }
 
 .confidence-tag {
-    display: inline-block;
-    margin-left: 6px;
-    padding: 1px 6px;
-    border-radius: 100px;
-    font-size: 0.66rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
     font-weight: 700;
+    padding: 0.1rem 0.45rem;
+    border-radius: var(--r-xs);
 }
+.confidence-tag.high { color: var(--ok-ink); background: var(--ok-bg); }
+.confidence-tag.medium { color: var(--warn-ink); background: var(--warn-bg); }
+.confidence-tag.low { color: var(--bad-ink); background: var(--bad-bg); }
 
-.confidence-tag.high { background: rgba(16, 185, 129, 0.15); color: var(--status-synced); }
-.confidence-tag.medium { background: rgba(245, 158, 11, 0.15); color: var(--status-unsynced); }
-.confidence-tag.low { background: rgba(239, 68, 68, 0.15); color: var(--status-failed); }
+.btn-sm + .btn-sm { margin-left: 0.3rem; }
 
-/* Right Section: Inspector Styling */
-.inspector-container {
-    padding: 24px;
-    border-left: 1px solid var(--border-color);
+/* Cột thao tác: mỗi nút một hàng cùng bề rộng, nhãn không bẻ dòng. */
+.his-table td:last-child { min-width: 200px; }
+.his-table td:last-child .btn-sm {
     display: flex;
-    flex-direction: column;
-    background: rgba(5, 8, 15, 0.3);
+    width: 100%;
+    margin: 0 0 0.35rem;
+    white-space: nowrap;
 }
+.his-table td:last-child .btn-sm + .btn-sm { margin-left: 0; }
+
+/* ---------- Khung kiểm tra FHIR và log ---------- */
 
 .inspector-card {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    background: rgba(0, 0, 0, 0.25);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
     overflow: hidden;
 }
 
 .inspector-tabs {
     display: flex;
-    background: rgba(0, 0, 0, 0.2);
-    border-bottom: 1px solid var(--border-color);
+    background: var(--ground);
+    padding: 0.3rem;
+    gap: 0.25rem;
 }
 
 .tab-btn {
     flex: 1;
-    padding: 12px 6px;
-    background: transparent;
+    padding: 0.5rem 0.5rem;
+    background: none;
     border: none;
-    color: var(--text-muted);
-    font-weight: 500;
-    cursor: pointer;
+    border-radius: var(--r-xs);
+    color: var(--ink-2);
     font-size: 0.85rem;
-    transition: all 0.2s ease;
-    border-bottom: 2px solid transparent;
+    font-weight: 700;
+    cursor: pointer;
 }
 
-.tab-btn:hover {
-    color: var(--text-primary);
-}
+.tab-btn:hover { color: var(--accent); }
+.tab-btn.active { color: var(--accent-hover); background: var(--surface); box-shadow: 0 1px 2px rgba(31, 52, 65, 0.1); }
 
-.tab-btn.active {
-    color: var(--accent-blue);
-    border-color: var(--accent-blue);
-    background: rgba(14, 165, 233, 0.05);
-}
+.inspector-content { height: 380px; background: var(--surface); }
 
-.inspector-content {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 16px;
-}
+.tab-pane { display: none; height: 100%; }
+.tab-pane.active { display: block; }
 
-.tab-pane {
-    display: none;
+.tab-pane pre {
     height: 100%;
-}
-
-.tab-pane.active {
-    display: block;
-}
-
-/* Code Pre block */
-pre {
-    height: 100%;
+    overflow: auto;
     margin: 0;
+    padding: 0.9rem 1rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--ink);
 }
 
-code {
-    display: block;
-    height: 100%;
-    font-family: 'Consolas', 'Courier New', Courier, monospace;
-    font-size: 0.8rem;
-    line-height: 1.5;
-    color: #e2e8f0;
-    white-space: pre-wrap;
-    overflow-y: auto;
-}
-
-/* Log Console */
-.log-console {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    font-family: monospace;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-}
+.log-console { height: 100%; overflow-y: auto; padding: 0.7rem 0.8rem; font-size: 0.85rem; }
 
 .log-line {
-    padding: 6px 10px;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.02);
-    line-height: 1.4;
-    word-break: break-all;
+    padding: 0.5rem 0.7rem;
+    border-radius: var(--r-xs);
+    background: var(--ground);
+    margin-bottom: 0.45rem;
+    color: var(--ink-2);
 }
-
-.log-line.info {
-    border-left: 3px solid var(--accent-blue);
-}
-
-.log-line.success {
-    border-left: 3px solid var(--status-synced);
-    color: #a7f3d0;
-}
-
-.log-line.error {
-    border-left: 3px solid var(--status-failed);
-    color: #fca5a5;
-    background: rgba(239, 68, 68, 0.05);
-}
+.log-line.info { background: var(--tile-total); color: var(--ink-2); }
+.log-line.success { background: var(--ok-bg); color: var(--ok-ink); }
+.log-line.error { background: var(--bad-bg); color: var(--bad-ink); }
+.log-line.warning { background: var(--warn-bg); color: var(--warn-ink); }
 
 .inspector-footer {
-    padding: 12px 16px;
-    border-top: 1px solid var(--border-color);
-    background: rgba(0, 0, 0, 0.15);
     display: flex;
-    gap: 10px;
     justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    border-top: 1px solid var(--line-soft);
+    background: var(--ground);
 }
 
-/* Modal Dialog */
+/* ---------- Modal ---------- */
+
 .modal {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(5, 8, 15, 0.65);
-    backdrop-filter: blur(5px);
-    display: flex;
-    justify-content: center;
+    inset: 0;
+    background: rgba(31, 52, 65, 0.35);
+    display: none;
     align-items: center;
-    z-index: 1000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
+    justify-content: center;
+    padding: 1.25rem;
+    z-index: 100;
 }
 
-.modal.active {
-    opacity: 1;
-    pointer-events: auto;
-}
+.modal.active { display: flex; }
 
 .modal-content {
-    width: 600px;
-    background: rgba(15, 25, 42, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 16px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-    overflow: hidden;
-    transform: scale(0.9);
-    transition: transform 0.3s ease;
+    background: var(--surface);
+    border-radius: var(--r-md);
+    width: min(580px, 100%);
+    max-height: 92vh;
+    overflow-y: auto;
+    padding: 1.5rem 1.6rem;
+    box-shadow: 0 12px 40px rgba(31, 52, 65, 0.18);
 }
 
-.modal.active .modal-content {
-    transform: scale(1);
-}
+.modal-content.modal-wide { width: min(800px, 100%); }
 
 .modal-header {
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--border-color);
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.9rem;
+    margin-bottom: 1.1rem;
+    border-bottom: 1px solid var(--line-soft);
 }
 
-.modal-header h3 {
-    font-size: 1.15rem;
-    font-weight: 600;
-}
+.modal-header h3 { font-size: 1.08rem; display: flex; align-items: center; gap: 0.55rem; }
+.modal-header h3 i { color: var(--accent); }
 
 .close-modal {
-    font-size: 1.8rem;
-    font-weight: 300;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--ink-3);
     cursor: pointer;
-    color: var(--text-muted);
-    transition: color 0.2s ease;
+    padding: 0 0.3rem;
 }
-
-.close-modal:hover {
-    color: var(--text-primary);
-}
-
-/* Hộp thoại nhiều nội dung (danh sách chẩn đoán) cần rộng hơn form nhập liệu và
-   phải cuộn được trong khung, nếu không hồ sơ nhiều bệnh sẽ tràn khỏi màn hình. */
-.modal-content.modal-wide {
-    width: 760px;
-    max-width: 94vw;
-    display: flex;
-    flex-direction: column;
-    max-height: 88vh;
-}
-
-.modal-body {
-    padding: 20px 24px;
-    overflow-y: auto;
-    background-color: #080d16;
-}
-
-/* Form Styles */
-#add-patient-form,
-#diagnose-form {
-    padding: 24px;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 16px;
-}
-
-/* Ghi chú giải thích đặt ngay dưới nhóm ô nhập liên quan. */
-.form-hint {
-    margin: -6px 0 16px;
-    padding: 10px 12px;
-    border-left: 3px solid var(--accent-blue);
-    background: rgba(14, 165, 233, 0.08);
-    border-radius: 4px;
-    font-size: 12.5px;
-    line-height: 1.5;
-    /* Nền tối nên chữ phải sáng: màu #4a5568 trước đây gần như chìm hẳn. */
-    color: var(--text-muted);
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
-.form-group label {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text-muted);
-}
-
-.form-group input, .form-group select, .form-group textarea {
-    padding: 10px 14px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    color: var(--text-primary);
-    outline: none;
-    font-size: 0.9rem;
-    transition: border-color 0.2s ease;
-}
-
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-    border-color: var(--accent-blue);
-}
+.close-modal:hover { color: var(--ink); }
 
 .modal-footer {
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
-    margin-top: 24px;
+    gap: 0.6rem;
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line-soft);
 }
 
-/* Chân hộp thoại nằm ngoài <form> thì không thừa hưởng padding của form. */
-.modal-footer-pad {
-    margin-top: 0;
-    padding: 16px 24px;
-    border-top: 1px solid var(--border-color);
-    background: rgba(0, 0, 0, 0.15);
+.modal-footer-pad { padding: 1rem 1.6rem; margin: 0; }
+.modal-body { display: flex; flex-direction: column; gap: 1rem; }
+
+/* ---------- Form ---------- */
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+
+.form-group { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.9rem; min-width: 0; }
+.form-group label { font-size: 0.84rem; color: var(--ink-2); font-weight: 700; }
+.form-group label small { color: var(--ink-3); font-weight: 400; }
+
+input[type="text"],
+input[type="date"],
+select,
+textarea {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* --- Màn hình sửa chẩn đoán đã ghi nhận ------------------------------------ */
+input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+input[readonly] { background: var(--ground); color: var(--ink-2); }
+textarea { resize: vertical; line-height: 1.5; }
+
+.form-hint {
+    font-size: 0.84rem;
+    color: var(--ink-2);
+    background: var(--tile-total);
+    border-radius: var(--r-sm);
+    padding: 0.65rem 0.85rem;
+    margin: 0.2rem 0 1rem;
+    line-height: 1.55;
+}
+
+.form-hint strong { color: var(--ink); font-weight: 700; }
+
+/* ---------- Chẩn đoán, sửa và bệnh sử ---------- */
+
 .cond-patient {
-    padding-bottom: 14px;
-    margin-bottom: 16px;
-    border-bottom: 1px solid var(--border-color);
+    padding: 0.8rem 0.95rem;
+    background: var(--tile-total);
+    border-radius: var(--r-sm);
+    font-size: 0.9rem;
 }
 
-.cond-patient strong {
-    font-size: 1.05rem;
-}
-
-.cond-note {
-    margin-top: 6px;
-    font-size: 0.82rem;
-    color: var(--text-muted);
-}
-
-.cond-empty {
-    padding: 24px;
+.cond-empty,
+.cand-empty {
+    color: var(--ink-3);
+    font-size: 0.9rem;
+    padding: 1rem;
+    border-radius: var(--r-sm);
+    background: var(--ground);
     text-align: center;
-    color: var(--text-muted);
-    font-size: 0.88rem;
 }
 
 .cond-card {
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 14px 16px;
-    margin-bottom: 12px;
-    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    padding: 0.85rem 1rem;
+    background: var(--surface);
 }
 
-/* Thẻ đang mở phần sửa được viền sáng để bác sĩ không nhầm sang chẩn đoán khác
-   khi hồ sơ có nhiều bệnh. */
-.cond-card.editing {
-    border-color: rgba(245, 158, 11, 0.45);
-    background: rgba(245, 158, 11, 0.04);
-}
+.cond-card.editing { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 
-.cond-head {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.cond-ids {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-
-.cond-actions {
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0;
-}
-
-.cond-name {
-    margin: 8px 0 6px;
-    font-weight: 500;
-}
-
-.cond-meta {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-
-.cond-fragment {
-    font-style: italic;
-}
-
-.cond-time {
-    margin-left: auto;
-    font-family: monospace;
-}
-
-.clinical-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 100px;
-    font-size: 0.68rem;
-    font-weight: 600;
-}
-
-.clinical-badge.on {
-    background: rgba(20, 184, 166, 0.14);
-    color: var(--accent-teal);
-}
-
-/* Bệnh đã khỏi / không còn hoạt động: để nhạt hẳn so với bệnh đang mắc. */
-.clinical-badge.off {
-    background: rgba(148, 163, 184, 0.16);
-    color: var(--text-muted);
-}
-
-.facility-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 2px 8px;
-    border-radius: 100px;
-    font-size: 0.68rem;
-    font-weight: 600;
-    background: rgba(99, 102, 241, 0.15);
-    color: #a5b4fc;
-}
+.cond-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.6rem; }
+.cond-name { font-weight: 700; font-size: 0.95rem; color: var(--ink); }
+.cond-meta,
+.cond-time { font-size: 0.8rem; color: var(--ink-3); }
+.cond-ids { font-family: var(--mono); font-size: 0.74rem; color: var(--ink-3); }
+.cond-fragment { font-size: 0.86rem; color: var(--ink-2); margin: 0.35rem 0; }
+.cond-note { font-size: 0.82rem; color: var(--ink-3); }
+.cond-actions { display: flex; gap: 0.3rem; flex-shrink: 0; }
 
 .cond-editor {
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px dashed var(--border-color);
-}
-
-.cond-editor .form-row {
-    margin-bottom: 0;
-}
-
-.cond-editor-actions {
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--line-soft);
     display: flex;
-    justify-content: flex-end;
-    gap: 10px;
+    flex-direction: column;
+    gap: 0.6rem;
 }
 
-.e-candidates {
-    margin: 10px 0 14px;
-}
+.e-candidates { display: flex; flex-direction: column; gap: 0.45rem; }
 
-/* Mã do mô hình gợi ý: bấm là điền vào ô mã, nên phải trông bấm được. */
 .cand-item {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.6rem;
     align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    margin-bottom: 6px;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.cand-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.2);
-}
+.cand-item:hover { background: #F7FAFB; }
+.cand-item.selected { border-color: var(--accent); background: var(--accent-soft); }
 
-.cand-item.selected {
-    border-color: var(--accent-blue);
-    background: rgba(14, 165, 233, 0.1);
-}
+.cand-code { font-family: var(--mono); font-weight: 700; font-size: 0.84rem; }
+.cand-name { font-size: 0.87rem; color: var(--ink); }
 
-.cand-name {
-    font-size: 0.82rem;
-    color: var(--text-muted);
-}
-
-.cand-empty {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    padding: 6px 2px;
-}
-
-/* Scrollbar Customization */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-
-/* --- Benh su toan tuyen ------------------------------------------------- */
-/* Mau tim, tach han khoi nut Sua (cam) va Dong bo: day la mau CHI DOC, bam
-   vao khong doi gi ca. Cung mau voi nut la vien trai cua khoi tuyen khac. */
-.btn-history {
-    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
-    color: white;
-    box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.1);
-}
-
-.btn-history:hover:not(:disabled) {
-    filter: brightness(1.08);
-    transform: translateY(-1px);
-}
-
-.history-summary {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 14px;
-    padding: 12px 14px;
-    margin-bottom: 14px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 0.88rem;
-    background-color: #080d16;
-}
-
-.history-src {
-    color: var(--text-muted);
-    font-size: 0.82rem;
-}
+.history-summary { margin-bottom: 1rem; }
 
 .history-group {
-    border: 1px solid #e2e8f0;
-    border-left: 4px solid #22c55e;   /* vien vien minh */
-    border-radius: 8px;
-    padding: 12px 14px;
-    margin-bottom: 14px;
+    border-radius: var(--r-sm);
+    padding: 0.8rem 0.95rem;
+    margin-bottom: 0.8rem;
+    background: var(--ground);
 }
 
-/* Tuyen khac phai NHIN RA NGAY la khong phai cua minh: bac si doc benh su ma
-   khong biet ai ghi thi khong danh gia duoc do tin cay cua thong tin. */
-.history-group.ngoai-vien {
-    border-left-color: #8b5cf6;
-    background: #faf5ff;
-    background-color: #080d16;
-}
-
-.history-group.chua-lien-thong {
-    border-left-color: #f59e0b;
-    background: #545350;
-}
+.history-group.chua-lien-thong { background: var(--warn-bg); }
 
 .history-group-head {
     display: flex;
-    flex-wrap: wrap;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--ink-2);
+    margin-bottom: 0.5rem;
 }
 
 .history-count {
-    margin-left: auto;
-    font-size: 0.8rem;
-    color: var(--text-muted);
+    font-size: 0.76rem;
+    background: var(--surface);
+    border-radius: 999px;
+    padding: 0.05rem 0.55rem;
 }
 
 .history-item {
-    padding: 10px 0;
-    border-top: 1px dashed #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.6rem;
+    padding: 0.5rem 0;
+    border-top: 1px solid rgba(31, 52, 65, 0.08);
+    font-size: 0.87rem;
 }
 
-.history-item:first-of-type {
-    border-top: none;
+.history-src { font-size: 0.78rem; color: var(--ink-3); }
+.icd-line { font-size: 0.88rem; color: var(--ink); }
+.icd-desc-text { color: var(--ink-2); }
+.diagnosis-text { font-size: 0.87rem; color: var(--ink-2); }
+
+@media (max-width: 1280px) {
+    .stat-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-/* Dong chan doan do tuyen khac lap: phai nhin ra ngay trong bang, khong phai
-   mo modal moi biet. Vien trai tim dong bo voi khoi tuyen khac o modal benh su. */
-.icd-line.ngoai-vien {
-    border-left: 3px solid #8b5cf6;
-    padding-left: 6px;
+@media (max-width: 1100px) {
+    .content-grid { grid-template-columns: 1fr; }
 }
 
-.pending-badge {
-    display: inline-block;
-    padding: 1px 6px;
-    margin-left: 4px;
-    border-radius: 4px;
-    background: #fef3c7;
-    color: #92400e;
-    font-size: 0.68rem;
-    font-weight: 600;
+@media (max-width: 860px) {
+    .glass-app { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: static; }
+    .top-header { flex-direction: column; align-items: stretch; }
+    .page-body { padding: 1.2rem; }
+    .form-row { grid-template-columns: 1fr; }
 }
