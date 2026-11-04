@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.time.Duration;
 import java.util.*;
 
@@ -98,12 +99,12 @@ public class EmrLookupService {
     /** Gọi một phép tìm kiếm FHIR và lấy tài nguyên đầu tiên trong Bundle. */
     @SuppressWarnings("unchecked")
     private Map<String, Object> timTaiNguyenDauTien(String loai, String thamSo, String giaTri) {
-        String url = UriComponentsBuilder.fromHttpUrl(fhirUrl)
+        URI url = UriComponentsBuilder.fromHttpUrl(fhirUrl)
                 .pathSegment(loai)
                 .queryParam(thamSo, giaTri)
                 .build()
                 .encode()
-                .toUriString();
+                .toUri();
         try {
             Map<String, Object> bundle = restTemplate.getForObject(url, Map.class);
             List<Map<String, Object>> entries =
@@ -186,12 +187,12 @@ public class EmrLookupService {
     @SuppressWarnings("unchecked")
     private List<Map<String, Object>> docChanDoan(String emrPatientId) {
         List<Map<String, Object>> ketQua = new ArrayList<>();
-        String url = UriComponentsBuilder.fromHttpUrl(fhirUrl)
+        URI url = UriComponentsBuilder.fromHttpUrl(fhirUrl)
                 .pathSegment("Condition")
                 .queryParam("subject", "Patient/" + emrPatientId)
                 .build()
                 .encode()
-                .toUriString();
+                .toUri();
 
         Map<String, Object> bundle;
         try {
