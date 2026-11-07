@@ -10219,7 +10219,7 @@
     "name_en": "Human immunodeficiency virus [HIV] disease resulting in malignant neoplasms",
     "synonyms": [
       "benh hiv gay u ac tinh",
-      "bệnh hiv gây ung thư",
+      "bệnh hiv gây u ác",
       "benh hiv gay ung thu"
     ],
     "meta": {
@@ -10289,7 +10289,7 @@
     "synonyms": [
       "benh hiv dan den u ac tinh khac cua to chuc bach huyet, tao mau va to chuc lien quan",
       "b213",
-      "bệnh hiv dẫn đến ung thư khác của tổ chức bạch huyết, tạo máu và tổ chức liên quan",
+      "bệnh hiv dẫn đến u ác khác của tổ chức bạch huyết, tạo máu và tổ chức liên quan",
       "benh hiv dan den ung thu khac cua to chuc bach huyet, tao mau va to chuc lien quan"
     ],
     "meta": {
@@ -10308,7 +10308,7 @@
     "synonyms": [
       "benh hiv dan den da u ac tinh",
       "b217",
-      "bệnh hiv dẫn đến đa ung thư",
+      "bệnh hiv dẫn đến đa u ác",
       "benh hiv dan den da ung thu"
     ],
     "meta": {
@@ -10327,7 +10327,7 @@
     "synonyms": [
       "benh hiv dan den u ac tinh khac",
       "b218",
-      "bệnh hiv dẫn đến ung thư khác",
+      "bệnh hiv dẫn đến u ác khác",
       "benh hiv dan den ung thu khac"
     ],
     "meta": {
@@ -10346,7 +10346,7 @@
     "synonyms": [
       "benh hiv dan den u ac tinh khong dac hieu",
       "b219",
-      "bệnh hiv dẫn đến ung thư không đặc hiệu",
+      "bệnh hiv dẫn đến u ác không đặc hiệu",
       "benh hiv dan den ung thu khong dac hieu"
     ],
     "meta": {
@@ -17123,7 +17123,7 @@
     "name_en": "Malignant neoplasm of lip",
     "synonyms": [
       "u ac cua moi",
-      "ung thư của môi",
+      "u ác của môi",
       "ung thu cua moi"
     ],
     "meta": {
@@ -17142,7 +17142,7 @@
     "synonyms": [
       "u ac cua moi phan ngoai moi tren",
       "c000",
-      "ung thư của môi phần ngoài môi trên",
+      "u ác của môi phần ngoài môi trên",
       "ung thu cua moi phan ngoai moi tren"
     ],
     "meta": {
@@ -17178,7 +17178,7 @@
     "synonyms": [
       "u ac cua phan ngoai moi khong dac hieu",
       "c002",
-      "ung thư của phần ngoài môi không đặc hiệu",
+      "u ác của phần ngoài môi không đặc hiệu",
       "ung thu cua phan ngoai moi khong dac hieu"
     ],
     "meta": {
@@ -17197,7 +17197,7 @@
     "synonyms": [
       "u ac cua moi tren, mat trong",
       "c003",
-      "ung thư của môi trên, mặt trong",
+      "u ác của môi trên, mặt trong",
       "ung thu cua moi tren, mat trong"
     ],
     "meta": {
@@ -17216,7 +17216,7 @@
     "synonyms": [
       "u ac cua moi duoi, mat trong",
       "c004",
-      "ung thư của môi dưới, mặt trong",
+      "u ác của môi dưới, mặt trong",
       "ung thu cua moi duoi, mat trong"
     ],
     "meta": {
@@ -17235,7 +17235,7 @@
     "synonyms": [
       "u ac cua moi, mat trong khong dac hieu",
       "c005",
-      "ung thư của môi, mặt trong không đặc hiệu",
+      "u ác của môi, mặt trong không đặc hiệu",
       "ung thu cua moi, mat trong khong dac hieu"
     ],
     "meta": {
@@ -17254,7 +17254,7 @@
     "synonyms": [
       "u ac cua mep moi",
       "c006",
-      "ung thư của mép môi",
+      "u ác của mép môi",
       "ung thu cua mep moi"
     ],
     "meta": {
@@ -17273,7 +17273,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua moi",
       "c008",
-      "ung thư với tổn thương chồng lấn của môi",
+      "u ác với tổn thương chồng lấn của môi",
       "ung thu voi ton thuong chong lan cua moi"
     ],
     "meta": {
@@ -17292,7 +17292,7 @@
     "synonyms": [
       "u ac cua moi, khong dac hieu",
       "c009",
-      "ung thư của môi, không đặc hiệu",
+      "u ác của môi, không đặc hiệu",
       "ung thu cua moi, khong dac hieu"
     ],
     "meta": {
@@ -17310,7 +17310,7 @@
     "name_en": "Malignant neoplasm of base of tongue",
     "synonyms": [
       "u ac cua day luoi",
-      "ung thư của đáy lưỡi",
+      "u ác của đáy lưỡi",
       "ung thu cua day luoi"
     ],
     "meta": {
@@ -17328,7 +17328,7 @@
     "name_en": "Malignant neoplasm of other and unspecified parts of tongue",
     "synonyms": [
       "u ac cua phan khac va khong xac dinh cua luoi",
-      "ung thư của phần khác và không xác định của lưỡi",
+      "u ác của phần khác và không xác định của lưỡi",
       "ung thu cua phan khac va khong xac dinh cua luoi"
     ],
     "meta": {
@@ -17347,7 +17347,7 @@
     "synonyms": [
       "u ac mat lung cua luoi",
       "c020",
-      "ung thư mặt lưng của lưỡi",
+      "u ác mặt lưng của lưỡi",
       "ung thu mat lung cua luoi"
     ],
     "meta": {
@@ -17366,7 +17366,7 @@
     "synonyms": [
       "u ac bo cua luoi",
       "c021",
-      "ung thư bờ của lưỡi",
+      "u ác bờ của lưỡi",
       "ung thu bo cua luoi"
     ],
     "meta": {
@@ -17385,7 +17385,7 @@
     "synonyms": [
       "u ac mat bung cua luoi",
       "c022",
-      "ung thư mặt bụng của lưỡi",
+      "u ác mặt bụng của lưỡi",
       "ung thu mat bung cua luoi"
     ],
     "meta": {
@@ -17404,7 +17404,7 @@
     "synonyms": [
       "u ac hai phan ba truoc cua luoi, phan khong xac dinh",
       "c023",
-      "ung thư hai phần ba trước của lưỡi, phần không xác định",
+      "u ác hai phần ba trước của lưỡi, phần không xác định",
       "ung thu hai phan ba truoc cua luoi, phan khong xac dinh"
     ],
     "meta": {
@@ -17423,7 +17423,7 @@
     "synonyms": [
       "u ac cua amidan day luoi",
       "c024",
-      "ung thư của amiđan đáy lưỡi",
+      "u ác của amiđan đáy lưỡi",
       "ung thu cua amidan day luoi"
     ],
     "meta": {
@@ -17442,7 +17442,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua luoi",
       "c028",
-      "ung thư với tổn thương chồng lấn của lưỡi",
+      "u ác với tổn thương chồng lấn của lưỡi",
       "ung thu voi ton thuong chong lan cua luoi"
     ],
     "meta": {
@@ -17461,7 +17461,7 @@
     "synonyms": [
       "u ac cua luoi khong dac hieu",
       "c029",
-      "ung thư của lưỡi không đặc hiệu",
+      "u ác của lưỡi không đặc hiệu",
       "ung thu cua luoi khong dac hieu"
     ],
     "meta": {
@@ -17480,7 +17480,7 @@
     "synonyms": [
       "u ac cua loi (nuou) rang",
       "u ác của lợi răng",
-      "ung thư của lợi (nướu) răng",
+      "u ác của lợi (nướu) răng",
       "ung thu cua loi (nuou) rang"
     ],
     "meta": {
@@ -17499,7 +17499,7 @@
     "synonyms": [
       "u ac cua nuou ham tren",
       "c030",
-      "ung thư của nướu hàm trên",
+      "u ác của nướu hàm trên",
       "ung thu cua nuou ham tren"
     ],
     "meta": {
@@ -17518,7 +17518,7 @@
     "synonyms": [
       "u ac cua nuou ham duoi",
       "c031",
-      "ung thư của nướu hàm dưới",
+      "u ác của nướu hàm dưới",
       "ung thu cua nuou ham duoi"
     ],
     "meta": {
@@ -17537,7 +17537,7 @@
     "synonyms": [
       "u ac cua nuou, khong dac hieu",
       "c039",
-      "ung thư của nướu, không đặc hiệu",
+      "u ác của nướu, không đặc hiệu",
       "ung thu cua nuou, khong dac hieu"
     ],
     "meta": {
@@ -17555,7 +17555,7 @@
     "name_en": "Malignant neoplasm of floor of mouth",
     "synonyms": [
       "u ac cua san mieng",
-      "ung thư của sàn miệng",
+      "u ác của sàn miệng",
       "ung thu cua san mieng"
     ],
     "meta": {
@@ -17574,7 +17574,7 @@
     "synonyms": [
       "u ac cua san truoc mieng",
       "c040",
-      "ung thư của sàn trước miệng",
+      "u ác của sàn trước miệng",
       "ung thu cua san truoc mieng"
     ],
     "meta": {
@@ -17593,7 +17593,7 @@
     "synonyms": [
       "u ac cua san mieng ben",
       "c041",
-      "ung thư của sàn miệng bên",
+      "u ác của sàn miệng bên",
       "ung thu cua san mieng ben"
     ],
     "meta": {
@@ -17612,7 +17612,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua san mieng",
       "c048",
-      "ung thư với tổn thương chồng lấn của sàn miệng",
+      "u ác với tổn thương chồng lấn của sàn miệng",
       "ung thu voi ton thuong chong lan cua san mieng"
     ],
     "meta": {
@@ -17631,7 +17631,7 @@
     "synonyms": [
       "u ac cua san mieng khong dac hieu",
       "c049",
-      "ung thư của sàn miệng không đặc hiệu",
+      "u ác của sàn miệng không đặc hiệu",
       "ung thu cua san mieng khong dac hieu"
     ],
     "meta": {
@@ -17649,7 +17649,7 @@
     "name_en": "Malignant neoplasm of palate",
     "synonyms": [
       "u ac cua khau cai",
-      "ung thư của khẩu cái",
+      "u ác của khẩu cái",
       "ung thu cua khau cai"
     ],
     "meta": {
@@ -17668,7 +17668,7 @@
     "synonyms": [
       "u ac cua khau cai cung",
       "c050",
-      "ung thư của khẩu cái cứng",
+      "u ác của khẩu cái cứng",
       "ung thu cua khau cai cung"
     ],
     "meta": {
@@ -17687,7 +17687,7 @@
     "synonyms": [
       "u ac cua khau cai mem",
       "c051",
-      "ung thư của khẩu cái mềm",
+      "u ác của khẩu cái mềm",
       "ung thu cua khau cai mem"
     ],
     "meta": {
@@ -17706,7 +17706,7 @@
     "synonyms": [
       "u ac cua luoi ga",
       "c052",
-      "ung thư của lưỡi gà",
+      "u ác của lưỡi gà",
       "ung thu cua luoi ga"
     ],
     "meta": {
@@ -17725,7 +17725,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua khau cai",
       "c058",
-      "ung thư với tổn thương chồng lấn của khẩu cái",
+      "u ác với tổn thương chồng lấn của khẩu cái",
       "ung thu voi ton thuong chong lan cua khau cai"
     ],
     "meta": {
@@ -17744,7 +17744,7 @@
     "synonyms": [
       "u ac cua khau cai, khong dac hieu",
       "c059",
-      "ung thư của khẩu cái, không đặc hiệu",
+      "u ác của khẩu cái, không đặc hiệu",
       "ung thu cua khau cai, khong dac hieu"
     ],
     "meta": {
@@ -17762,7 +17762,7 @@
     "name_en": "Malignant neoplasm of other and unspecified parts of mouth",
     "synonyms": [
       "u ac cua phan khac va khong xac dinh cua mieng",
-      "ung thư của phần khác và không xác định của miệng",
+      "u ác của phần khác và không xác định của miệng",
       "ung thu cua phan khac va khong xac dinh cua mieng"
     ],
     "meta": {
@@ -17781,7 +17781,7 @@
     "synonyms": [
       "u ac cua niem mac ma",
       "c060",
-      "ung thư của niêm mạc má",
+      "u ác của niêm mạc má",
       "ung thu cua niem mac ma"
     ],
     "meta": {
@@ -17800,7 +17800,7 @@
     "synonyms": [
       "u ac cua tien dinh cua mieng",
       "c061",
-      "ung thư của tiền đình của miệng",
+      "u ác của tiền đình của miệng",
       "ung thu cua tien dinh cua mieng"
     ],
     "meta": {
@@ -17819,7 +17819,7 @@
     "synonyms": [
       "u ac cua vung sau rang ham",
       "c062",
-      "ung thư của vùng sau răng hàm",
+      "u ác của vùng sau răng hàm",
       "ung thu cua vung sau rang ham"
     ],
     "meta": {
@@ -17838,7 +17838,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua phan khac va khong xac dinh cua mieng",
       "c068",
-      "ung thư với tổn thương chồng lấn của phần khác và không xác định của miệng",
+      "u ác với tổn thương chồng lấn của phần khác và không xác định của miệng",
       "ung thu voi ton thuong chong lan cua phan khac va khong xac dinh cua mieng"
     ],
     "meta": {
@@ -17857,7 +17857,7 @@
     "synonyms": [
       "u ac cua mieng, khong dac hieu",
       "c069",
-      "ung thư của miệng, không đặc hiệu",
+      "u ác của miệng, không đặc hiệu",
       "ung thu cua mieng, khong dac hieu"
     ],
     "meta": {
@@ -17875,7 +17875,7 @@
     "name_en": "Malignant neoplasm of parotid gland",
     "synonyms": [
       "u ac tuyen mang tai",
-      "ung thư tuyến mang tai",
+      "u ác tuyến mang tai",
       "ung thu tuyen mang tai"
     ],
     "meta": {
@@ -17893,7 +17893,7 @@
     "name_en": "Malignant neoplasm of other and unspecified major salivary glands",
     "synonyms": [
       "u ac cua cac tuyen nuoc bot chinh khac va khong xac dinh",
-      "ung thư của các tuyến nước bọt chính khác và không xác định",
+      "u ác của các tuyến nước bọt chính khác và không xác định",
       "ung thu cua cac tuyen nuoc bot chinh khac va khong xac dinh"
     ],
     "meta": {
@@ -17912,7 +17912,7 @@
     "synonyms": [
       "u ac cua tuyen nuoc bot duoi ham duoi",
       "c080",
-      "ung thư của tuyến nước bọt dưới hàm dưới",
+      "u ác của tuyến nước bọt dưới hàm dưới",
       "ung thu cua tuyen nuoc bot duoi ham duoi"
     ],
     "meta": {
@@ -17931,7 +17931,7 @@
     "synonyms": [
       "u ac cua tuyen nuoc bot duoi luoi",
       "c081",
-      "ung thư của tuyến nước bọt dưới lưỡi",
+      "u ác của tuyến nước bọt dưới lưỡi",
       "ung thu cua tuyen nuoc bot duoi luoi"
     ],
     "meta": {
@@ -17950,7 +17950,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua tuyen nuoc bot chinh",
       "c088",
-      "ung thư với tổn thương chồng lấn của tuyến nước bọt chính",
+      "u ác với tổn thương chồng lấn của tuyến nước bọt chính",
       "ung thu voi ton thuong chong lan cua tuyen nuoc bot chinh"
     ],
     "meta": {
@@ -17969,7 +17969,7 @@
     "synonyms": [
       "u ac cua tuyen nuoc bot chinh, khong dac hieu",
       "c089",
-      "ung thư của tuyến nước bọt chính, không đặc hiệu",
+      "u ác của tuyến nước bọt chính, không đặc hiệu",
       "ung thu cua tuyen nuoc bot chinh, khong dac hieu"
     ],
     "meta": {
@@ -17987,7 +17987,7 @@
     "name_en": "Malignant neoplasm of tonsil",
     "synonyms": [
       "u ac cua amidan",
-      "ung thư của amiđan",
+      "u ác của amiđan",
       "ung thu cua amidan"
     ],
     "meta": {
@@ -18006,7 +18006,7 @@
     "synonyms": [
       "u ac cua ho amidan",
       "c090",
-      "ung thư của hố amiđan",
+      "u ác của hố amiđan",
       "ung thu cua ho amidan"
     ],
     "meta": {
@@ -18026,7 +18026,7 @@
       "u ac cua tru amidan (truoc) (sau)",
       "c091",
       "u ác của trụ amiđan",
-      "ung thư của trụ amiđan (trước) (sau)",
+      "u ác của trụ amiđan (trước) (sau)",
       "ung thu cua tru amidan (truoc) (sau)"
     ],
     "meta": {
@@ -18045,7 +18045,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua amidan",
       "c098",
-      "ung thư với tổn thương chồng lấn của amiđan",
+      "u ác với tổn thương chồng lấn của amiđan",
       "ung thu voi ton thuong chong lan cua amidan"
     ],
     "meta": {
@@ -18064,7 +18064,7 @@
     "synonyms": [
       "u ac cua amidan khong dac hieu",
       "c099",
-      "ung thư của amiđan không đặc hiệu",
+      "u ác của amiđan không đặc hiệu",
       "ung thu cua amidan khong dac hieu"
     ],
     "meta": {
@@ -18082,7 +18082,7 @@
     "name_en": "Malignant neoplasm of oropharynx",
     "synonyms": [
       "u ac cua hau mieng",
-      "ung thư của hầu miệng",
+      "u ác của hầu miệng",
       "ung thu cua hau mieng"
     ],
     "meta": {
@@ -18101,7 +18101,7 @@
     "synonyms": [
       "u ac cua nap thanh quan",
       "c100",
-      "ung thư của nắp thanh quản",
+      "u ác của nắp thanh quản",
       "ung thu cua nap thanh quan"
     ],
     "meta": {
@@ -18120,7 +18120,7 @@
     "synonyms": [
       "u ac cua mat truoc cua nap thanh mon",
       "c101",
-      "ung thư của mặt trước của nắp thanh môn",
+      "u ác của mặt trước của nắp thanh môn",
       "ung thu cua mat truoc cua nap thanh mon"
     ],
     "meta": {
@@ -18139,7 +18139,7 @@
     "synonyms": [
       "u ac cua thanh ben hau-mieng",
       "c102",
-      "ung thư của thành bên hầu-miệng",
+      "u ác của thành bên hầu-miệng",
       "ung thu cua thanh ben hau-mieng"
     ],
     "meta": {
@@ -18158,7 +18158,7 @@
     "synonyms": [
       "u ac cua thanh sau hau-mieng",
       "c103",
-      "ung thư của thành sau hầu-miệng",
+      "u ác của thành sau hầu-miệng",
       "ung thu cua thanh sau hau-mieng"
     ],
     "meta": {
@@ -18194,7 +18194,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua hau mieng",
       "c108",
-      "ung thư với tổn thương chồng lấn của hầu miệng",
+      "u ác với tổn thương chồng lấn của hầu miệng",
       "ung thu voi ton thuong chong lan cua hau mieng"
     ],
     "meta": {
@@ -18213,7 +18213,7 @@
     "synonyms": [
       "u ac cua hau-mieng, khong dac hieu",
       "c109",
-      "ung thư của hầu-miệng, không đặc hiệu",
+      "u ác của hầu-miệng, không đặc hiệu",
       "ung thu cua hau-mieng, khong dac hieu"
     ],
     "meta": {
@@ -18231,7 +18231,7 @@
     "name_en": "Malignant neoplasm of nasopharynx",
     "synonyms": [
       "u ac cua hau-mui",
-      "ung thư của hầu-mũi",
+      "u ác của hầu-mũi",
       "ung thu cua hau-mui"
     ],
     "meta": {
@@ -18250,7 +18250,7 @@
     "synonyms": [
       "u ac cua vach tren cua hau-mui",
       "c110",
-      "ung thư của vách trên của hầu-mũi",
+      "u ác của vách trên của hầu-mũi",
       "ung thu cua vach tren cua hau-mui"
     ],
     "meta": {
@@ -18269,7 +18269,7 @@
     "synonyms": [
       "u ac cua vach sau cua hau-mui",
       "c111",
-      "ung thư của vách sau của hầu-mũi",
+      "u ác của vách sau của hầu-mũi",
       "ung thu cua vach sau cua hau-mui"
     ],
     "meta": {
@@ -18288,7 +18288,7 @@
     "synonyms": [
       "u ac cua vach ben cua hau-mui",
       "c112",
-      "ung thư của vách bên của hầu-mũi",
+      "u ác của vách bên của hầu-mũi",
       "ung thu cua vach ben cua hau-mui"
     ],
     "meta": {
@@ -18307,7 +18307,7 @@
     "synonyms": [
       "u ac cua vach truoc cua hau-mui",
       "c113",
-      "ung thư của vách trước của hầu-mũi",
+      "u ác của vách trước của hầu-mũi",
       "ung thu cua vach truoc cua hau-mui"
     ],
     "meta": {
@@ -18326,7 +18326,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua hau-mui",
       "c118",
-      "ung thư với tổn thương chồng lấn của hầu-mũi",
+      "u ác với tổn thương chồng lấn của hầu-mũi",
       "ung thu voi ton thuong chong lan cua hau-mui"
     ],
     "meta": {
@@ -18345,7 +18345,7 @@
     "synonyms": [
       "u ac cua mui hau khong dac hieu",
       "c119",
-      "ung thư của mũi hầu không đặc hiệu",
+      "u ác của mũi hầu không đặc hiệu",
       "ung thu cua mui hau khong dac hieu"
     ],
     "meta": {
@@ -18363,7 +18363,7 @@
     "name_en": "Malignant neoplasm of piriform sinus",
     "synonyms": [
       "u ac cua xoang le",
-      "ung thư của xoang lê",
+      "u ác của xoang lê",
       "ung thu cua xoang le"
     ],
     "meta": {
@@ -18381,7 +18381,7 @@
     "name_en": "Malignant neoplasm of hypopharynx",
     "synonyms": [
       "u ac cua ha hau",
-      "ung thư của hạ hầu",
+      "u ác của hạ hầu",
       "ung thu cua ha hau"
     ],
     "meta": {
@@ -18400,7 +18400,7 @@
     "synonyms": [
       "u ac cua vung sau sun nhan",
       "c130",
-      "ung thư của vùng sau sụn nhẫn",
+      "u ác của vùng sau sụn nhẫn",
       "ung thu cua vung sau sun nhan"
     ],
     "meta": {
@@ -18419,7 +18419,7 @@
     "synonyms": [
       "u ac cua nep pheu nap, mat ha hau",
       "c131",
-      "ung thư của nếp phễu nắp, mặt hạ hầu",
+      "u ác của nếp phễu nắp, mặt hạ hầu",
       "ung thu cua nep pheu nap, mat ha hau"
     ],
     "meta": {
@@ -18438,7 +18438,7 @@
     "synonyms": [
       "u ac cua vach sau cua ha hau",
       "c132",
-      "ung thư của vách sau của hạ hầu",
+      "u ác của vách sau của hạ hầu",
       "ung thu cua vach sau cua ha hau"
     ],
     "meta": {
@@ -18457,7 +18457,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua ha hau",
       "c138",
-      "ung thư với tổn thương chồng lấn của hạ hầu",
+      "u ác với tổn thương chồng lấn của hạ hầu",
       "ung thu voi ton thuong chong lan cua ha hau"
     ],
     "meta": {
@@ -18476,7 +18476,7 @@
     "synonyms": [
       "u ac cua ha hau khong dac hieu",
       "c139",
-      "ung thư của hạ hầu không đặc hiệu",
+      "u ác của hạ hầu không đặc hiệu",
       "ung thu cua ha hau khong dac hieu"
     ],
     "meta": {
@@ -18494,7 +18494,7 @@
     "name_en": "Malignant neoplasm of other and ill-defined sites in the lip, oral cavity and pharynx",
     "synonyms": [
       "u ac vi tri khac va khong ro rang cua moi, khoang mieng va hau",
-      "ung thư vị trí khác và không rõ ràng của môi, khoang miệng và hầu",
+      "u ác vị trí khác và không rõ ràng của môi, khoang miệng và hầu",
       "ung thu vi tri khac va khong ro rang cua moi, khoang mieng va hau"
     ],
     "meta": {
@@ -18513,7 +18513,7 @@
     "synonyms": [
       "u ac cua hau, khong dac hieu",
       "c140",
-      "ung thư của hầu, không đặc hiệu",
+      "u ác của hầu, không đặc hiệu",
       "ung thu cua hau, khong dac hieu"
     ],
     "meta": {
@@ -18532,7 +18532,7 @@
     "synonyms": [
       "u ac cua hau thanh quan",
       "c142",
-      "ung thư của hầu thanh quản",
+      "u ác của hầu thanh quản",
       "ung thu cua hau thanh quan"
     ],
     "meta": {
@@ -18551,7 +18551,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua moi, khoang mieng va hau hong",
       "c148",
-      "ung thư với tổn thương chồng lấn của môi, khoang miệng và hầu họng",
+      "u ác với tổn thương chồng lấn của môi, khoang miệng và hầu họng",
       "ung thu voi ton thuong chong lan cua moi, khoang mieng va hau hong"
     ],
     "meta": {
@@ -18569,7 +18569,7 @@
     "name_en": "Malignant neoplasm of oesophagus",
     "synonyms": [
       "u ac thuc quan",
-      "ung thư thực quản",
+      "u ác thực quản",
       "ung thu thuc quan"
     ],
     "meta": {
@@ -18588,7 +18588,7 @@
     "synonyms": [
       "u ac cua thuc quan phan co",
       "c150",
-      "ung thư của thực quản phần cổ",
+      "u ác của thực quản phần cổ",
       "ung thu cua thuc quan phan co"
     ],
     "meta": {
@@ -18607,7 +18607,7 @@
     "synonyms": [
       "u ac cua thuc quan phan nguc",
       "c151",
-      "ung thư của thực quản phần ngực",
+      "u ác của thực quản phần ngực",
       "ung thu cua thuc quan phan nguc"
     ],
     "meta": {
@@ -18626,7 +18626,7 @@
     "synonyms": [
       "u ac cua thuc quan phan bung",
       "c152",
-      "ung thư của thực quản phần bụng",
+      "u ác của thực quản phần bụng",
       "ung thu cua thuc quan phan bung"
     ],
     "meta": {
@@ -18645,7 +18645,7 @@
     "synonyms": [
       "u ac cua phan ba tren thuc quan",
       "c153",
-      "ung thư của phần ba trên thực quản",
+      "u ác của phần ba trên thực quản",
       "ung thu cua phan ba tren thuc quan"
     ],
     "meta": {
@@ -18664,7 +18664,7 @@
     "synonyms": [
       "u ac cua phan ba giua thuc quan",
       "c154",
-      "ung thư của phần ba giữa thực quản",
+      "u ác của phần ba giữa thực quản",
       "ung thu cua phan ba giua thuc quan"
     ],
     "meta": {
@@ -18683,7 +18683,7 @@
     "synonyms": [
       "u ac cua phan ba duoi thuc quan",
       "c155",
-      "ung thư của phần ba dưới thực quản",
+      "u ác của phần ba dưới thực quản",
       "ung thu cua phan ba duoi thuc quan"
     ],
     "meta": {
@@ -18702,7 +18702,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua thuc quan",
       "c158",
-      "ung thư với tổn thương chồng lấn của thực quản",
+      "u ác với tổn thương chồng lấn của thực quản",
       "ung thu voi ton thuong chong lan cua thuc quan"
     ],
     "meta": {
@@ -18721,7 +18721,7 @@
     "synonyms": [
       "u ac cua thuc quan, khong dac hieu",
       "c159",
-      "ung thư của thực quản, không đặc hiệu",
+      "u ác của thực quản, không đặc hiệu",
       "ung thu cua thuc quan, khong dac hieu"
     ],
     "meta": {
@@ -18739,7 +18739,7 @@
     "name_en": "Malignant neoplasm of stomach",
     "synonyms": [
       "u ac cua da day",
-      "ung thư của dạ dày",
+      "u ác của dạ dày",
       "ung thu cua da day"
     ],
     "meta": {
@@ -18758,7 +18758,7 @@
     "synonyms": [
       "u ac cua tam vi",
       "c160",
-      "ung thư của tâm vị",
+      "u ác của tâm vị",
       "ung thu cua tam vi"
     ],
     "meta": {
@@ -18777,7 +18777,7 @@
     "synonyms": [
       "u ac cua day vi",
       "c161",
-      "ung thư của đáy vị",
+      "u ác của đáy vị",
       "ung thu cua day vi"
     ],
     "meta": {
@@ -18796,7 +18796,7 @@
     "synonyms": [
       "u ac cua than vi",
       "c162",
-      "ung thư của thân vị",
+      "u ác của thân vị",
       "ung thu cua than vi"
     ],
     "meta": {
@@ -18815,7 +18815,7 @@
     "synonyms": [
       "u ac cua hang mon vi",
       "c163",
-      "ung thư của hang môn vị",
+      "u ác của hang môn vị",
       "ung thu cua hang mon vi"
     ],
     "meta": {
@@ -18834,7 +18834,7 @@
     "synonyms": [
       "u ac cua mon vi",
       "c164",
-      "ung thư của môn vị",
+      "u ác của môn vị",
       "ung thu cua mon vi"
     ],
     "meta": {
@@ -18853,7 +18853,7 @@
     "synonyms": [
       "u ac cua bo cong nho da day, khong dac hieu",
       "c165",
-      "ung thư của bờ cong nhỏ dạ dày, không đặc hiệu",
+      "u ác của bờ cong nhỏ dạ dày, không đặc hiệu",
       "ung thu cua bo cong nho da day, khong dac hieu"
     ],
     "meta": {
@@ -18872,7 +18872,7 @@
     "synonyms": [
       "u ac cua bo cong lon da day, khong dac hieu",
       "c166",
-      "ung thư của bờ cong lớn dạ dày, không đặc hiệu",
+      "u ác của bờ cong lớn dạ dày, không đặc hiệu",
       "ung thu cua bo cong lon da day, khong dac hieu"
     ],
     "meta": {
@@ -18891,7 +18891,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua da day",
       "c168",
-      "ung thư với tổn thương chồng lấn của dạ dày",
+      "u ác với tổn thương chồng lấn của dạ dày",
       "ung thu voi ton thuong chong lan cua da day"
     ],
     "meta": {
@@ -18910,7 +18910,7 @@
     "synonyms": [
       "u ac cua da day khong dac hieu",
       "c169",
-      "ung thư của dạ dày không đặc hiệu",
+      "u ác của dạ dày không đặc hiệu",
       "ung thu cua da day khong dac hieu"
     ],
     "meta": {
@@ -18928,7 +18928,7 @@
     "name_en": "Malignant neoplasm of small intestine",
     "synonyms": [
       "u ac ruot non",
-      "ung thư ruột non",
+      "u ác ruột non",
       "ung thu ruot non"
     ],
     "meta": {
@@ -18947,7 +18947,7 @@
     "synonyms": [
       "u ac cua ta trang",
       "c170",
-      "ung thư của tá tràng",
+      "u ác của tá tràng",
       "ung thu cua ta trang"
     ],
     "meta": {
@@ -18966,7 +18966,7 @@
     "synonyms": [
       "u ac cua hong trang",
       "c171",
-      "ung thư của hỗng tràng",
+      "u ác của hỗng tràng",
       "ung thu cua hong trang"
     ],
     "meta": {
@@ -18985,7 +18985,7 @@
     "synonyms": [
       "u ac cua hoi trang",
       "c172",
-      "ung thư của hồi tràng",
+      "u ác của hồi tràng",
       "ung thu cua hoi trang"
     ],
     "meta": {
@@ -19004,7 +19004,7 @@
     "synonyms": [
       "u ac cua tui thua meckel",
       "c173",
-      "ung thư của túi thừa meckel",
+      "u ác của túi thừa meckel",
       "ung thu cua tui thua meckel"
     ],
     "meta": {
@@ -19023,7 +19023,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua ruot non",
       "c178",
-      "ung thư với tổn thương chồng lấn của ruột non",
+      "u ác với tổn thương chồng lấn của ruột non",
       "ung thu voi ton thuong chong lan cua ruot non"
     ],
     "meta": {
@@ -19042,7 +19042,7 @@
     "synonyms": [
       "u ac cua ruot non, khong dac hieu",
       "c179",
-      "ung thư của ruột non, không đặc hiệu",
+      "u ác của ruột non, không đặc hiệu",
       "ung thu cua ruot non, khong dac hieu"
     ],
     "meta": {
@@ -19060,7 +19060,7 @@
     "name_en": "Malignant neoplasm of colon",
     "synonyms": [
       "u ac dai trang",
-      "ung thư đại tràng",
+      "u ác đại tràng",
       "ung thu dai trang"
     ],
     "meta": {
@@ -19079,7 +19079,7 @@
     "synonyms": [
       "u ac cua manh trang",
       "c180",
-      "ung thư của manh tràng",
+      "u ác của manh tràng",
       "ung thu cua manh trang"
     ],
     "meta": {
@@ -19098,7 +19098,7 @@
     "synonyms": [
       "u ac cua ruot thua",
       "c181",
-      "ung thư của ruột thừa",
+      "u ác của ruột thừa",
       "ung thu cua ruot thua"
     ],
     "meta": {
@@ -19117,7 +19117,7 @@
     "synonyms": [
       "u ac cua dai trang len",
       "c182",
-      "ung thư của đại tràng lên",
+      "u ác của đại tràng lên",
       "ung thu cua dai trang len"
     ],
     "meta": {
@@ -19136,7 +19136,7 @@
     "synonyms": [
       "u ac cua dai trang goc gan",
       "c183",
-      "ung thư của đại tràng góc gan",
+      "u ác của đại tràng góc gan",
       "ung thu cua dai trang goc gan"
     ],
     "meta": {
@@ -19155,7 +19155,7 @@
     "synonyms": [
       "u ac cua dai trang ngang",
       "c184",
-      "ung thư của đại tràng ngang",
+      "u ác của đại tràng ngang",
       "ung thu cua dai trang ngang"
     ],
     "meta": {
@@ -19174,7 +19174,7 @@
     "synonyms": [
       "u ac cua dai trang goc lach",
       "c185",
-      "ung thư của đại tràng góc lách",
+      "u ác của đại tràng góc lách",
       "ung thu cua dai trang goc lach"
     ],
     "meta": {
@@ -19193,7 +19193,7 @@
     "synonyms": [
       "u ac cua dai trang xuong",
       "c186",
-      "ung thư của đại tràng xuống",
+      "u ác của đại tràng xuống",
       "ung thu cua dai trang xuong"
     ],
     "meta": {
@@ -19212,7 +19212,7 @@
     "synonyms": [
       "u ac cua dai trang xich ma",
       "c187",
-      "ung thư của đại tràng xích ma",
+      "u ác của đại tràng xích ma",
       "ung thu cua dai trang xich ma"
     ],
     "meta": {
@@ -19231,7 +19231,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua dai trang",
       "c188",
-      "ung thư với tổn thương chồng lấn của đại tràng",
+      "u ác với tổn thương chồng lấn của đại tràng",
       "ung thu voi ton thuong chong lan cua dai trang"
     ],
     "meta": {
@@ -19250,7 +19250,7 @@
     "synonyms": [
       "u ac cua dai trang khong dac hieu",
       "c189",
-      "ung thư của đại tràng không đặc hiệu",
+      "u ác của đại tràng không đặc hiệu",
       "ung thu cua dai trang khong dac hieu"
     ],
     "meta": {
@@ -19268,7 +19268,7 @@
     "name_en": "Malignant neoplasm of rectosigmoid junction",
     "synonyms": [
       "u ac cua noi noi truc trang-xich ma",
-      "ung thư của nơi nối trực tràng-xích ma",
+      "u ác của nơi nối trực tràng-xích ma",
       "ung thu cua noi noi truc trang-xich ma"
     ],
     "meta": {
@@ -19286,7 +19286,7 @@
     "name_en": "Malignant neoplasm of rectum",
     "synonyms": [
       "u ac truc trang",
-      "ung thư trực tràng",
+      "u ác trực tràng",
       "ung thu truc trang"
     ],
     "meta": {
@@ -19304,7 +19304,7 @@
     "name_en": "Malignant neoplasm of anus and anal canal",
     "synonyms": [
       "u ac cua hau mon va ong hau mon",
-      "ung thư của hậu môn và ống hậu môn",
+      "u ác của hậu môn và ống hậu môn",
       "ung thu cua hau mon va ong hau mon"
     ],
     "meta": {
@@ -19323,7 +19323,7 @@
     "synonyms": [
       "u ac cua hau mon, khong dac hieu",
       "c210",
-      "ung thư của hậu môn, không đặc hiệu",
+      "u ác của hậu môn, không đặc hiệu",
       "ung thu cua hau mon, khong dac hieu"
     ],
     "meta": {
@@ -19342,7 +19342,7 @@
     "synonyms": [
       "u ac cua ong hau mon",
       "c211",
-      "ung thư của ống hậu môn",
+      "u ác của ống hậu môn",
       "ung thu cua ong hau mon"
     ],
     "meta": {
@@ -19361,7 +19361,7 @@
     "synonyms": [
       "u ac cua vung co nguon goc tu o nhop",
       "c212",
-      "ung thư của vùng có nguồn gốc từ ổ nhớp",
+      "u ác của vùng có nguồn gốc từ ổ nhớp",
       "ung thu cua vung co nguon goc tu o nhop"
     ],
     "meta": {
@@ -19380,7 +19380,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua dai trang, hau mon va ong hau mon",
       "c218",
-      "ung thư với tổn thương chồng lấn của đại tràng, hậu môn và ống hậu môn",
+      "u ác với tổn thương chồng lấn của đại tràng, hậu môn và ống hậu môn",
       "ung thu voi ton thuong chong lan cua dai trang, hau mon va ong hau mon"
     ],
     "meta": {
@@ -19398,7 +19398,7 @@
     "name_en": "Malignant neoplasm of liver and intrahepatic bile ducts",
     "synonyms": [
       "u ac cua gan va duong mat trong gan",
-      "ung thư của gan và đường mật trong gan",
+      "u ác của gan và đường mật trong gan",
       "ung thu cua gan va duong mat trong gan"
     ],
     "meta": {
@@ -19412,7 +19412,7 @@
   {
     "code": "C22.0",
     "code_no_dot": "C220",
-    "name_vi": "Ung thư biểu mô tế bào gan",
+    "name_vi": "u ác biểu mô tế bào gan",
     "name_en": "Malignant neoplasm: Liver cell carcinoma",
     "synonyms": [
       "ung thu bieu mo te bao gan",
@@ -19429,7 +19429,7 @@
   {
     "code": "C22.1",
     "code_no_dot": "C221",
-    "name_vi": "Ung thư biểu mô đường mật trong gan",
+    "name_vi": "u ác biểu mô đường mật trong gan",
     "name_en": "Malignant neoplasm: Intrahepatic bile duct carcinoma",
     "synonyms": [
       "ung thu bieu mo duong mat trong gan",
@@ -19463,7 +19463,7 @@
   {
     "code": "C22.3",
     "code_no_dot": "C223",
-    "name_vi": "Ung thư mô liên kết mạch máu của gan",
+    "name_vi": "u ác mô liên kết mạch máu của gan",
     "name_en": "Malignant neoplasm: Angiosarcoma of liver",
     "synonyms": [
       "ung thu mo lien ket mach mau cua gan",
@@ -19480,7 +19480,7 @@
   {
     "code": "C22.4",
     "code_no_dot": "C224",
-    "name_vi": "Ung thư mô liên kết khác của gan",
+    "name_vi": "u ác mô liên kết khác của gan",
     "name_en": "Malignant neoplasm: Other sarcomas of liver",
     "synonyms": [
       "ung thu mo lien ket khac cua gan",
@@ -19497,7 +19497,7 @@
   {
     "code": "C22.7",
     "code_no_dot": "C227",
-    "name_vi": "Ung thư biểu mô xác định khác của gan",
+    "name_vi": "u ác biểu mô xác định khác của gan",
     "name_en": "Malignant neoplasm: Other specified carcinomas of liver",
     "synonyms": [
       "ung thu bieu mo xac dinh khac cua gan",
@@ -19519,7 +19519,7 @@
     "synonyms": [
       "u ac cua gan, khong dac hieu",
       "c229",
-      "ung thư của gan, không đặc hiệu",
+      "u ác của gan, không đặc hiệu",
       "ung thu cua gan, khong dac hieu"
     ],
     "meta": {
@@ -19537,7 +19537,7 @@
     "name_en": "Malignant neoplasm of gallbladder",
     "synonyms": [
       "u ac tui mat",
-      "ung thư túi mật",
+      "u ác túi mật",
       "ung thu tui mat"
     ],
     "meta": {
@@ -19555,7 +19555,7 @@
     "name_en": "Malignant neoplasm of other and unspecified parts of biliary tract",
     "synonyms": [
       "u ac cua phan khac va khong xac dinh cua duong mat",
-      "ung thư của phần khác và không xác định của đường mật",
+      "u ác của phần khác và không xác định của đường mật",
       "ung thu cua phan khac va khong xac dinh cua duong mat"
     ],
     "meta": {
@@ -19574,7 +19574,7 @@
     "synonyms": [
       "u ac cua duong mat ngoai gan",
       "c240",
-      "ung thư của đường mật ngoài gan",
+      "u ác của đường mật ngoài gan",
       "ung thu cua duong mat ngoai gan"
     ],
     "meta": {
@@ -19593,7 +19593,7 @@
     "synonyms": [
       "u ac cua bong vater",
       "c241",
-      "ung thư của bóng vater",
+      "u ác của bóng vater",
       "ung thu cua bong vater"
     ],
     "meta": {
@@ -19612,7 +19612,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua duong mat",
       "c248",
-      "ung thư với tổn thương chồng lấn của đường mật",
+      "u ác với tổn thương chồng lấn của đường mật",
       "ung thu voi ton thuong chong lan cua duong mat"
     ],
     "meta": {
@@ -19631,7 +19631,7 @@
     "synonyms": [
       "u ac cua duong mat, khong dac hieu",
       "c249",
-      "ung thư của đường mật, không đặc hiệu",
+      "u ác của đường mật, không đặc hiệu",
       "ung thu cua duong mat, khong dac hieu"
     ],
     "meta": {
@@ -19649,7 +19649,7 @@
     "name_en": "Malignant neoplasm of pancreas",
     "synonyms": [
       "u ac tuy",
-      "ung thư tụy",
+      "u ác tụy",
       "ung thu tuy"
     ],
     "meta": {
@@ -19668,7 +19668,7 @@
     "synonyms": [
       "u ac cua dau tuy",
       "c250",
-      "ung thư của đầu tụy",
+      "u ác của đầu tụy",
       "ung thu cua dau tuy"
     ],
     "meta": {
@@ -19687,7 +19687,7 @@
     "synonyms": [
       "u ac cua than tuy",
       "c251",
-      "ung thư của thân tụy",
+      "u ác của thân tụy",
       "ung thu cua than tuy"
     ],
     "meta": {
@@ -19706,7 +19706,7 @@
     "synonyms": [
       "u ac cua duoi tuy",
       "c252",
-      "ung thư của đuôi tụy",
+      "u ác của đuôi tụy",
       "ung thu cua duoi tuy"
     ],
     "meta": {
@@ -19725,7 +19725,7 @@
     "synonyms": [
       "u ac cua ong tuy",
       "c253",
-      "ung thư của ống tụy",
+      "u ác của ống tụy",
       "ung thu cua ong tuy"
     ],
     "meta": {
@@ -19744,7 +19744,7 @@
     "synonyms": [
       "u ac cua tuy noi tiet",
       "c254",
-      "ung thư của tụy nội tiết",
+      "u ác của tụy nội tiết",
       "ung thu cua tuy noi tiet"
     ],
     "meta": {
@@ -19763,7 +19763,7 @@
     "synonyms": [
       "u ac phan khac cua tuy",
       "c257",
-      "ung thư phần khác của tụy",
+      "u ác phần khác của tụy",
       "ung thu phan khac cua tuy"
     ],
     "meta": {
@@ -19782,7 +19782,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua tuy",
       "c258",
-      "ung thư với tổn thương chồng lấn của tụy",
+      "u ác với tổn thương chồng lấn của tụy",
       "ung thu voi ton thuong chong lan cua tuy"
     ],
     "meta": {
@@ -19801,7 +19801,7 @@
     "synonyms": [
       "u ac cua tuy, khong dac hieu",
       "c259",
-      "ung thư của tụỵ, không đặc hiệu",
+      "u ác của tụỵ, không đặc hiệu",
       "ung thu cua tuy, khong dac hieu"
     ],
     "meta": {
@@ -19819,7 +19819,7 @@
     "name_en": "Malignant neoplasm of other and ill-defined digestive organs",
     "synonyms": [
       "u ac cua co quan tieu hoa khac va khong ro rang",
-      "ung thư của cơ quan tiêu hóa khác và không rõ ràng",
+      "u ác của cơ quan tiêu hóa khác và không rõ ràng",
       "ung thu cua co quan tieu hoa khac va khong ro rang"
     ],
     "meta": {
@@ -19838,7 +19838,7 @@
     "synonyms": [
       "u ac cua duong ruot phan khong xac dinh vi tri",
       "c260",
-      "ung thư của đường ruột phần không xác định vị trí",
+      "u ác của đường ruột phần không xác định vị trí",
       "ung thu cua duong ruot phan khong xac dinh vi tri"
     ],
     "meta": {
@@ -19857,7 +19857,7 @@
     "synonyms": [
       "u ac tinh o lach",
       "c261",
-      "ung thư ở lách",
+      "u ác ở lách",
       "ung thu o lach"
     ],
     "meta": {
@@ -19876,7 +19876,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua he tieu hoa",
       "c268",
-      "ung thư với tổn thương chồng lấn của hệ tiêu hóa",
+      "u ác với tổn thương chồng lấn của hệ tiêu hóa",
       "ung thu voi ton thuong chong lan cua he tieu hoa"
     ],
     "meta": {
@@ -19895,7 +19895,7 @@
     "synonyms": [
       "u ac o vi tri khong ro rang trong he tieu hoa",
       "c269",
-      "ung thư ở vị trí không rõ ràng trong hệ tiêu hóa",
+      "u ác ở vị trí không rõ ràng trong hệ tiêu hóa",
       "ung thu o vi tri khong ro rang trong he tieu hoa"
     ],
     "meta": {
@@ -19913,7 +19913,7 @@
     "name_en": "Malignant neoplasm of nasal cavity and middle ear",
     "synonyms": [
       "u ac cua hoc mui va tai giua",
-      "ung thư của hốc mũi và tai giữa",
+      "u ác của hốc mũi và tai giữa",
       "ung thu cua hoc mui va tai giua"
     ],
     "meta": {
@@ -19932,7 +19932,7 @@
     "synonyms": [
       "u ac cua hoc mui",
       "c300",
-      "ung thư của hốc mũi",
+      "u ác của hốc mũi",
       "ung thu cua hoc mui"
     ],
     "meta": {
@@ -19951,7 +19951,7 @@
     "synonyms": [
       "u ac cua tai giua",
       "c301",
-      "ung thư của tai giữa",
+      "u ác của tai giữa",
       "ung thu cua tai giua"
     ],
     "meta": {
@@ -19969,7 +19969,7 @@
     "name_en": "Malignant neoplasm of accessory sinuses",
     "synonyms": [
       "u ac cua cac xoang phu",
-      "ung thư của các xoang phụ",
+      "u ác của các xoang phụ",
       "ung thu cua cac xoang phu"
     ],
     "meta": {
@@ -19988,7 +19988,7 @@
     "synonyms": [
       "u ac cua xoang ham",
       "c310",
-      "ung thư của xoang hàm",
+      "u ác của xoang hàm",
       "ung thu cua xoang ham"
     ],
     "meta": {
@@ -20007,7 +20007,7 @@
     "synonyms": [
       "u ac cua xoang sang",
       "c311",
-      "ung thư của xoang sàng",
+      "u ác của xoang sàng",
       "ung thu cua xoang sang"
     ],
     "meta": {
@@ -20026,7 +20026,7 @@
     "synonyms": [
       "u ac cua xoang tran",
       "c312",
-      "ung thư của xoang trán",
+      "u ác của xoang trán",
       "ung thu cua xoang tran"
     ],
     "meta": {
@@ -20045,7 +20045,7 @@
     "synonyms": [
       "u ac cua xoang buom",
       "c313",
-      "ung thư của xoang bướm",
+      "u ác của xoang bướm",
       "ung thu cua xoang buom"
     ],
     "meta": {
@@ -20064,7 +20064,7 @@
     "synonyms": [
       "u ac voi ton thuong lan rong cua xoang phu",
       "c318",
-      "ung thư với tổn thương lan rộng của xoang phụ",
+      "u ác với tổn thương lan rộng của xoang phụ",
       "ung thu voi ton thuong lan rong cua xoang phu"
     ],
     "meta": {
@@ -20083,7 +20083,7 @@
     "synonyms": [
       "u ac cua xoang phu, khong dac hieu",
       "c319",
-      "ung thư của xoang phụ, không đặc hiệu",
+      "u ác của xoang phụ, không đặc hiệu",
       "ung thu cua xoang phu, khong dac hieu"
     ],
     "meta": {
@@ -20101,7 +20101,7 @@
     "name_en": "Malignant neoplasm of larynx",
     "synonyms": [
       "u ac thanh quan",
-      "ung thư thanh quản",
+      "u ác thanh quản",
       "ung thu thanh quan"
     ],
     "meta": {
@@ -20120,7 +20120,7 @@
     "synonyms": [
       "u ac cua thanh mon",
       "c320",
-      "ung thư của thanh môn",
+      "u ác của thanh môn",
       "ung thu cua thanh mon"
     ],
     "meta": {
@@ -20139,7 +20139,7 @@
     "synonyms": [
       "u ac vung tren thanh mon",
       "c321",
-      "ung thư vùng trên thanh môn",
+      "u ác vùng trên thanh môn",
       "ung thu vung tren thanh mon"
     ],
     "meta": {
@@ -20158,7 +20158,7 @@
     "synonyms": [
       "u ac vung duoi thanh mon",
       "c322",
-      "ung thư vùng dưới thanh môn",
+      "u ác vùng dưới thanh môn",
       "ung thu vung duoi thanh mon"
     ],
     "meta": {
@@ -20177,7 +20177,7 @@
     "synonyms": [
       "u ac cua sun thanh quan",
       "c323",
-      "ung thư của sụn thanh quản",
+      "u ác của sụn thanh quản",
       "ung thu cua sun thanh quan"
     ],
     "meta": {
@@ -20196,7 +20196,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua thanh quan",
       "c328",
-      "ung thư với tổn thương chồng lấn của thanh quản",
+      "u ác với tổn thương chồng lấn của thanh quản",
       "ung thu voi ton thuong chong lan cua thanh quan"
     ],
     "meta": {
@@ -20215,7 +20215,7 @@
     "synonyms": [
       "u ac cua thanh quan, khong dac hieu",
       "c329",
-      "ung thư của thanh quản, không đặc hiệu",
+      "u ác của thanh quản, không đặc hiệu",
       "ung thu cua thanh quan, khong dac hieu"
     ],
     "meta": {
@@ -20233,7 +20233,7 @@
     "name_en": "Malignant neoplasm of trachea",
     "synonyms": [
       "u ac khi quan",
-      "ung thư khí quản",
+      "u ác khí quản",
       "ung thu khi quan"
     ],
     "meta": {
@@ -20251,7 +20251,7 @@
     "name_en": "Malignant neoplasm of bronchus and lung",
     "synonyms": [
       "u ac cua phe quan va phoi",
-      "ung thư của phế quản và phổi",
+      "u ác của phế quản và phổi",
       "ung thu cua phe quan va phoi"
     ],
     "meta": {
@@ -20270,7 +20270,7 @@
     "synonyms": [
       "u ac cua phe quan chinh",
       "c340",
-      "ung thư của phế quản chính",
+      "u ác của phế quản chính",
       "ung thu cua phe quan chinh"
     ],
     "meta": {
@@ -20289,7 +20289,7 @@
     "synonyms": [
       "u ac cua thuy tren, phe quan hoac phoi",
       "c341",
-      "ung thư của thuỳ trên, phế quản hoặc phổi",
+      "u ác của thuỳ trên, phế quản hoặc phổi",
       "ung thu cua thuy tren, phe quan hoac phoi"
     ],
     "meta": {
@@ -20308,7 +20308,7 @@
     "synonyms": [
       "u ac cua thuy giua, phe quan hoac phoi",
       "c342",
-      "ung thư của thuỳ giữa, phế quản hoặc phổi",
+      "u ác của thuỳ giữa, phế quản hoặc phổi",
       "ung thu cua thuy giua, phe quan hoac phoi"
     ],
     "meta": {
@@ -20327,7 +20327,7 @@
     "synonyms": [
       "u ac cua thuy duoi, phe quan hoac phoi",
       "c343",
-      "ung thư của thuỳ dưới, phế quản hoặc phổi",
+      "u ác của thuỳ dưới, phế quản hoặc phổi",
       "ung thu cua thuy duoi, phe quan hoac phoi"
     ],
     "meta": {
@@ -20346,7 +20346,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua phe quan va phoi",
       "c348",
-      "ung thư với tổn thương chồng lấn của phế quản và phổi",
+      "u ác với tổn thương chồng lấn của phế quản và phổi",
       "ung thu voi ton thuong chong lan cua phe quan va phoi"
     ],
     "meta": {
@@ -20365,7 +20365,7 @@
     "synonyms": [
       "u ac cua khi quan hoac phoi, khong dac hieu",
       "c349",
-      "ung thư của khí quản hoặc phổi, không đặc hiệu",
+      "u ác của khí quản hoặc phổi, không đặc hiệu",
       "ung thu cua khi quan hoac phoi, khong dac hieu"
     ],
     "meta": {
@@ -20383,7 +20383,7 @@
     "name_en": "Malignant neoplasm of thymus",
     "synonyms": [
       "u ac tuyen uc",
-      "ung thư tuyến ức",
+      "u ác tuyến ức",
       "ung thu tuyen uc"
     ],
     "meta": {
@@ -20401,7 +20401,7 @@
     "name_en": "Malignant neoplasm of heart, mediastinum and pleura",
     "synonyms": [
       "u ac cua tim, trung that va mang phoi",
-      "ung thư của tim, trung thất và màng phổi",
+      "u ác của tim, trung thất và màng phổi",
       "ung thu cua tim, trung that va mang phoi"
     ],
     "meta": {
@@ -20420,7 +20420,7 @@
     "synonyms": [
       "u ac cua tim",
       "c380",
-      "ung thư của tim",
+      "u ác của tim",
       "ung thu cua tim"
     ],
     "meta": {
@@ -20439,7 +20439,7 @@
     "synonyms": [
       "u ac cua trung that truoc",
       "c381",
-      "ung thư của trung thất trước",
+      "u ác của trung thất trước",
       "ung thu cua trung that truoc"
     ],
     "meta": {
@@ -20458,7 +20458,7 @@
     "synonyms": [
       "u ac cua trung that sau",
       "c382",
-      "ung thư của trung thất sau",
+      "u ác của trung thất sau",
       "ung thu cua trung that sau"
     ],
     "meta": {
@@ -20477,7 +20477,7 @@
     "synonyms": [
       "u ac cua trung that, phan khong xac dinh",
       "c383",
-      "ung thư của trung thất, phần không xác định",
+      "u ác của trung thất, phần không xác định",
       "ung thu cua trung that, phan khong xac dinh"
     ],
     "meta": {
@@ -20496,7 +20496,7 @@
     "synonyms": [
       "u ac cua mang phoi",
       "c384",
-      "ung thư của màng phổi",
+      "u ác của màng phổi",
       "ung thu cua mang phoi"
     ],
     "meta": {
@@ -20515,7 +20515,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua tim, trung that, mang phoi",
       "c388",
-      "ung thư với tổn thương chồng lấn của tim, trung thất, màng phổi",
+      "u ác với tổn thương chồng lấn của tim, trung thất, màng phổi",
       "ung thu voi ton thuong chong lan cua tim, trung that, mang phoi"
     ],
     "meta": {
@@ -20533,7 +20533,7 @@
     "name_en": "Malignant neoplasm of other and ill-defined sites in the respiratory system and intrathoracic organs",
     "synonyms": [
       "u ac o nhung vi tri khac va khong ro rang cua he ho hap va co quan trong long nguc",
-      "ung thư ở những vị trí khác và không rõ ràng của hệ hô hấp và cơ quan trong lồng ngực",
+      "u ác ở những vị trí khác và không rõ ràng của hệ hô hấp và cơ quan trong lồng ngực",
       "ung thu o nhung vi tri khac va khong ro rang cua he ho hap va co quan trong long nguc"
     ],
     "meta": {
@@ -20552,7 +20552,7 @@
     "synonyms": [
       "u ac cua duong ho hap tren, phan khong xac dinh vi tri",
       "c390",
-      "ung thư của đường hô hấp trên, phần không xác định vị trí",
+      "u ác của đường hô hấp trên, phần không xác định vị trí",
       "ung thu cua duong ho hap tren, phan khong xac dinh vi tri"
     ],
     "meta": {
@@ -20571,7 +20571,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua co quan ho hap va trong long nguc",
       "c398",
-      "ung thư với tổn thương chồng lấn của cơ quan hô hấp và trong lồng ngực",
+      "u ác với tổn thương chồng lấn của cơ quan hô hấp và trong lồng ngực",
       "ung thu voi ton thuong chong lan cua co quan ho hap va trong long nguc"
     ],
     "meta": {
@@ -20590,7 +20590,7 @@
     "synonyms": [
       "u ac o vi tri kho xac dinh trong he ho hap",
       "c399",
-      "ung thư ở vị trí khó xác định trong hệ hô hấp",
+      "u ác ở vị trí khó xác định trong hệ hô hấp",
       "ung thu o vi tri kho xac dinh trong he ho hap"
     ],
     "meta": {
@@ -20608,7 +20608,7 @@
     "name_en": "Malignant neoplasm of bone and articular cartilage of limbs",
     "synonyms": [
       "u ac cua xuong va sun khop cua cac chi",
-      "ung thư của xương và sụn khớp của các chi",
+      "u ác của xương và sụn khớp của các chi",
       "ung thu cua xuong va sun khop cua cac chi"
     ],
     "meta": {
@@ -20627,7 +20627,7 @@
     "synonyms": [
       "u ac cua xuong ba vai va xuong dai cua chi tren",
       "c400",
-      "ung thư của xương bả vai và xương dài của chi trên",
+      "u ác của xương bả vai và xương dài của chi trên",
       "ung thu cua xuong ba vai va xuong dai cua chi tren"
     ],
     "meta": {
@@ -20646,7 +20646,7 @@
     "synonyms": [
       "u ac cua xuong ngan cua chi tren",
       "c401",
-      "ung thư của xương ngắn của chi trên",
+      "u ác của xương ngắn của chi trên",
       "ung thu cua xuong ngan cua chi tren"
     ],
     "meta": {
@@ -20665,7 +20665,7 @@
     "synonyms": [
       "u ac cua xuong dai cua chi duoi",
       "c402",
-      "ung thư của xương dài của chi dưới",
+      "u ác của xương dài của chi dưới",
       "ung thu cua xuong dai cua chi duoi"
     ],
     "meta": {
@@ -20684,7 +20684,7 @@
     "synonyms": [
       "u ac cua xuong ngan cua chi duoi",
       "c403",
-      "ung thư của xương ngắn của chi dưới",
+      "u ác của xương ngắn của chi dưới",
       "ung thu cua xuong ngan cua chi duoi"
     ],
     "meta": {
@@ -20703,7 +20703,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua xuong va sun khop cua cac chi",
       "c408",
-      "ung thư với tổn thương chồng lấn của xương và sụn khớp của các chi",
+      "u ác với tổn thương chồng lấn của xương và sụn khớp của các chi",
       "ung thu voi ton thuong chong lan cua xuong va sun khop cua cac chi"
     ],
     "meta": {
@@ -20722,7 +20722,7 @@
     "synonyms": [
       "u ac cua xuong va sun khop cua chi, khong dac hieu",
       "c409",
-      "ung thư của xương và sụn khớp của chi, không đặc hiệu",
+      "u ác của xương và sụn khớp của chi, không đặc hiệu",
       "ung thu cua xuong va sun khop cua chi, khong dac hieu"
     ],
     "meta": {
@@ -20740,7 +20740,7 @@
     "name_en": "Malignant neoplasm of bone and articular cartilage of other and unspecified sites",
     "synonyms": [
       "u ac cua xuong va sun khop o vi tri khac va khong xac dinh",
-      "ung thư của xương và sụn khớp ở vị trí khác và không xác định",
+      "u ác của xương và sụn khớp ở vị trí khác và không xác định",
       "ung thu cua xuong va sun khop o vi tri khac va khong xac dinh"
     ],
     "meta": {
@@ -20759,7 +20759,7 @@
     "synonyms": [
       "u ac cua xuong so va mat",
       "c410",
-      "ung thư của xương sọ và mặt",
+      "u ác của xương sọ và mặt",
       "ung thu cua xuong so va mat"
     ],
     "meta": {
@@ -20778,7 +20778,7 @@
     "synonyms": [
       "u ac cua xuong ham duoi",
       "c411",
-      "ung thư của xương hàm dưới",
+      "u ác của xương hàm dưới",
       "ung thu cua xuong ham duoi"
     ],
     "meta": {
@@ -20797,7 +20797,7 @@
     "synonyms": [
       "u ac cua cot song",
       "c412",
-      "ung thư của cột sống",
+      "u ác của cột sống",
       "ung thu cua cot song"
     ],
     "meta": {
@@ -20816,7 +20816,7 @@
     "synonyms": [
       "u ac cua xuong suon, xuong uc va xuong don",
       "c413",
-      "ung thư của xương sườn, xương ức và xương đòn",
+      "u ác của xương sườn, xương ức và xương đòn",
       "ung thu cua xuong suon, xuong uc va xuong don"
     ],
     "meta": {
@@ -20835,7 +20835,7 @@
     "synonyms": [
       "u ac cua xuong chau, xuong cung va xuong cut",
       "c414",
-      "ung thư của xương chậu, xương cùng và xương cụt",
+      "u ác của xương chậu, xương cùng và xương cụt",
       "ung thu cua xuong chau, xuong cung va xuong cut"
     ],
     "meta": {
@@ -20854,7 +20854,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua xuong va sun khop",
       "c418",
-      "ung thư với tổn thương chồng lấn của xương và sụn khớp",
+      "u ác với tổn thương chồng lấn của xương và sụn khớp",
       "ung thu voi ton thuong chong lan cua xuong va sun khop"
     ],
     "meta": {
@@ -20873,7 +20873,7 @@
     "synonyms": [
       "u ac cua xuong va sun khop khong dac hieu",
       "c419",
-      "ung thư của xương và sụn khớp không đặc hiệu",
+      "u ác của xương và sụn khớp không đặc hiệu",
       "ung thu cua xuong va sun khop khong dac hieu"
     ],
     "meta": {
@@ -21077,7 +21077,7 @@
     "name_en": "Other malignant neoplasms of skin",
     "synonyms": [
       "u ac khac cua da",
-      "ung thư khác của da",
+      "u ác khác của da",
       "ung thu khac cua da"
     ],
     "meta": {
@@ -21232,7 +21232,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua da",
       "c448",
-      "ung thư với tổn thương chồng lấn của da",
+      "u ác với tổn thương chồng lấn của da",
       "ung thu voi ton thuong chong lan cua da"
     ],
     "meta": {
@@ -21364,7 +21364,7 @@
   {
     "code": "C46",
     "code_no_dot": "C46",
-    "name_vi": "Ung thư mô liên kết Kaposi",
+    "name_vi": "u ác mô liên kết Kaposi",
     "name_en": "Kaposi s sarcoma",
     "synonyms": [
       "ung thu mo lien ket kaposi"
@@ -21373,14 +21373,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "C00-C75",
-      "type_name": "Ung thư mô liên kết Kaposi",
+      "type_name": "u ác mô liên kết Kaposi",
       "source": "ICD10"
     }
   },
   {
     "code": "C46.0",
     "code_no_dot": "C460",
-    "name_vi": "Ung thư mô liên kết Kaposi của da",
+    "name_vi": "u ác mô liên kết Kaposi của da",
     "name_en": "Kaposi s sarcoma of skin",
     "synonyms": [
       "ung thu mo lien ket kaposi cua da",
@@ -21390,14 +21390,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "C00-C75",
-      "type_name": "Ung thư mô liên kết Kaposi",
+      "type_name": "u ác mô liên kết Kaposi",
       "source": "ICD10"
     }
   },
   {
     "code": "C46.1",
     "code_no_dot": "C461",
-    "name_vi": "Ung thư mô liên kết Kaposi của mô mềm",
+    "name_vi": "u ác mô liên kết Kaposi của mô mềm",
     "name_en": "Kaposi s sarcoma of soft tissue",
     "synonyms": [
       "ung thu mo lien ket kaposi cua mo mem",
@@ -21407,14 +21407,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "C00-C75",
-      "type_name": "Ung thư mô liên kết Kaposi",
+      "type_name": "u ác mô liên kết Kaposi",
       "source": "ICD10"
     }
   },
   {
     "code": "C46.2",
     "code_no_dot": "C462",
-    "name_vi": "Ung thư mô liên kết Kaposi của vòm khẩu cái",
+    "name_vi": "u ác mô liên kết Kaposi của vòm khẩu cái",
     "name_en": "Kaposi s sarcoma of palate",
     "synonyms": [
       "ung thu mo lien ket kaposi cua vom khau cai",
@@ -21424,14 +21424,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "C00-C75",
-      "type_name": "Ung thư mô liên kết Kaposi",
+      "type_name": "u ác mô liên kết Kaposi",
       "source": "ICD10"
     }
   },
   {
     "code": "C46.3",
     "code_no_dot": "C463",
-    "name_vi": "Ung thư mô liên kết Kaposi của hạch lympho",
+    "name_vi": "u ác mô liên kết Kaposi của hạch lympho",
     "name_en": "Kaposi s sarcoma of lymph nodes",
     "synonyms": [
       "ung thu mo lien ket kaposi cua hach lympho",
@@ -21441,14 +21441,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "C00-C75",
-      "type_name": "Ung thư mô liên kết Kaposi",
+      "type_name": "u ác mô liên kết Kaposi",
       "source": "ICD10"
     }
   },
   {
     "code": "C46.7",
     "code_no_dot": "C467",
-    "name_vi": "Ung thư mô liên kết Kaposi của các nơi khác",
+    "name_vi": "u ác mô liên kết Kaposi của các nơi khác",
     "name_en": "Kaposi s sarcoma of other sites",
     "synonyms": [
       "ung thu mo lien ket kaposi cua cac noi khac",
@@ -21458,14 +21458,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "C00-C75",
-      "type_name": "Ung thư mô liên kết Kaposi",
+      "type_name": "u ác mô liên kết Kaposi",
       "source": "ICD10"
     }
   },
   {
     "code": "C46.8",
     "code_no_dot": "C468",
-    "name_vi": "Ung thư mô liên kết Kaposi của nhiều cơ quan",
+    "name_vi": "u ác mô liên kết Kaposi của nhiều cơ quan",
     "name_en": "Kaposi s sarcoma of multiple organs",
     "synonyms": [
       "ung thu mo lien ket kaposi cua nhieu co quan",
@@ -21475,14 +21475,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "C00-C75",
-      "type_name": "Ung thư mô liên kết Kaposi",
+      "type_name": "u ác mô liên kết Kaposi",
       "source": "ICD10"
     }
   },
   {
     "code": "C46.9",
     "code_no_dot": "C469",
-    "name_vi": "Ung thư mô liên kết Kaposi không đặc hiệu",
+    "name_vi": "u ác mô liên kết Kaposi không đặc hiệu",
     "name_en": "Kaposi s sarcoma, unspecified",
     "synonyms": [
       "ung thu mo lien ket kaposi khong dac hieu",
@@ -21492,7 +21492,7 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "C00-C75",
-      "type_name": "Ung thư mô liên kết Kaposi",
+      "type_name": "u ác mô liên kết Kaposi",
       "source": "ICD10"
     }
   },
@@ -21503,7 +21503,7 @@
     "name_en": "Malignant neoplasm of peripheral nerves and autonomic nervous system",
     "synonyms": [
       "u ac cua day than kinh ngoai bien va cua he than kinh tu dong",
-      "ung thư của dây thần kinh ngoại biên và của hệ thần kinh tự động",
+      "u ác của dây thần kinh ngoại biên và của hệ thần kinh tự động",
       "ung thu cua day than kinh ngoai bien va cua he than kinh tu dong"
     ],
     "meta": {
@@ -21522,7 +21522,7 @@
     "synonyms": [
       "u ac cua day than kinh ngoai bien cua dau, mat, co",
       "c470",
-      "ung thư của dây thần kinh ngoại biên của đầu, mặt, cổ",
+      "u ác của dây thần kinh ngoại biên của đầu, mặt, cổ",
       "ung thu cua day than kinh ngoai bien cua dau, mat, co"
     ],
     "meta": {
@@ -21541,7 +21541,7 @@
     "synonyms": [
       "u ac cua day than kinh ngoai bien cua chi tren, bao gom vai",
       "c471",
-      "ung thư của dây thần kinh ngoại biên của chi trên, bao gồm vai",
+      "u ác của dây thần kinh ngoại biên của chi trên, bao gồm vai",
       "ung thu cua day than kinh ngoai bien cua chi tren, bao gom vai"
     ],
     "meta": {
@@ -21560,7 +21560,7 @@
     "synonyms": [
       "u ac cua day than kinh ngoai bien cua chi duoi, bao gom hang",
       "c472",
-      "ung thư của dây thần kinh ngoại biên của chi dưới, bao gồm háng",
+      "u ác của dây thần kinh ngoại biên của chi dưới, bao gồm háng",
       "ung thu cua day than kinh ngoai bien cua chi duoi, bao gom hang"
     ],
     "meta": {
@@ -21579,7 +21579,7 @@
     "synonyms": [
       "u ac cua day than kinh ngoai bien cua long nguc",
       "c473",
-      "ung thư của dây thần kinh ngoại biên của lồng ngực",
+      "u ác của dây thần kinh ngoại biên của lồng ngực",
       "ung thu cua day than kinh ngoai bien cua long nguc"
     ],
     "meta": {
@@ -21598,7 +21598,7 @@
     "synonyms": [
       "u ac cua day than kinh ngoai bien cua bung",
       "c474",
-      "ung thư của dây thần kinh ngoại biên của bụng",
+      "u ác của dây thần kinh ngoại biên của bụng",
       "ung thu cua day than kinh ngoai bien cua bung"
     ],
     "meta": {
@@ -21617,7 +21617,7 @@
     "synonyms": [
       "u ac cua day than kinh ngoai bien cua chau",
       "c475",
-      "ung thư của dây thần kinh ngoại biên của chậu",
+      "u ác của dây thần kinh ngoại biên của chậu",
       "ung thu cua day than kinh ngoai bien cua chau"
     ],
     "meta": {
@@ -21636,7 +21636,7 @@
     "synonyms": [
       "u ac cua day than kinh ngoai bien cua than minh, khong dac hieu",
       "c476",
-      "ung thư của dây thần kinh ngoại biên của thân mình, không đặc hiệu",
+      "u ác của dây thần kinh ngoại biên của thân mình, không đặc hiệu",
       "ung thu cua day than kinh ngoai bien cua than minh, khong dac hieu"
     ],
     "meta": {
@@ -21655,7 +21655,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua day than kinh ngoai bien va cua he than kinh tu dong",
       "c478",
-      "ung thư với tổn thương chồng lấn của dây thần kinh ngoại biên và của hệ thần kinh tự động",
+      "u ác với tổn thương chồng lấn của dây thần kinh ngoại biên và của hệ thần kinh tự động",
       "ung thu voi ton thuong chong lan cua day than kinh ngoai bien va cua he than kinh tu dong"
     ],
     "meta": {
@@ -21674,7 +21674,7 @@
     "synonyms": [
       "u ac cua day than kinh ngoai bien va he than kinh tu dong, khong dac hieu",
       "c479",
-      "ung thư của dây thần kinh ngoại biên và hệ thần kinh tự động, không đặc hiệu",
+      "u ác của dây thần kinh ngoại biên và hệ thần kinh tự động, không đặc hiệu",
       "ung thu cua day than kinh ngoai bien va he than kinh tu dong, khong dac hieu"
     ],
     "meta": {
@@ -21692,7 +21692,7 @@
     "name_en": "Malignant neoplasm of retroperitoneum and peritoneum",
     "synonyms": [
       "u ac cua vung sau phuc mac va phuc mac",
-      "ung thư của vùng sau phúc mạc và phúc mạc",
+      "u ác của vùng sau phúc mạc và phúc mạc",
       "ung thu cua vung sau phuc mac va phuc mac"
     ],
     "meta": {
@@ -21711,7 +21711,7 @@
     "synonyms": [
       "u ac cua vung sau phuc mac",
       "c480",
-      "ung thư của vùng sau phúc mạc",
+      "u ác của vùng sau phúc mạc",
       "ung thu cua vung sau phuc mac"
     ],
     "meta": {
@@ -21730,7 +21730,7 @@
     "synonyms": [
       "u ac cua cac phan xac dinh cua phuc mac",
       "c481",
-      "ung thư của các phần xác định của phúc mạc",
+      "u ác của các phần xác định của phúc mạc",
       "ung thu cua cac phan xac dinh cua phuc mac"
     ],
     "meta": {
@@ -21749,7 +21749,7 @@
     "synonyms": [
       "u ac cua phuc mac khong dac hieu",
       "c482",
-      "ung thư của phúc mạc không đặc hiệu",
+      "u ác của phúc mạc không đặc hiệu",
       "ung thu cua phuc mac khong dac hieu"
     ],
     "meta": {
@@ -21768,7 +21768,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua vung sau phuc mac va phuc mac",
       "c488",
-      "ung thư với tổn thương chồng lấn của vùng sau phúc mạc và phúc mạc",
+      "u ác với tổn thương chồng lấn của vùng sau phúc mạc và phúc mạc",
       "ung thu voi ton thuong chong lan cua vung sau phuc mac va phuc mac"
     ],
     "meta": {
@@ -21786,7 +21786,7 @@
     "name_en": "Malignant neoplasm of other connective and soft tissue",
     "synonyms": [
       "u ac cua mo lien ket va mo mem khac",
-      "ung thư của mô liên kết và mô mềm khác",
+      "u ác của mô liên kết và mô mềm khác",
       "ung thu cua mo lien ket va mo mem khac"
     ],
     "meta": {
@@ -21805,7 +21805,7 @@
     "synonyms": [
       "u ac cua mo lien ket va mem cua dau, mat va co",
       "c490",
-      "ung thư của mô liên kết và mềm của đầu, mặt và cổ",
+      "u ác của mô liên kết và mềm của đầu, mặt và cổ",
       "ung thu cua mo lien ket va mem cua dau, mat va co"
     ],
     "meta": {
@@ -21824,7 +21824,7 @@
     "synonyms": [
       "u ac cua mo lien ket va mo mem cua chi tren bao gom vai",
       "c491",
-      "ung thư của mô liên kết và mô mềm của chi trên bao gồm vai",
+      "u ác của mô liên kết và mô mềm của chi trên bao gồm vai",
       "ung thu cua mo lien ket va mo mem cua chi tren bao gom vai"
     ],
     "meta": {
@@ -21843,7 +21843,7 @@
     "synonyms": [
       "u ac cua mo lien ket va mo mem cua chi duoi bao gom hang",
       "c492",
-      "ung thư của mô liên kết và mô mềm của chi dưới bao gồm háng",
+      "u ác của mô liên kết và mô mềm của chi dưới bao gồm háng",
       "ung thu cua mo lien ket va mo mem cua chi duoi bao gom hang"
     ],
     "meta": {
@@ -21862,7 +21862,7 @@
     "synonyms": [
       "u ac cua mo lien ket va mo mem cua long nguc",
       "c493",
-      "ung thư của mô liên kết và mô mềm của lồng ngực",
+      "u ác của mô liên kết và mô mềm của lồng ngực",
       "ung thu cua mo lien ket va mo mem cua long nguc"
     ],
     "meta": {
@@ -21881,7 +21881,7 @@
     "synonyms": [
       "u ac cua mo lien ket va mo mem cua bung",
       "c494",
-      "ung thư của mô liên kết và mô mềm của bụng",
+      "u ác của mô liên kết và mô mềm của bụng",
       "ung thu cua mo lien ket va mo mem cua bung"
     ],
     "meta": {
@@ -21900,7 +21900,7 @@
     "synonyms": [
       "u ac cua mo lien ket va mo mem cua vung chau",
       "c495",
-      "ung thư của mô liên kết và mô mềm của vùng chậu",
+      "u ác của mô liên kết và mô mềm của vùng chậu",
       "ung thu cua mo lien ket va mo mem cua vung chau"
     ],
     "meta": {
@@ -21919,7 +21919,7 @@
     "synonyms": [
       "u ac cua mo lien ket va mo mem cua than minh, khong dac hieu",
       "c496",
-      "ung thư của mô liên kết và mô mềm của thân mình, không đặc hiệu",
+      "u ác của mô liên kết và mô mềm của thân mình, không đặc hiệu",
       "ung thu cua mo lien ket va mo mem cua than minh, khong dac hieu"
     ],
     "meta": {
@@ -21938,7 +21938,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua mo lien ket va mo mem",
       "c498",
-      "ung thư với tổn thương chồng lấn của mô liên kết và mô mềm",
+      "u ác với tổn thương chồng lấn của mô liên kết và mô mềm",
       "ung thu voi ton thuong chong lan cua mo lien ket va mo mem"
     ],
     "meta": {
@@ -21957,7 +21957,7 @@
     "synonyms": [
       "u ac cua mo lien ket va mo mem, khong dac hieu",
       "c499",
-      "ung thư của mô liên kết và mô mềm, không đặc hiệu",
+      "u ác của mô liên kết và mô mềm, không đặc hiệu",
       "ung thu cua mo lien ket va mo mem, khong dac hieu"
     ],
     "meta": {
@@ -21975,7 +21975,7 @@
     "name_en": "Malignant neoplasm of breast",
     "synonyms": [
       "u ac cua vu",
-      "ung thư của vú",
+      "u ác của vú",
       "ung thu cua vu"
     ],
     "meta": {
@@ -21994,7 +21994,7 @@
     "synonyms": [
       "u ac cua num va quang vu",
       "c500",
-      "ung thư của núm và quầng vú",
+      "u ác của núm và quầng vú",
       "ung thu cua num va quang vu"
     ],
     "meta": {
@@ -22013,7 +22013,7 @@
     "synonyms": [
       "u ac cua vung trung tam vu",
       "c501",
-      "ung thư của vùng trung tâm vú",
+      "u ác của vùng trung tâm vú",
       "ung thu cua vung trung tam vu"
     ],
     "meta": {
@@ -22032,7 +22032,7 @@
     "synonyms": [
       "u ac cua 1/4 tren - trong vu",
       "c502",
-      "ung thư của 1/4 trên - trong vú",
+      "u ác của 1/4 trên - trong vú",
       "ung thu cua 1/4 tren - trong vu"
     ],
     "meta": {
@@ -22051,7 +22051,7 @@
     "synonyms": [
       "u ac cua 1/4 duoi - trong vu",
       "c503",
-      "ung thư của 1/4 dưới - trong vú",
+      "u ác của 1/4 dưới - trong vú",
       "ung thu cua 1/4 duoi - trong vu"
     ],
     "meta": {
@@ -22070,7 +22070,7 @@
     "synonyms": [
       "u ac cua 1/4 tren - ngoai vu",
       "c504",
-      "ung thư của 1/4 trên - ngoài vú",
+      "u ác của 1/4 trên - ngoài vú",
       "ung thu cua 1/4 tren - ngoai vu"
     ],
     "meta": {
@@ -22089,7 +22089,7 @@
     "synonyms": [
       "u ac cua 1/4 duoi - ngoai vu",
       "c505",
-      "ung thư của 1/4 dưới - ngoài vú",
+      "u ác của 1/4 dưới - ngoài vú",
       "ung thu cua 1/4 duoi - ngoai vu"
     ],
     "meta": {
@@ -22108,7 +22108,7 @@
     "synonyms": [
       "u ac cua duoi nach cua vu",
       "c506",
-      "ung thư của đuôi nách của vú",
+      "u ác của đuôi nách của vú",
       "ung thu cua duoi nach cua vu"
     ],
     "meta": {
@@ -22127,7 +22127,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua vu",
       "c508",
-      "ung thư với tổn thương chồng lấn của vú",
+      "u ác với tổn thương chồng lấn của vú",
       "ung thu voi ton thuong chong lan cua vu"
     ],
     "meta": {
@@ -22146,7 +22146,7 @@
     "synonyms": [
       "u ac cua vu khong dac hieu",
       "c509",
-      "ung thư của vú không đặc hiệu",
+      "u ác của vú không đặc hiệu",
       "ung thu cua vu khong dac hieu"
     ],
     "meta": {
@@ -22164,7 +22164,7 @@
     "name_en": "Malignant neoplasm of vulva",
     "synonyms": [
       "u ac am ho",
-      "ung thư âm hộ",
+      "u ác âm hộ",
       "ung thu am ho"
     ],
     "meta": {
@@ -22183,7 +22183,7 @@
     "synonyms": [
       "u ac cua moi lon",
       "c510",
-      "ung thư của môi lớn",
+      "u ác của môi lớn",
       "ung thu cua moi lon"
     ],
     "meta": {
@@ -22203,7 +22203,7 @@
     "synonyms": [
       "u ac cua moi nho",
       "c511",
-      "ung thư của môi nhỏ",
+      "u ác của môi nhỏ",
       "ung thu cua moi nho"
     ],
     "meta": {
@@ -22223,7 +22223,7 @@
     "synonyms": [
       "u ac cua am vat",
       "c512",
-      "ung thư của âm vật",
+      "u ác của âm vật",
       "ung thu cua am vat"
     ],
     "meta": {
@@ -22243,7 +22243,7 @@
     "synonyms": [
       "u ac voi ton thuong lan rong cua am ho",
       "c518",
-      "ung thư với tổn thương lan rộng của âm hộ",
+      "u ác với tổn thương lan rộng của âm hộ",
       "ung thu voi ton thuong lan rong cua am ho"
     ],
     "meta": {
@@ -22263,7 +22263,7 @@
     "synonyms": [
       "u ac cua am ho khong dac hieu",
       "c519",
-      "ung thư của âm hộ không đặc hiệu",
+      "u ác của âm hộ không đặc hiệu",
       "ung thu cua am ho khong dac hieu"
     ],
     "meta": {
@@ -22282,7 +22282,7 @@
     "name_en": "Malignant neoplasm of vagina",
     "synonyms": [
       "u ac cua am dao",
-      "ung thư của âm đạo",
+      "u ác của âm đạo",
       "ung thu cua am dao"
     ],
     "meta": {
@@ -22301,7 +22301,7 @@
     "name_en": "Malignant neoplasm of cervix uteri",
     "synonyms": [
       "u ac cua co tu cung",
-      "ung thư của cổ tử cung",
+      "u ác của cổ tử cung",
       "ung thu cua co tu cung"
     ],
     "meta": {
@@ -22320,7 +22320,7 @@
     "synonyms": [
       "u ac cua co tu cung trong",
       "c530",
-      "ung thư của cổ tử cung trong",
+      "u ác của cổ tử cung trong",
       "ung thu cua co tu cung trong"
     ],
     "meta": {
@@ -22340,7 +22340,7 @@
     "synonyms": [
       "u ac cua co tu cung ngoai",
       "c531",
-      "ung thư của cổ tử cung ngoài",
+      "u ác của cổ tử cung ngoài",
       "ung thu cua co tu cung ngoai"
     ],
     "meta": {
@@ -22360,7 +22360,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua co tu cung",
       "c538",
-      "ung thư với tổn thương chồng lấn của cổ tử cung",
+      "u ác với tổn thương chồng lấn của cổ tử cung",
       "ung thu voi ton thuong chong lan cua co tu cung"
     ],
     "meta": {
@@ -22380,7 +22380,7 @@
     "synonyms": [
       "u ac cua co tu cung khong dac hieu",
       "c539",
-      "ung thư của cổ tử cung không đặc hiệu",
+      "u ác của cổ tử cung không đặc hiệu",
       "ung thu cua co tu cung khong dac hieu"
     ],
     "meta": {
@@ -22399,7 +22399,7 @@
     "name_en": "Malignant neoplasm of corpus uteri",
     "synonyms": [
       "u ac cua than tu cung",
-      "ung thư của thân tử cung",
+      "u ác của thân tử cung",
       "ung thu cua than tu cung"
     ],
     "meta": {
@@ -22418,7 +22418,7 @@
     "synonyms": [
       "u ac cua eo tu cung",
       "c540",
-      "ung thư của eo tử cung",
+      "u ác của eo tử cung",
       "ung thu cua eo tu cung"
     ],
     "meta": {
@@ -22438,7 +22438,7 @@
     "synonyms": [
       "u ac cua noi mac tu cung",
       "c541",
-      "ung thư của nội mạc tử cung",
+      "u ác của nội mạc tử cung",
       "ung thu cua noi mac tu cung"
     ],
     "meta": {
@@ -22458,7 +22458,7 @@
     "synonyms": [
       "u ac cua co tu cung",
       "c542",
-      "ung thư của cơ tử cung",
+      "u ác của cơ tử cung",
       "ung thu cua co tu cung"
     ],
     "meta": {
@@ -22478,7 +22478,7 @@
     "synonyms": [
       "u ac cua day tu cung",
       "c543",
-      "ung thư của đáy tử cung",
+      "u ác của đáy tử cung",
       "ung thu cua day tu cung"
     ],
     "meta": {
@@ -22498,7 +22498,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua than tu cung",
       "c548",
-      "ung thư với tổn thương chồng lấn của thân tử cung",
+      "u ác với tổn thương chồng lấn của thân tử cung",
       "ung thu voi ton thuong chong lan cua than tu cung"
     ],
     "meta": {
@@ -22518,7 +22518,7 @@
     "synonyms": [
       "u ac cua than tu cung khong dac hieu",
       "c549",
-      "ung thư của thân tử cung không đặc hiệu",
+      "u ác của thân tử cung không đặc hiệu",
       "ung thu cua than tu cung khong dac hieu"
     ],
     "meta": {
@@ -22537,7 +22537,7 @@
     "name_en": "Malignant neoplasm of uterus, part unspecified",
     "synonyms": [
       "u ac tu cung phan khong xac dinh",
-      "ung thư tử cung phần không xác định",
+      "u ác tử cung phần không xác định",
       "ung thu tu cung phan khong xac dinh"
     ],
     "meta": {
@@ -22556,7 +22556,7 @@
     "name_en": "Malignant neoplasm of ovary",
     "synonyms": [
       "u ac buong trung",
-      "ung thư buồng trứng",
+      "u ác buồng trứng",
       "ung thu buong trung"
     ],
     "meta": {
@@ -22575,7 +22575,7 @@
     "name_en": "Malignant neoplasm of other and unspecified female genital organs",
     "synonyms": [
       "u ac cua co quan sinh duc nu khac va khong xac dinh",
-      "ung thư của cơ quan sinh dục nữ khác và không xác định",
+      "u ác của cơ quan sinh dục nữ khác và không xác định",
       "ung thu cua co quan sinh duc nu khac va khong xac dinh"
     ],
     "meta": {
@@ -22594,7 +22594,7 @@
     "synonyms": [
       "u ac cua voi fallop",
       "c570",
-      "ung thư của vòi fallop",
+      "u ác của vòi fallop",
       "ung thu cua voi fallop"
     ],
     "meta": {
@@ -22614,7 +22614,7 @@
     "synonyms": [
       "u ac cua day chang rong",
       "c571",
-      "ung thư của dây chằng rộng",
+      "u ác của dây chằng rộng",
       "ung thu cua day chang rong"
     ],
     "meta": {
@@ -22634,7 +22634,7 @@
     "synonyms": [
       "u ac cua day chang tron",
       "c572",
-      "ung thư của dây chằng tròn",
+      "u ác của dây chằng tròn",
       "ung thu cua day chang tron"
     ],
     "meta": {
@@ -22654,7 +22654,7 @@
     "synonyms": [
       "u ac cua can tu cung",
       "c573",
-      "ung thư của cận tử cung",
+      "u ác của cận tử cung",
       "ung thu cua can tu cung"
     ],
     "meta": {
@@ -22674,7 +22674,7 @@
     "synonyms": [
       "u ac cua phan phu tu cung khong dac hieu",
       "c574",
-      "ung thư của phần phụ tử cung không đặc hiệu",
+      "u ác của phần phụ tử cung không đặc hiệu",
       "ung thu cua phan phu tu cung khong dac hieu"
     ],
     "meta": {
@@ -22694,7 +22694,7 @@
     "synonyms": [
       "u ac cua co quan sinh duc nu xac dinh khac",
       "c577",
-      "ung thư của cơ quan sinh dục nữ xác định khác",
+      "u ác của cơ quan sinh dục nữ xác định khác",
       "ung thu cua co quan sinh duc nu xac dinh khac"
     ],
     "meta": {
@@ -22714,7 +22714,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua co quan sinh duc nu",
       "c578",
-      "ung thư với tổn thương chồng lấn của cơ quan sinh dục nữ",
+      "u ác với tổn thương chồng lấn của cơ quan sinh dục nữ",
       "ung thu voi ton thuong chong lan cua co quan sinh duc nu"
     ],
     "meta": {
@@ -22734,7 +22734,7 @@
     "synonyms": [
       "u ac cua co quan sinh duc nu khong dac hieu",
       "c579",
-      "ung thư của cơ quan sinh dục nữ không đặc hiệu",
+      "u ác của cơ quan sinh dục nữ không đặc hiệu",
       "ung thu cua co quan sinh duc nu khong dac hieu"
     ],
     "meta": {
@@ -22754,7 +22754,7 @@
     "synonyms": [
       "u ac cua rau thai (nhau thai)",
       "u ác của rau thai",
-      "ung thư của rau thai (nhau thai)",
+      "u ác của rau thai (nhau thai)",
       "ung thu cua rau thai (nhau thai)"
     ],
     "meta": {
@@ -22774,7 +22774,7 @@
     "name_en": "Malignant neoplasm of penis",
     "synonyms": [
       "u ac cua duong vat",
-      "ung thư của dương vật",
+      "u ác của dương vật",
       "ung thu cua duong vat"
     ],
     "meta": {
@@ -22829,7 +22829,7 @@
     "synonyms": [
       "u ac cua than duong vat",
       "c602",
-      "ung thư của thân dương vật",
+      "u ác của thân dương vật",
       "ung thu cua than duong vat"
     ],
     "meta": {
@@ -22849,7 +22849,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua duong vat",
       "c608",
-      "ung thư với tổn thương chồng lấn của dương vật",
+      "u ác với tổn thương chồng lấn của dương vật",
       "ung thu voi ton thuong chong lan cua duong vat"
     ],
     "meta": {
@@ -22869,7 +22869,7 @@
     "synonyms": [
       "u ac cua duong vat khong dac hieu",
       "c609",
-      "ung thư của dương vật không đặc hiệu",
+      "u ác của dương vật không đặc hiệu",
       "ung thu cua duong vat khong dac hieu"
     ],
     "meta": {
@@ -22888,7 +22888,7 @@
     "name_en": "Malignant neoplasm of prostate",
     "synonyms": [
       "u ac cua tuyen tien liet",
-      "ung thư của tuyến tiền liệt",
+      "u ác của tuyến tiền liệt",
       "ung thu cua tuyen tien liet"
     ],
     "meta": {
@@ -22908,7 +22908,7 @@
     "name_en": "Malignant neoplasm of testis",
     "synonyms": [
       "u ac cua tinh hoan",
-      "ung thư của tinh hoàn",
+      "u ác của tinh hoàn",
       "ung thu cua tinh hoan"
     ],
     "meta": {
@@ -22927,7 +22927,7 @@
     "synonyms": [
       "u ac cua tinh hoan khong xuong",
       "c620",
-      "ung thư của tinh hoàn không xuống",
+      "u ác của tinh hoàn không xuống",
       "ung thu cua tinh hoan khong xuong"
     ],
     "meta": {
@@ -22947,7 +22947,7 @@
     "synonyms": [
       "u ac cua tinh hoan da xuong",
       "c621",
-      "ung thư của tinh hoàn đã xuống",
+      "u ác của tinh hoàn đã xuống",
       "ung thu cua tinh hoan da xuong"
     ],
     "meta": {
@@ -22967,7 +22967,7 @@
     "synonyms": [
       "u ac cua tinh hoan khong dac hieu",
       "c629",
-      "ung thư của tinh hoàn không đặc hiệu",
+      "u ác của tinh hoàn không đặc hiệu",
       "ung thu cua tinh hoan khong dac hieu"
     ],
     "meta": {
@@ -22986,7 +22986,7 @@
     "name_en": "Malignant neoplasm of other and unspecified male genital organs",
     "synonyms": [
       "u ac cua co quan sinh duc nam khac va khong xac dinh",
-      "ung thư của cơ quan sinh dục nam khác và không xác định",
+      "u ác của cơ quan sinh dục nam khác và không xác định",
       "ung thu cua co quan sinh duc nam khac va khong xac dinh"
     ],
     "meta": {
@@ -23005,7 +23005,7 @@
     "synonyms": [
       "u ac cua mao tinh",
       "c630",
-      "ung thư của mào tinh",
+      "u ác của mào tinh",
       "ung thu cua mao tinh"
     ],
     "meta": {
@@ -23025,7 +23025,7 @@
     "synonyms": [
       "u ac cua thung tinh",
       "c631",
-      "ung thư của thừng tinh",
+      "u ác của thừng tinh",
       "ung thu cua thung tinh"
     ],
     "meta": {
@@ -23046,7 +23046,7 @@
       "u ac cua biu (dai)",
       "c632",
       "u ác của bìu",
-      "ung thư của bìu (dái)",
+      "u ác của bìu (dái)",
       "ung thu cua biu (dai)"
     ],
     "meta": {
@@ -23066,7 +23066,7 @@
     "synonyms": [
       "u ac cua co quan sinh duc nam xac dinh khac",
       "c637",
-      "ung thư của cơ quan sinh dục nam xác định khác",
+      "u ác của cơ quan sinh dục nam xác định khác",
       "ung thu cua co quan sinh duc nam xac dinh khac"
     ],
     "meta": {
@@ -23086,7 +23086,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua co quan sinh duc nam",
       "c638",
-      "ung thư với tổn thương chồng lấn của cơ quan sinh dục nam",
+      "u ác với tổn thương chồng lấn của cơ quan sinh dục nam",
       "ung thu voi ton thuong chong lan cua co quan sinh duc nam"
     ],
     "meta": {
@@ -23106,7 +23106,7 @@
     "synonyms": [
       "u ac cua co quan sinh duc nam khong xac dinh",
       "c639",
-      "ung thư của cơ quan sinh dục nam không xác định",
+      "u ác của cơ quan sinh dục nam không xác định",
       "ung thu cua co quan sinh duc nam khong xac dinh"
     ],
     "meta": {
@@ -23125,7 +23125,7 @@
     "name_en": "Malignant neoplasm of kidney, except renal pelvis",
     "synonyms": [
       "u ac cua than ngoai tru be than",
-      "ung thư của thận ngoại trừ bể thận",
+      "u ác của thận ngoại trừ bể thận",
       "ung thu cua than ngoai tru be than"
     ],
     "meta": {
@@ -23143,7 +23143,7 @@
     "name_en": "Malignant neoplasm of renal pelvis",
     "synonyms": [
       "u ac cua be than",
-      "ung thư của bể thận",
+      "u ác của bể thận",
       "ung thu cua be than"
     ],
     "meta": {
@@ -23161,7 +23161,7 @@
     "name_en": "Malignant neoplasm of ureter",
     "synonyms": [
       "u ac nieu quan",
-      "ung thư niệu quản",
+      "u ác niệu quản",
       "ung thu nieu quan"
     ],
     "meta": {
@@ -23179,7 +23179,7 @@
     "name_en": "Malignant neoplasm of bladder",
     "synonyms": [
       "u ac cua bang quang",
-      "ung thư của bàng quang",
+      "u ác của bàng quang",
       "ung thu cua bang quang"
     ],
     "meta": {
@@ -23198,7 +23198,7 @@
     "synonyms": [
       "u ac cua tam giac bang quang",
       "c670",
-      "ung thư của tam giác bàng quang",
+      "u ác của tam giác bàng quang",
       "ung thu cua tam giac bang quang"
     ],
     "meta": {
@@ -23217,7 +23217,7 @@
     "synonyms": [
       "u ac cua day bang quang",
       "c671",
-      "ung thư của đáy bàng quang",
+      "u ác của đáy bàng quang",
       "ung thu cua day bang quang"
     ],
     "meta": {
@@ -23236,7 +23236,7 @@
     "synonyms": [
       "u ac cua thanh ben bang quang",
       "c672",
-      "ung thư của thành bên bàng quang",
+      "u ác của thành bên bàng quang",
       "ung thu cua thanh ben bang quang"
     ],
     "meta": {
@@ -23255,7 +23255,7 @@
     "synonyms": [
       "u ac cua thanh truoc bang quang",
       "c673",
-      "ung thư của thành trước bàng quang",
+      "u ác của thành trước bàng quang",
       "ung thu cua thanh truoc bang quang"
     ],
     "meta": {
@@ -23274,7 +23274,7 @@
     "synonyms": [
       "u ac cua thanh sau bang quang",
       "c674",
-      "ung thư của thành sau bàng quang",
+      "u ác của thành sau bàng quang",
       "ung thu cua thanh sau bang quang"
     ],
     "meta": {
@@ -23293,7 +23293,7 @@
     "synonyms": [
       "u ac cua co bang quang",
       "c675",
-      "ung thư của cổ bàng quang",
+      "u ác của cổ bàng quang",
       "ung thu cua co bang quang"
     ],
     "meta": {
@@ -23312,7 +23312,7 @@
     "synonyms": [
       "u ac cua lo nieu quan",
       "c676",
-      "ung thư của lỗ niệu quản",
+      "u ác của lỗ niệu quản",
       "ung thu cua lo nieu quan"
     ],
     "meta": {
@@ -23331,7 +23331,7 @@
     "synonyms": [
       "u ac cua day treo bang quang",
       "c677",
-      "ung thư của dây treo bàng quang",
+      "u ác của dây treo bàng quang",
       "ung thu cua day treo bang quang"
     ],
     "meta": {
@@ -23350,7 +23350,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua bang quang",
       "c678",
-      "ung thư với tổn thương chồng lấn của bàng quang",
+      "u ác với tổn thương chồng lấn của bàng quang",
       "ung thu voi ton thuong chong lan cua bang quang"
     ],
     "meta": {
@@ -23369,7 +23369,7 @@
     "synonyms": [
       "u ac cua bang quang khong dac hieu",
       "c679",
-      "ung thư của bàng quang không đặc hiệu",
+      "u ác của bàng quang không đặc hiệu",
       "ung thu cua bang quang khong dac hieu"
     ],
     "meta": {
@@ -23387,7 +23387,7 @@
     "name_en": "Malignant neoplasm of other and unspecified urinary organs",
     "synonyms": [
       "u ac cua co quan tiet nieu khac va khong xac dinh",
-      "ung thư của cơ quan tiết niệu khác và không xác định",
+      "u ác của cơ quan tiết niệu khác và không xác định",
       "ung thu cua co quan tiet nieu khac va khong xac dinh"
     ],
     "meta": {
@@ -23406,7 +23406,7 @@
     "synonyms": [
       "u ac cua nieu dao",
       "c680",
-      "ung thư của niệu đạo",
+      "u ác của niệu đạo",
       "ung thu cua nieu dao"
     ],
     "meta": {
@@ -23425,7 +23425,7 @@
     "synonyms": [
       "u ac cua tuyen can nieu dao",
       "c681",
-      "ung thư của tuyến cận niệu đạo",
+      "u ác của tuyến cận niệu đạo",
       "ung thu cua tuyen can nieu dao"
     ],
     "meta": {
@@ -23444,7 +23444,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua co quan tiet nieu",
       "c688",
-      "ung thư với tổn thương chồng lấn của cơ quan tiết niệu",
+      "u ác với tổn thương chồng lấn của cơ quan tiết niệu",
       "ung thu voi ton thuong chong lan cua co quan tiet nieu"
     ],
     "meta": {
@@ -23463,7 +23463,7 @@
     "synonyms": [
       "u ac cua co quan tiet nieu, khong dac hieu",
       "c689",
-      "ung thư của cơ quan tiết niệu, không đặc hiệu",
+      "u ác của cơ quan tiết niệu, không đặc hiệu",
       "ung thu cua co quan tiet nieu, khong dac hieu"
     ],
     "meta": {
@@ -23481,7 +23481,7 @@
     "name_en": "Malignant neoplasm of eye and adnexa",
     "synonyms": [
       "u ac cua mat va phan phu",
-      "ung thư của mắt và phần phụ",
+      "u ác của mắt và phần phụ",
       "ung thu cua mat va phan phu"
     ],
     "meta": {
@@ -23500,7 +23500,7 @@
     "synonyms": [
       "u ac cua ket mac",
       "c690",
-      "ung thư của kết mạc",
+      "u ác của kết mạc",
       "ung thu cua ket mac"
     ],
     "meta": {
@@ -23519,7 +23519,7 @@
     "synonyms": [
       "u ac cua cung mac",
       "c691",
-      "ung thư của củng mạc",
+      "u ác của củng mạc",
       "ung thu cua cung mac"
     ],
     "meta": {
@@ -23538,7 +23538,7 @@
     "synonyms": [
       "u ac cua vong mac",
       "c692",
-      "ung thư của võng mạc",
+      "u ác của võng mạc",
       "ung thu cua vong mac"
     ],
     "meta": {
@@ -23557,7 +23557,7 @@
     "synonyms": [
       "u ac cua mang mach",
       "c693",
-      "ung thư của màng mạch",
+      "u ác của màng mạch",
       "ung thu cua mang mach"
     ],
     "meta": {
@@ -23576,7 +23576,7 @@
     "synonyms": [
       "u ac cua the mi",
       "c694",
-      "ung thư của thể mi",
+      "u ác của thể mi",
       "ung thu cua the mi"
     ],
     "meta": {
@@ -23595,7 +23595,7 @@
     "synonyms": [
       "u ac cua tuyen le va ong",
       "c695",
-      "ung thư của tuyến lệ và ống",
+      "u ác của tuyến lệ và ống",
       "ung thu cua tuyen le va ong"
     ],
     "meta": {
@@ -23614,7 +23614,7 @@
     "synonyms": [
       "u ac cua hoc mat",
       "c696",
-      "ung thư của hốc mắt",
+      "u ác của hốc mắt",
       "ung thu cua hoc mat"
     ],
     "meta": {
@@ -23633,7 +23633,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua mat va phan phu",
       "c698",
-      "ung thư với tổn thương chồng lấn của mắt và phần phụ",
+      "u ác với tổn thương chồng lấn của mắt và phần phụ",
       "ung thu voi ton thuong chong lan cua mat va phan phu"
     ],
     "meta": {
@@ -23652,7 +23652,7 @@
     "synonyms": [
       "u ac cua mat khong dac hieu",
       "c699",
-      "ung thư của mắt không đặc hiệu",
+      "u ác của mắt không đặc hiệu",
       "ung thu cua mat khong dac hieu"
     ],
     "meta": {
@@ -23670,7 +23670,7 @@
     "name_en": "Malignant neoplasm of meninges",
     "synonyms": [
       "u ac cua mang nao",
-      "ung thư của màng não",
+      "u ác của màng não",
       "ung thu cua mang nao"
     ],
     "meta": {
@@ -23689,7 +23689,7 @@
     "synonyms": [
       "u ac cua mang nao",
       "c700",
-      "ung thư của màng não",
+      "u ác của màng não",
       "ung thu cua mang nao"
     ],
     "meta": {
@@ -23708,7 +23708,7 @@
     "synonyms": [
       "u ac cua mang tuy",
       "c701",
-      "ung thư của màng tủy",
+      "u ác của màng tủy",
       "ung thu cua mang tuy"
     ],
     "meta": {
@@ -23727,7 +23727,7 @@
     "synonyms": [
       "u ac cua mang nao, khong dac hieu",
       "c709",
-      "ung thư của màng não, không đặc hiệu",
+      "u ác của màng não, không đặc hiệu",
       "ung thu cua mang nao, khong dac hieu"
     ],
     "meta": {
@@ -23745,7 +23745,7 @@
     "name_en": "Malignant neoplasm of brain",
     "synonyms": [
       "u ac cua nao",
-      "ung thư của não",
+      "u ác của não",
       "ung thu cua nao"
     ],
     "meta": {
@@ -23764,7 +23764,7 @@
     "synonyms": [
       "u ac cua dai nao ngoai tru thuy nao va nao that",
       "c710",
-      "ung thư của đại não ngoại trừ thùy não và não thất",
+      "u ác của đại não ngoại trừ thùy não và não thất",
       "ung thu cua dai nao ngoai tru thuy nao va nao that"
     ],
     "meta": {
@@ -23783,7 +23783,7 @@
     "synonyms": [
       "u ac cua thuy tran",
       "c711",
-      "ung thư của thuỳ trán",
+      "u ác của thuỳ trán",
       "ung thu cua thuy tran"
     ],
     "meta": {
@@ -23802,7 +23802,7 @@
     "synonyms": [
       "u ac cua thuy thai duong",
       "c712",
-      "ung thư của thuỳ thái dương",
+      "u ác của thuỳ thái dương",
       "ung thu cua thuy thai duong"
     ],
     "meta": {
@@ -23821,7 +23821,7 @@
     "synonyms": [
       "u ac cua thuy dinh",
       "c713",
-      "ung thư của thuỳ đỉnh",
+      "u ác của thuỳ đỉnh",
       "ung thu cua thuy dinh"
     ],
     "meta": {
@@ -23840,7 +23840,7 @@
     "synonyms": [
       "u ac cua thuy cham",
       "c714",
-      "ung thư của thùy chẩm",
+      "u ác của thùy chẩm",
       "ung thu cua thuy cham"
     ],
     "meta": {
@@ -23859,7 +23859,7 @@
     "synonyms": [
       "u ac cua nao that",
       "c715",
-      "ung thư của não thất",
+      "u ác của não thất",
       "ung thu cua nao that"
     ],
     "meta": {
@@ -23878,7 +23878,7 @@
     "synonyms": [
       "u ac cua tieu nao",
       "c716",
-      "ung thư của tiểu não",
+      "u ác của tiểu não",
       "ung thu cua tieu nao"
     ],
     "meta": {
@@ -23897,7 +23897,7 @@
     "synonyms": [
       "u ac cua cuong nao",
       "c717",
-      "ung thư của cuống não",
+      "u ác của cuống não",
       "ung thu cua cuong nao"
     ],
     "meta": {
@@ -23916,7 +23916,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua nao",
       "c718",
-      "ung thư với tổn thương chồng lấn của não",
+      "u ác với tổn thương chồng lấn của não",
       "ung thu voi ton thuong chong lan cua nao"
     ],
     "meta": {
@@ -23935,7 +23935,7 @@
     "synonyms": [
       "u ac cua nao khong dac hieu",
       "c719",
-      "ung thư của não không đặc hiệu",
+      "u ác của não không đặc hiệu",
       "ung thu cua nao khong dac hieu"
     ],
     "meta": {
@@ -23953,7 +23953,7 @@
     "name_en": "Malignant neoplasm of spinal cord, cranial nerves and other parts of central nervous system",
     "synonyms": [
       "u ac cua tuy song, day than kinh so va cac phan khac cua he than kinh trung uong",
-      "ung thư của tủy sống, dây thần kinh sọ và các phần khác của hệ thần kinh trung ương",
+      "u ác của tủy sống, dây thần kinh sọ và các phần khác của hệ thần kinh trung ương",
       "ung thu cua tuy song, day than kinh so va cac phan khac cua he than kinh trung uong"
     ],
     "meta": {
@@ -23972,7 +23972,7 @@
     "synonyms": [
       "u ac cua tuy song",
       "c720",
-      "ung thư của tủy sống",
+      "u ác của tủy sống",
       "ung thu cua tuy song"
     ],
     "meta": {
@@ -23991,7 +23991,7 @@
     "synonyms": [
       "u ac cua chum duoi ngua",
       "c721",
-      "ung thư của chùm đuôi ngựa",
+      "u ác của chùm đuôi ngựa",
       "ung thu cua chum duoi ngua"
     ],
     "meta": {
@@ -24010,7 +24010,7 @@
     "synonyms": [
       "u ac cua than kinh khuu giac",
       "c722",
-      "ung thư của thần kinh khứu giác",
+      "u ác của thần kinh khứu giác",
       "ung thu cua than kinh khuu giac"
     ],
     "meta": {
@@ -24029,7 +24029,7 @@
     "synonyms": [
       "u ac cua than kinh thi giac",
       "c723",
-      "ung thư của thần kinh thị giác",
+      "u ác của thần kinh thị giác",
       "ung thu cua than kinh thi giac"
     ],
     "meta": {
@@ -24048,7 +24048,7 @@
     "synonyms": [
       "u ac cua than kinh thinh giac",
       "c724",
-      "ung thư của thần kinh thính giác",
+      "u ác của thần kinh thính giác",
       "ung thu cua than kinh thinh giac"
     ],
     "meta": {
@@ -24067,7 +24067,7 @@
     "synonyms": [
       "u ac cua day than kinh so khac va khong xac dinh",
       "c725",
-      "ung thư của dây thần kinh sọ khác và không xác định",
+      "u ác của dây thần kinh sọ khác và không xác định",
       "ung thu cua day than kinh so khac va khong xac dinh"
     ],
     "meta": {
@@ -24086,7 +24086,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua nao va cac phan khac cua he than kinh trung uong",
       "c728",
-      "ung thư với tổn thương chồng lấn của não và các phần khác của hệ thần kinh trung ương",
+      "u ác với tổn thương chồng lấn của não và các phần khác của hệ thần kinh trung ương",
       "ung thu voi ton thuong chong lan cua nao va cac phan khac cua he than kinh trung uong"
     ],
     "meta": {
@@ -24105,7 +24105,7 @@
     "synonyms": [
       "u ac cua he than kinh trung uong khong dac hieu",
       "c729",
-      "ung thư của hệ thần kinh trung ương không đặc hiệu",
+      "u ác của hệ thần kinh trung ương không đặc hiệu",
       "ung thu cua he than kinh trung uong khong dac hieu"
     ],
     "meta": {
@@ -24123,7 +24123,7 @@
     "name_en": "Malignant neoplasm of thyroid gland",
     "synonyms": [
       "u ac cua tuyen giap",
-      "ung thư của tuyến giáp",
+      "u ác của tuyến giáp",
       "ung thu cua tuyen giap"
     ],
     "meta": {
@@ -24141,7 +24141,7 @@
     "name_en": "Malignant neoplasm of adrenal gland",
     "synonyms": [
       "u ac cua tuyen thuong than",
-      "ung thư của tuyến thượng thận",
+      "u ác của tuyến thượng thận",
       "ung thu cua tuyen thuong than"
     ],
     "meta": {
@@ -24160,7 +24160,7 @@
     "synonyms": [
       "u ac cua vo tuyen thuong than",
       "c740",
-      "ung thư của vỏ tuyến thượng thận",
+      "u ác của vỏ tuyến thượng thận",
       "ung thu cua vo tuyen thuong than"
     ],
     "meta": {
@@ -24179,7 +24179,7 @@
     "synonyms": [
       "u ac cua tuy tuyen thuong than",
       "c741",
-      "ung thư của tủy tuyến thượng thận",
+      "u ác của tủy tuyến thượng thận",
       "ung thu cua tuy tuyen thuong than"
     ],
     "meta": {
@@ -24198,7 +24198,7 @@
     "synonyms": [
       "u ac cua tuyen thuong than, khong dac hieu",
       "c749",
-      "ung thư của tuyến thượng thận, không đặc hiệu",
+      "u ác của tuyến thượng thận, không đặc hiệu",
       "ung thu cua tuyen thuong than, khong dac hieu"
     ],
     "meta": {
@@ -24216,7 +24216,7 @@
     "name_en": "Malignant neoplasm of other endocrine glands and related structures",
     "synonyms": [
       "u ac cua cac tuyen noi tiet khac va cac co quan lien quan",
-      "ung thư của các tuyến nội tiết khác và các cơ quan liên quan",
+      "u ác của các tuyến nội tiết khác và các cơ quan liên quan",
       "ung thu cua cac tuyen noi tiet khac va cac co quan lien quan"
     ],
     "meta": {
@@ -24235,7 +24235,7 @@
     "synonyms": [
       "u ac cua tuyen can giap",
       "c750",
-      "ung thư của tuyến cận giáp",
+      "u ác của tuyến cận giáp",
       "ung thu cua tuyen can giap"
     ],
     "meta": {
@@ -24254,7 +24254,7 @@
     "synonyms": [
       "u ac cua tuyen yen",
       "c751",
-      "ung thư của tuyến yên",
+      "u ác của tuyến yên",
       "ung thu cua tuyen yen"
     ],
     "meta": {
@@ -24273,7 +24273,7 @@
     "synonyms": [
       "u ac cua ong so hau",
       "c752",
-      "ung thư của ống sọ hầu",
+      "u ác của ống sọ hầu",
       "ung thu cua ong so hau"
     ],
     "meta": {
@@ -24292,7 +24292,7 @@
     "synonyms": [
       "u ac cua tuyen tung",
       "c753",
-      "ung thư của tuyến tùng",
+      "u ác của tuyến tùng",
       "ung thu cua tuyen tung"
     ],
     "meta": {
@@ -24311,7 +24311,7 @@
     "synonyms": [
       "u ac cua the canh",
       "c754",
-      "ung thư của thể cảnh",
+      "u ác của thể cảnh",
       "ung thu cua the canh"
     ],
     "meta": {
@@ -24330,7 +24330,7 @@
     "synonyms": [
       "u ac cua the dong mach chu va pho hach khac",
       "c755",
-      "ung thư của thể động mạch chủ và phó hạch khác",
+      "u ác của thể động mạch chủ và phó hạch khác",
       "ung thu cua the dong mach chu va pho hach khac"
     ],
     "meta": {
@@ -24349,7 +24349,7 @@
     "synonyms": [
       "u ac anh huong nhieu tuyen khong dac hieu",
       "c758",
-      "ung thư ảnh hưởng nhiều tuyến không đặc hiệu",
+      "u ác ảnh hưởng nhiều tuyến không đặc hiệu",
       "ung thu anh huong nhieu tuyen khong dac hieu"
     ],
     "meta": {
@@ -24368,7 +24368,7 @@
     "synonyms": [
       "u ac cua tuyen noi tiet khong dac hieu",
       "c759",
-      "ung thư của tuyến nội tiết không đặc hiệu",
+      "u ác của tuyến nội tiết không đặc hiệu",
       "ung thu cua tuyen noi tiet khong dac hieu"
     ],
     "meta": {
@@ -24386,7 +24386,7 @@
     "name_en": "Malignant neoplasm of other and ill-defined sites",
     "synonyms": [
       "u ac co vi tri khac va khong ro rang",
-      "ung thư có vị trí khác và không rõ ràng",
+      "u ác có vị trí khác và không rõ ràng",
       "ung thu co vi tri khac va khong ro rang"
     ],
     "meta": {
@@ -24405,7 +24405,7 @@
     "synonyms": [
       "u ac cua dau mat va co",
       "c760",
-      "ung thư của đầu mặt và cổ",
+      "u ác của đầu mặt và cổ",
       "ung thu cua dau mat va co"
     ],
     "meta": {
@@ -24424,7 +24424,7 @@
     "synonyms": [
       "u ac cua nguc",
       "c761",
-      "ung thư của ngực",
+      "u ác của ngực",
       "ung thu cua nguc"
     ],
     "meta": {
@@ -24443,7 +24443,7 @@
     "synonyms": [
       "u ac cua bung",
       "c762",
-      "ung thư của bụng",
+      "u ác của bụng",
       "ung thu cua bung"
     ],
     "meta": {
@@ -24462,7 +24462,7 @@
     "synonyms": [
       "u ac cua chau",
       "c763",
-      "ung thư của chậu",
+      "u ác của chậu",
       "ung thu cua chau"
     ],
     "meta": {
@@ -24481,7 +24481,7 @@
     "synonyms": [
       "u ac cua chi tren",
       "c764",
-      "ung thư của chi trên",
+      "u ác của chi trên",
       "ung thu cua chi tren"
     ],
     "meta": {
@@ -24500,7 +24500,7 @@
     "synonyms": [
       "u ac cua chi duoi",
       "c765",
-      "ung thư của chi dưới",
+      "u ác của chi dưới",
       "ung thu cua chi duoi"
     ],
     "meta": {
@@ -24519,7 +24519,7 @@
     "synonyms": [
       "u ac o vi tri khong ro rang khac",
       "c767",
-      "ung thư ở vị trí không rõ ràng khác",
+      "u ác ở vị trí không rõ ràng khác",
       "ung thu o vi tri khong ro rang khac"
     ],
     "meta": {
@@ -24538,7 +24538,7 @@
     "synonyms": [
       "u ac voi ton thuong chong lan cua cac vi tri khac va khong ro rang",
       "c768",
-      "ung thư với tổn thương chồng lấn của các vị trí khác và không rõ ràng",
+      "u ác với tổn thương chồng lấn của các vị trí khác và không rõ ràng",
       "ung thu voi ton thuong chong lan cua cac vi tri khac va khong ro rang"
     ],
     "meta": {
@@ -24556,7 +24556,7 @@
     "name_en": "Secondary and unspecified malignant neoplasm of lymph nodes",
     "synonyms": [
       "u ac thu phat va khong xac dinh cua hach lympho",
-      "ung thư thứ phát và không xác định của hạch lympho",
+      "u ác thứ phát và không xác định của hạch lympho",
       "ung thu thu phat va khong xac dinh cua hach lympho"
     ],
     "meta": {
@@ -24575,7 +24575,7 @@
     "synonyms": [
       "u ac cua hach cua vung dau mat co",
       "c770",
-      "ung thư của hạch của vùng đầu mặt cổ",
+      "u ác của hạch của vùng đầu mặt cổ",
       "ung thu cua hach cua vung dau mat co"
     ],
     "meta": {
@@ -24594,7 +24594,7 @@
     "synonyms": [
       "u ac thu phat va khong xac dinh cua hach trong long nguc",
       "c771",
-      "ung thư thứ phát và không xác định của hạch trong lồng ngực",
+      "u ác thứ phát và không xác định của hạch trong lồng ngực",
       "ung thu thu phat va khong xac dinh cua hach trong long nguc"
     ],
     "meta": {
@@ -24613,7 +24613,7 @@
     "synonyms": [
       "u ac thu phat va khong dac hieu cua hach trong xoang bung",
       "c772",
-      "ung thư thứ phát và không đặc hiệu của hạch trong xoang bụng",
+      "u ác thứ phát và không đặc hiệu của hạch trong xoang bụng",
       "ung thu thu phat va khong dac hieu cua hach trong xoang bung"
     ],
     "meta": {
@@ -24632,7 +24632,7 @@
     "synonyms": [
       "u ac thu phat va khong dac hieu cua hach nach va hach chi tren",
       "c773",
-      "ung thư thứ phát và không đặc hiệu của hạch nách và hạch chi trên",
+      "u ác thứ phát và không đặc hiệu của hạch nách và hạch chi trên",
       "ung thu thu phat va khong dac hieu cua hach nach va hach chi tren"
     ],
     "meta": {
@@ -24651,7 +24651,7 @@
     "synonyms": [
       "u ac thu phat va khong dac hieu cua hach ben va hach chi duoi",
       "c774",
-      "ung thư thứ phát và không đặc hiệu của hạch bẹn và hạch chi dưới",
+      "u ác thứ phát và không đặc hiệu của hạch bẹn và hạch chi dưới",
       "ung thu thu phat va khong dac hieu cua hach ben va hach chi duoi"
     ],
     "meta": {
@@ -24670,7 +24670,7 @@
     "synonyms": [
       "u ac thu phat va khong dac hieu cua hach trong vung chau",
       "c775",
-      "ung thư thứ phát và không đặc hiệu của hạch trong vùng chậu",
+      "u ác thứ phát và không đặc hiệu của hạch trong vùng chậu",
       "ung thu thu phat va khong dac hieu cua hach trong vung chau"
     ],
     "meta": {
@@ -24689,7 +24689,7 @@
     "synonyms": [
       "u ac thu phat va khong dac hieu cua hach cua nhieu vung",
       "c778",
-      "ung thư thứ phát và không đặc hiệu của hạch của nhiều vùng",
+      "u ác thứ phát và không đặc hiệu của hạch của nhiều vùng",
       "ung thu thu phat va khong dac hieu cua hach cua nhieu vung"
     ],
     "meta": {
@@ -24708,7 +24708,7 @@
     "synonyms": [
       "u ac thu phat va khong dac hieu cua hach lympho, khong xac dinh",
       "c779",
-      "ung thư thứ phát và không đặc hiệu của hạch lympho, không xác định",
+      "u ác thứ phát và không đặc hiệu của hạch lympho, không xác định",
       "ung thu thu phat va khong dac hieu cua hach lympho, khong xac dinh"
     ],
     "meta": {
@@ -24726,7 +24726,7 @@
     "name_en": "Secondary malignant neoplasm of respiratory and digestive organs",
     "synonyms": [
       "u ac thu phat cua co quan ho hap va tieu ho",
-      "ung thư thứ phát của cơ quan hô hấp và tiêu ho",
+      "u ác thứ phát của cơ quan hô hấp và tiêu ho",
       "ung thu thu phat cua co quan ho hap va tieu ho"
     ],
     "meta": {
@@ -24745,7 +24745,7 @@
     "synonyms": [
       "u ac thu phat cua phoi",
       "c780",
-      "ung thư thứ phát của phổi",
+      "u ác thứ phát của phổi",
       "ung thu thu phat cua phoi"
     ],
     "meta": {
@@ -24764,7 +24764,7 @@
     "synonyms": [
       "u ac thu phat cua trung that",
       "c781",
-      "ung thư thứ phát của trung thất",
+      "u ác thứ phát của trung thất",
       "ung thu thu phat cua trung that"
     ],
     "meta": {
@@ -24783,7 +24783,7 @@
     "synonyms": [
       "u ac thu phat cua mang phoi",
       "c782",
-      "ung thư thứ phát của màng phổi",
+      "u ác thứ phát của màng phổi",
       "ung thu thu phat cua mang phoi"
     ],
     "meta": {
@@ -24802,7 +24802,7 @@
     "synonyms": [
       "u ac thu phat cua co quan ho hap va khong xac dinh",
       "c783",
-      "ung thư thứ phát của cơ quan hô hấp và không xác định",
+      "u ác thứ phát của cơ quan hô hấp và không xác định",
       "ung thu thu phat cua co quan ho hap va khong xac dinh"
     ],
     "meta": {
@@ -24821,7 +24821,7 @@
     "synonyms": [
       "u ac thu phat cua ruot non",
       "c784",
-      "ung thư thứ phát của ruột non",
+      "u ác thứ phát của ruột non",
       "ung thu thu phat cua ruot non"
     ],
     "meta": {
@@ -24840,7 +24840,7 @@
     "synonyms": [
       "u ac thu phat cua dai trang va truc trang",
       "c785",
-      "ung thư thứ phát của đại tràng và trực tràng",
+      "u ác thứ phát của đại tràng và trực tràng",
       "ung thu thu phat cua dai trang va truc trang"
     ],
     "meta": {
@@ -24859,7 +24859,7 @@
     "synonyms": [
       "u ac thu phat cua sau phuc mac va phuc mac",
       "c786",
-      "ung thư thứ phát của sau phúc mạc và phúc mạc",
+      "u ác thứ phát của sau phúc mạc và phúc mạc",
       "ung thu thu phat cua sau phuc mac va phuc mac"
     ],
     "meta": {
@@ -24878,7 +24878,7 @@
     "synonyms": [
       "u ac thu phat cua gan va duong mat trong gan",
       "c787",
-      "ung thư thứ phát của gan và đường mật trong gan",
+      "u ác thứ phát của gan và đường mật trong gan",
       "ung thu thu phat cua gan va duong mat trong gan"
     ],
     "meta": {
@@ -24897,7 +24897,7 @@
     "synonyms": [
       "u ac thu phat cua co quan tieu hoa khac va khong xac dinh",
       "c788",
-      "ung thư thứ phát của cơ quan tiêu hóa khác và không xác định",
+      "u ác thứ phát của cơ quan tiêu hóa khác và không xác định",
       "ung thu thu phat cua co quan tieu hoa khac va khong xac dinh"
     ],
     "meta": {
@@ -24915,7 +24915,7 @@
     "name_en": "Secondary malignant neoplasm of other sites",
     "synonyms": [
       "u ac thu phat co vi tri khac va khong xac dinh",
-      "ung thư thứ phát có vị trí khác và không xác định",
+      "u ác thứ phát có vị trí khác và không xác định",
       "ung thu thu phat co vi tri khac va khong xac dinh"
     ],
     "meta": {
@@ -24934,7 +24934,7 @@
     "synonyms": [
       "u ac thu phat cua than va be than",
       "c790",
-      "ung thư thứ phát của thận và bể thận",
+      "u ác thứ phát của thận và bể thận",
       "ung thu thu phat cua than va be than"
     ],
     "meta": {
@@ -24953,7 +24953,7 @@
     "synonyms": [
       "u ac thu phat cua bang quang va co quan tiet nieu khac va khong xac dinh",
       "c791",
-      "ung thư thứ phát của bàng quang và cơ quan tiết niệu khác và không xác định",
+      "u ác thứ phát của bàng quang và cơ quan tiết niệu khác và không xác định",
       "ung thu thu phat cua bang quang va co quan tiet nieu khac va khong xac dinh"
     ],
     "meta": {
@@ -24972,7 +24972,7 @@
     "synonyms": [
       "u ac thu phat cua da",
       "c792",
-      "ung thư thứ phát của da",
+      "u ác thứ phát của da",
       "ung thu thu phat cua da"
     ],
     "meta": {
@@ -24991,7 +24991,7 @@
     "synonyms": [
       "u ac thu phat cua nao va mang nao",
       "c793",
-      "ung thư thứ phát của não và màng não",
+      "u ác thứ phát của não và màng não",
       "ung thu thu phat cua nao va mang nao"
     ],
     "meta": {
@@ -25010,7 +25010,7 @@
     "synonyms": [
       "u ac thu phat khong xac dinh vi tri cua he than kinh",
       "c794",
-      "ung thư thứ phát không xác định vị trí của hệ thần kinh",
+      "u ác thứ phát không xác định vị trí của hệ thần kinh",
       "ung thu thu phat khong xac dinh vi tri cua he than kinh"
     ],
     "meta": {
@@ -25029,7 +25029,7 @@
     "synonyms": [
       "u ac thu phat cua xuong va tuy xuong",
       "c795",
-      "ung thư thứ phát của xương và tủy xương",
+      "u ác thứ phát của xương và tủy xương",
       "ung thu thu phat cua xuong va tuy xuong"
     ],
     "meta": {
@@ -25048,7 +25048,7 @@
     "synonyms": [
       "u ac thu phat cua buong trung",
       "c796",
-      "ung thư thứ phát của buồng trứng",
+      "u ác thứ phát của buồng trứng",
       "ung thu thu phat cua buong trung"
     ],
     "meta": {
@@ -25068,7 +25068,7 @@
     "synonyms": [
       "u ac thu phat cua tuyen thuong than",
       "c797",
-      "ung thư thứ phát của tuyến thượng thận",
+      "u ác thứ phát của tuyến thượng thận",
       "ung thu thu phat cua tuyen thuong than"
     ],
     "meta": {
@@ -25087,7 +25087,7 @@
     "synonyms": [
       "u ac thu phat cua cac vi tri xac dinh ro khac",
       "c798",
-      "ung thư thứ phát của các vị trí xác định rõ khác",
+      "u ác thứ phát của các vị trí xác định rõ khác",
       "ung thu thu phat cua cac vi tri xac dinh ro khac"
     ],
     "meta": {
@@ -25106,7 +25106,7 @@
     "synonyms": [
       "u ac tinh thu phat, khong xac dinh vi tri",
       "c799",
-      "ung thư thứ phát, không xác định vị trí",
+      "u ác thứ phát, không xác định vị trí",
       "ung thu thu phat, khong xac dinh vi tri"
     ],
     "meta": {
@@ -25124,7 +25124,7 @@
     "name_en": "Malignant neoplasms of ill-defined, secondary and unspecified sites",
     "synonyms": [
       "u ac khong xac dinh vi tri",
-      "ung thư không xác định vị trí",
+      "u ác không xác định vị trí",
       "ung thu khong xac dinh vi tri"
     ],
     "meta": {
@@ -25143,7 +25143,7 @@
     "synonyms": [
       "u ac tinh, khong biet vi tri nguyen phat",
       "c800",
-      "ung thư, không biết vị trí nguyên phát",
+      "u ác, không biết vị trí nguyên phát",
       "ung thu, khong biet vi tri nguyen phat"
     ],
     "meta": {
@@ -25162,7 +25162,7 @@
     "synonyms": [
       "u ac, khong dac hieu",
       "c809",
-      "ung thư, không đặc hiệu",
+      "u ác, không đặc hiệu",
       "ung thu, khong dac hieu"
     ],
     "meta": {
@@ -26566,7 +26566,7 @@
   {
     "code": "C92.3",
     "code_no_dot": "C923",
-    "name_vi": "Ung thư mô liên kết dòng tủy",
+    "name_vi": "u ác mô liên kết dòng tủy",
     "name_en": "Myeloid sarcoma",
     "synonyms": [
       "ung thu mo lien ket dong tuy",
@@ -27061,7 +27061,7 @@
     "name_en": "Other and unspecified malignant neoplasms of lymphoid, haematopoietic and related tissue",
     "synonyms": [
       "u ac khac va khong xac dinh cua he lympho, he tao mau va mo lien quan",
-      "ung thư khác và không xác định của hệ lympho, hệ tạo máu và mô liên quan",
+      "u ác khác và không xác định của hệ lympho, hệ tạo máu và mô liên quan",
       "ung thu khac va khong xac dinh cua he lympho, he tao mau va mo lien quan"
     ],
     "meta": {
@@ -27201,7 +27201,7 @@
     "synonyms": [
       "u ac tinh khac cua mo dang lympho, he tao mau va mo lien quan",
       "c967",
-      "ung thư khác của mô dạng lympho, hệ tạo máu và mô liên quan",
+      "u ác khác của mô dạng lympho, hệ tạo máu và mô liên quan",
       "ung thu khac cua mo dang lympho, he tao mau va mo lien quan"
     ],
     "meta": {
@@ -27237,7 +27237,7 @@
     "synonyms": [
       "u ac tinh khong dac hieu cua mo dang lympho, he tao mau va mo lien quan",
       "c969",
-      "ung thư không đặc hiệu của mô dạng lympho, hệ tạo máu và mô liên quan",
+      "u ác không đặc hiệu của mô dạng lympho, hệ tạo máu và mô liên quan",
       "ung thu khong dac hieu cua mo dang lympho, he tao mau va mo lien quan"
     ],
     "meta": {
@@ -27256,7 +27256,7 @@
     "synonyms": [
       "u ac co nhieu vi tri doc lap (nguyen phat) nhieu cho",
       "u ác có nhiều vị trí độc lập nhiều chỗ",
-      "ung thư có nhiều vị trí độc lập (nguyên phát) nhiều chỗ",
+      "u ác có nhiều vị trí độc lập (nguyên phát) nhiều chỗ",
       "ung thu co nhieu vi tri doc lap (nguyen phat) nhieu cho"
     ],
     "meta": {
@@ -27270,7 +27270,7 @@
   {
     "code": "D00",
     "code_no_dot": "D00",
-    "name_vi": "Ung thư biểu mô tại chỗ của khoang miệng, thực quản và dạ dày",
+    "name_vi": "u ác biểu mô tại chỗ của khoang miệng, thực quản và dạ dày",
     "name_en": "Carcinoma in situ of oral cavity, oesophagus and stomach",
     "synonyms": [
       "ung thu bieu mo tai cho cua khoang mieng, thuc quan va da day"
@@ -27279,14 +27279,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của khoang miệng, thực quản và dạ dày",
+      "type_name": "u ác biểu mô tại chỗ của khoang miệng, thực quản và dạ dày",
       "source": "ICD10"
     }
   },
   {
     "code": "D00.0",
     "code_no_dot": "D000",
-    "name_vi": "Ung thư biểu mô tại chỗ của của môi khoang miệng và hầu",
+    "name_vi": "u ác biểu mô tại chỗ của của môi khoang miệng và hầu",
     "name_en": "Carcinoma in situ: Lip, oral cavity and pharynx",
     "synonyms": [
       "ung thu bieu mo tai cho cua cua moi khoang mieng va hau",
@@ -27296,14 +27296,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của khoang miệng, thực quản và dạ dày",
+      "type_name": "u ác biểu mô tại chỗ của khoang miệng, thực quản và dạ dày",
       "source": "ICD10"
     }
   },
   {
     "code": "D00.1",
     "code_no_dot": "D001",
-    "name_vi": "Ung thư biểu mô tại chỗ của của thực quản",
+    "name_vi": "u ác biểu mô tại chỗ của của thực quản",
     "name_en": "Carcinoma in situ: Oesophagus",
     "synonyms": [
       "ung thu bieu mo tai cho cua cua thuc quan",
@@ -27313,7 +27313,7 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của khoang miệng, thực quản và dạ dày",
+      "type_name": "u ác biểu mô tại chỗ của khoang miệng, thực quản và dạ dày",
       "source": "ICD10"
     }
   },
@@ -27325,21 +27325,21 @@
     "synonyms": [
       "u ac cua da day",
       "d002",
-      "ung thư của dạ dày",
+      "u ác của dạ dày",
       "ung thu cua da day"
     ],
     "meta": {
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của khoang miệng, thực quản và dạ dày",
+      "type_name": "u ác biểu mô tại chỗ của khoang miệng, thực quản và dạ dày",
       "source": "ICD10"
     }
   },
   {
     "code": "D01",
     "code_no_dot": "D01",
-    "name_vi": "Ung thư biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
+    "name_vi": "u ác biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
     "name_en": "Carcinoma in situ of other and unspecified digestive organs",
     "synonyms": [
       "ung thu bieu mo tai cho cua co quan tieu hoa khac va khong xac dinh"
@@ -27348,14 +27348,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
       "source": "ICD10"
     }
   },
   {
     "code": "D01.0",
     "code_no_dot": "D010",
-    "name_vi": "Ung thư biểu mô tại chỗ của đại tràng",
+    "name_vi": "u ác biểu mô tại chỗ của đại tràng",
     "name_en": "Carcinoma in situ: Colon",
     "synonyms": [
       "ung thu bieu mo tai cho cua dai trang",
@@ -27365,14 +27365,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
       "source": "ICD10"
     }
   },
   {
     "code": "D01.1",
     "code_no_dot": "D011",
-    "name_vi": "Ung thư biểu mô tại chỗ nơi nối trực tràng - đại tràng sigma",
+    "name_vi": "u ác biểu mô tại chỗ nơi nối trực tràng - đại tràng sigma",
     "name_en": "Carcinoma in situ: Rectosigmoid junction",
     "synonyms": [
       "ung thu bieu mo tai cho noi noi truc trang - dai trang sigma",
@@ -27382,14 +27382,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
       "source": "ICD10"
     }
   },
   {
     "code": "D01.2",
     "code_no_dot": "D012",
-    "name_vi": "Ung thư biểu mô tại chỗ của trực tràng",
+    "name_vi": "u ác biểu mô tại chỗ của trực tràng",
     "name_en": "Carcinoma in situ: Rectum",
     "synonyms": [
       "ung thu bieu mo tai cho cua truc trang",
@@ -27399,14 +27399,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
       "source": "ICD10"
     }
   },
   {
     "code": "D01.3",
     "code_no_dot": "D013",
-    "name_vi": "Ung thư biểu mô tại chỗ của hậu môn và ống hậu môn",
+    "name_vi": "u ác biểu mô tại chỗ của hậu môn và ống hậu môn",
     "name_en": "Carcinoma in situ: Anus and anal canal",
     "synonyms": [
       "ung thu bieu mo tai cho cua hau mon va ong hau mon",
@@ -27416,14 +27416,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
       "source": "ICD10"
     }
   },
   {
     "code": "D01.4",
     "code_no_dot": "D014",
-    "name_vi": "Ung thư biểu mô tại chỗ của phần khác và không xác định của ruột non",
+    "name_vi": "u ác biểu mô tại chỗ của phần khác và không xác định của ruột non",
     "name_en": "Carcinoma in situ: Other and unspecified parts of intestine",
     "synonyms": [
       "ung thu bieu mo tai cho cua phan khac va khong xac dinh cua ruot non",
@@ -27433,14 +27433,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
       "source": "ICD10"
     }
   },
   {
     "code": "D01.5",
     "code_no_dot": "D015",
-    "name_vi": "Ung thư biểu mô tại chỗ của gan, túi mật và đường dẫn mật",
+    "name_vi": "u ác biểu mô tại chỗ của gan, túi mật và đường dẫn mật",
     "name_en": "Carcinoma in situ: Liver, gallbladder and bile ducts",
     "synonyms": [
       "ung thu bieu mo tai cho cua gan, tui mat va duong dan mat",
@@ -27450,14 +27450,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
       "source": "ICD10"
     }
   },
   {
     "code": "D01.7",
     "code_no_dot": "D017",
-    "name_vi": "Ung thư biểu mô tại chỗ của cơ quan tiêu hóa xác định khác",
+    "name_vi": "u ác biểu mô tại chỗ của cơ quan tiêu hóa xác định khác",
     "name_en": "Carcinoma in situ: Other specified digestive organs",
     "synonyms": [
       "ung thu bieu mo tai cho cua co quan tieu hoa xac dinh khac",
@@ -27467,14 +27467,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
       "source": "ICD10"
     }
   },
   {
     "code": "D01.9",
     "code_no_dot": "D019",
-    "name_vi": "Ung thư biểu mô tại chỗ của cơ quan tiêu hóa không đặc hiệu",
+    "name_vi": "u ác biểu mô tại chỗ của cơ quan tiêu hóa không đặc hiệu",
     "name_en": "Carcinoma in situ: Digestive organ, unspecified",
     "synonyms": [
       "ung thu bieu mo tai cho cua co quan tieu hoa khong dac hieu",
@@ -27484,14 +27484,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ của cơ quan tiêu hóa khác và không xác định",
       "source": "ICD10"
     }
   },
   {
     "code": "D02",
     "code_no_dot": "D02",
-    "name_vi": "Ung thư biểu mô tại chỗ của tai giữa và hệ hô hấp",
+    "name_vi": "u ác biểu mô tại chỗ của tai giữa và hệ hô hấp",
     "name_en": "Carcinoma in situ of middle ear and respiratory system",
     "synonyms": [
       "ung thu bieu mo tai cho cua tai giua va he ho hap"
@@ -27500,14 +27500,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của tai giữa và hệ hô hấp",
+      "type_name": "u ác biểu mô tại chỗ của tai giữa và hệ hô hấp",
       "source": "ICD10"
     }
   },
   {
     "code": "D02.0",
     "code_no_dot": "D020",
-    "name_vi": "Ung thư biểu mô tại chỗ của thanh quản",
+    "name_vi": "u ác biểu mô tại chỗ của thanh quản",
     "name_en": "Carcinoma in situ: Larynx",
     "synonyms": [
       "ung thu bieu mo tai cho cua thanh quan",
@@ -27517,14 +27517,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của tai giữa và hệ hô hấp",
+      "type_name": "u ác biểu mô tại chỗ của tai giữa và hệ hô hấp",
       "source": "ICD10"
     }
   },
   {
     "code": "D02.1",
     "code_no_dot": "D021",
-    "name_vi": "Ung thư biểu mô tại chỗ của khí quản",
+    "name_vi": "u ác biểu mô tại chỗ của khí quản",
     "name_en": "Carcinoma in situ: Trachea",
     "synonyms": [
       "ung thu bieu mo tai cho cua khi quan",
@@ -27534,14 +27534,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của tai giữa và hệ hô hấp",
+      "type_name": "u ác biểu mô tại chỗ của tai giữa và hệ hô hấp",
       "source": "ICD10"
     }
   },
   {
     "code": "D02.2",
     "code_no_dot": "D022",
-    "name_vi": "Ung thư biểu mô tại chỗ của phế quản và phổi",
+    "name_vi": "u ác biểu mô tại chỗ của phế quản và phổi",
     "name_en": "Carcinoma in situ: Bronchus and lung",
     "synonyms": [
       "ung thu bieu mo tai cho cua phe quan va phoi",
@@ -27551,14 +27551,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của tai giữa và hệ hô hấp",
+      "type_name": "u ác biểu mô tại chỗ của tai giữa và hệ hô hấp",
       "source": "ICD10"
     }
   },
   {
     "code": "D02.3",
     "code_no_dot": "D023",
-    "name_vi": "Ung thư biểu mô tại chỗ của phần khác và hệ hô hấp",
+    "name_vi": "u ác biểu mô tại chỗ của phần khác và hệ hô hấp",
     "name_en": "Carcinoma in situ: Other parts of respiratory system",
     "synonyms": [
       "ung thu bieu mo tai cho cua phan khac va he ho hap",
@@ -27568,14 +27568,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của tai giữa và hệ hô hấp",
+      "type_name": "u ác biểu mô tại chỗ của tai giữa và hệ hô hấp",
       "source": "ICD10"
     }
   },
   {
     "code": "D02.4",
     "code_no_dot": "D024",
-    "name_vi": "Ung thư biểu mô tại chỗ của hệ hô hấp không đặc hiệu",
+    "name_vi": "u ác biểu mô tại chỗ của hệ hô hấp không đặc hiệu",
     "name_en": "Carcinoma in situ: Respiratory system, unspecified",
     "synonyms": [
       "ung thu bieu mo tai cho cua he ho hap khong dac hieu",
@@ -27585,7 +27585,7 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của tai giữa và hệ hô hấp",
+      "type_name": "u ác biểu mô tại chỗ của tai giữa và hệ hô hấp",
       "source": "ICD10"
     }
   },
@@ -27778,7 +27778,7 @@
   {
     "code": "D04",
     "code_no_dot": "D04",
-    "name_vi": "Ung thư biểu mô tại chỗ của da",
+    "name_vi": "u ác biểu mô tại chỗ của da",
     "name_en": "Carcinoma in situ of skin",
     "synonyms": [
       "ung thu bieu mo tai cho cua da"
@@ -27787,14 +27787,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của da",
+      "type_name": "u ác biểu mô tại chỗ của da",
       "source": "ICD10"
     }
   },
   {
     "code": "D04.0",
     "code_no_dot": "D040",
-    "name_vi": "Ung thư biểu mô tại chỗ của da môi",
+    "name_vi": "u ác biểu mô tại chỗ của da môi",
     "name_en": "Carcinoma in situ: Skin of lip",
     "synonyms": [
       "ung thu bieu mo tai cho cua da moi",
@@ -27804,14 +27804,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của da",
+      "type_name": "u ác biểu mô tại chỗ của da",
       "source": "ICD10"
     }
   },
   {
     "code": "D04.1",
     "code_no_dot": "D041",
-    "name_vi": "Ung thư biểu mô tại chỗ của da mí mắt bao gồm góc mắt",
+    "name_vi": "u ác biểu mô tại chỗ của da mí mắt bao gồm góc mắt",
     "name_en": "Carcinoma in situ: Skin of eyelid, including canthus",
     "synonyms": [
       "ung thu bieu mo tai cho cua da mi mat bao gom goc mat",
@@ -27821,14 +27821,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của da",
+      "type_name": "u ác biểu mô tại chỗ của da",
       "source": "ICD10"
     }
   },
   {
     "code": "D04.2",
     "code_no_dot": "D042",
-    "name_vi": "Ung thư biểu mô tại chỗ của da vùng tai và ống tai ngoài",
+    "name_vi": "u ác biểu mô tại chỗ của da vùng tai và ống tai ngoài",
     "name_en": "Carcinoma in situ: Skin of ear and external auricular canal",
     "synonyms": [
       "ung thu bieu mo tai cho cua da vung tai va ong tai ngoai",
@@ -27838,14 +27838,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của da",
+      "type_name": "u ác biểu mô tại chỗ của da",
       "source": "ICD10"
     }
   },
   {
     "code": "D04.3",
     "code_no_dot": "D043",
-    "name_vi": "Ung thư biểu mô tại chỗ của da của phần khác và không xác định của mặt",
+    "name_vi": "u ác biểu mô tại chỗ của da của phần khác và không xác định của mặt",
     "name_en": "Carcinoma in situ: Skin of other and unspecified parts of face",
     "synonyms": [
       "ung thu bieu mo tai cho cua da cua phan khac va khong xac dinh cua mat",
@@ -27855,14 +27855,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của da",
+      "type_name": "u ác biểu mô tại chỗ của da",
       "source": "ICD10"
     }
   },
   {
     "code": "D04.4",
     "code_no_dot": "D044",
-    "name_vi": "Ung thư biểu mô tại chỗ của da đầu và cổ",
+    "name_vi": "u ác biểu mô tại chỗ của da đầu và cổ",
     "name_en": "Carcinoma in situ: Skin of scalp and neck",
     "synonyms": [
       "ung thu bieu mo tai cho cua da dau va co",
@@ -27872,14 +27872,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của da",
+      "type_name": "u ác biểu mô tại chỗ của da",
       "source": "ICD10"
     }
   },
   {
     "code": "D04.5",
     "code_no_dot": "D045",
-    "name_vi": "Ung thư biểu mô tại chỗ của da thân mình",
+    "name_vi": "u ác biểu mô tại chỗ của da thân mình",
     "name_en": "Carcinoma in situ: Skin of trunk",
     "synonyms": [
       "ung thu bieu mo tai cho cua da than minh",
@@ -27889,14 +27889,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của da",
+      "type_name": "u ác biểu mô tại chỗ của da",
       "source": "ICD10"
     }
   },
   {
     "code": "D04.6",
     "code_no_dot": "D046",
-    "name_vi": "Ung thư biểu mô tại chỗ của da chi trên, bao gồm vai",
+    "name_vi": "u ác biểu mô tại chỗ của da chi trên, bao gồm vai",
     "name_en": "Carcinoma in situ: Skin of upper limb, including shoulder",
     "synonyms": [
       "ung thu bieu mo tai cho cua da chi tren, bao gom vai",
@@ -27906,14 +27906,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của da",
+      "type_name": "u ác biểu mô tại chỗ của da",
       "source": "ICD10"
     }
   },
   {
     "code": "D04.7",
     "code_no_dot": "D047",
-    "name_vi": "Ung thư biểu mô tại chỗ của da chi dưới, bao gồm háng",
+    "name_vi": "u ác biểu mô tại chỗ của da chi dưới, bao gồm háng",
     "name_en": "Carcinoma in situ: Skin of lower limb, including hip",
     "synonyms": [
       "ung thu bieu mo tai cho cua da chi duoi, bao gom hang",
@@ -27923,14 +27923,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của da",
+      "type_name": "u ác biểu mô tại chỗ của da",
       "source": "ICD10"
     }
   },
   {
     "code": "D04.8",
     "code_no_dot": "D048",
-    "name_vi": "Ung thư biểu mô tại chỗ của da ở vị trí khác",
+    "name_vi": "u ác biểu mô tại chỗ của da ở vị trí khác",
     "name_en": "Carcinoma in situ: Skin of other sites",
     "synonyms": [
       "ung thu bieu mo tai cho cua da o vi tri khac",
@@ -27940,14 +27940,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của da",
+      "type_name": "u ác biểu mô tại chỗ của da",
       "source": "ICD10"
     }
   },
   {
     "code": "D04.9",
     "code_no_dot": "D049",
-    "name_vi": "Ung thư biểu mô tại chỗ của da, không đặc hiệu",
+    "name_vi": "u ác biểu mô tại chỗ của da, không đặc hiệu",
     "name_en": "Carcinoma in situ: Skin, unspecified",
     "synonyms": [
       "ung thu bieu mo tai cho cua da, khong dac hieu",
@@ -27957,14 +27957,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của da",
+      "type_name": "u ác biểu mô tại chỗ của da",
       "source": "ICD10"
     }
   },
   {
     "code": "D05",
     "code_no_dot": "D05",
-    "name_vi": "Ung thư biểu mô tại chỗ của vú",
+    "name_vi": "u ác biểu mô tại chỗ của vú",
     "name_en": "Carcinoma in situ of breast",
     "synonyms": [
       "ung thu bieu mo tai cho cua vu"
@@ -27973,14 +27973,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của vú",
+      "type_name": "u ác biểu mô tại chỗ của vú",
       "source": "ICD10"
     }
   },
   {
     "code": "D05.0",
     "code_no_dot": "D050",
-    "name_vi": "Ung thư biểu mô tiểu thuỳ tại chỗ",
+    "name_vi": "u ác biểu mô tiểu thuỳ tại chỗ",
     "name_en": "Lobular carcinoma in situ",
     "synonyms": [
       "ung thu bieu mo tieu thuy tai cho",
@@ -27990,14 +27990,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của vú",
+      "type_name": "u ác biểu mô tại chỗ của vú",
       "source": "ICD10"
     }
   },
   {
     "code": "D05.1",
     "code_no_dot": "D051",
-    "name_vi": "Ung thư biểu mô ống tuyến vú tại chỗ",
+    "name_vi": "u ác biểu mô ống tuyến vú tại chỗ",
     "name_en": "Intraductal carcinoma in situ",
     "synonyms": [
       "ung thu bieu mo ong tuyen vu tai cho",
@@ -28007,14 +28007,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của vú",
+      "type_name": "u ác biểu mô tại chỗ của vú",
       "source": "ICD10"
     }
   },
   {
     "code": "D05.7",
     "code_no_dot": "D057",
-    "name_vi": "Ung thư biểu mô ống tuyến khác tại chỗ của vú",
+    "name_vi": "u ác biểu mô ống tuyến khác tại chỗ của vú",
     "name_en": "Other carcinoma in situ of breast",
     "synonyms": [
       "ung thu bieu mo ong tuyen khac tai cho cua vu",
@@ -28024,14 +28024,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của vú",
+      "type_name": "u ác biểu mô tại chỗ của vú",
       "source": "ICD10"
     }
   },
   {
     "code": "D05.9",
     "code_no_dot": "D059",
-    "name_vi": "Ung thư biểu mô tại chỗ của vú, không đặc hiệu",
+    "name_vi": "u ác biểu mô tại chỗ của vú, không đặc hiệu",
     "name_en": "Carcinoma in situ of breast, unspecified",
     "synonyms": [
       "ung thu bieu mo tai cho cua vu, khong dac hieu",
@@ -28041,14 +28041,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của vú",
+      "type_name": "u ác biểu mô tại chỗ của vú",
       "source": "ICD10"
     }
   },
   {
     "code": "D06",
     "code_no_dot": "D06",
-    "name_vi": "Ung thư biểu mô tại chỗ của cổ tử cung",
+    "name_vi": "u ác biểu mô tại chỗ của cổ tử cung",
     "name_en": "Carcinoma in situ of cervix uteri",
     "synonyms": [
       "ung thu bieu mo tai cho cua co tu cung"
@@ -28057,14 +28057,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cổ tử cung",
+      "type_name": "u ác biểu mô tại chỗ của cổ tử cung",
       "source": "ICD10"
     }
   },
   {
     "code": "D06.0",
     "code_no_dot": "D060",
-    "name_vi": "Ung thư biểu mô tại chỗ của nội mạc",
+    "name_vi": "u ác biểu mô tại chỗ của nội mạc",
     "name_en": "Carcinoma in situ: Endocervix",
     "synonyms": [
       "ung thu bieu mo tai cho cua noi mac",
@@ -28074,7 +28074,7 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cổ tử cung",
+      "type_name": "u ác biểu mô tại chỗ của cổ tử cung",
       "source": "ICD10",
       "sex_constraint": "female"
     }
@@ -28082,7 +28082,7 @@
   {
     "code": "D06.1",
     "code_no_dot": "D061",
-    "name_vi": "Ung thư biểu mô tại chỗ của ngoại mạc",
+    "name_vi": "u ác biểu mô tại chỗ của ngoại mạc",
     "name_en": "Carcinoma in situ: Exocervix",
     "synonyms": [
       "ung thu bieu mo tai cho cua ngoai mac",
@@ -28092,7 +28092,7 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cổ tử cung",
+      "type_name": "u ác biểu mô tại chỗ của cổ tử cung",
       "source": "ICD10",
       "sex_constraint": "female"
     }
@@ -28100,7 +28100,7 @@
   {
     "code": "D06.7",
     "code_no_dot": "D067",
-    "name_vi": "Ung thư biểu mô tại chỗ của phần khác của cổ tử cung",
+    "name_vi": "u ác biểu mô tại chỗ của phần khác của cổ tử cung",
     "name_en": "Carcinoma in situ: Other parts of cervix",
     "synonyms": [
       "ung thu bieu mo tai cho cua phan khac cua co tu cung",
@@ -28110,7 +28110,7 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cổ tử cung",
+      "type_name": "u ác biểu mô tại chỗ của cổ tử cung",
       "source": "ICD10",
       "sex_constraint": "female"
     }
@@ -28118,7 +28118,7 @@
   {
     "code": "D06.9",
     "code_no_dot": "D069",
-    "name_vi": "Ung thư biểu mô tại chỗ của cổ tử cung, không đặc hiệu",
+    "name_vi": "u ác biểu mô tại chỗ của cổ tử cung, không đặc hiệu",
     "name_en": "Carcinoma in situ: Cervix, unspecified",
     "synonyms": [
       "ung thu bieu mo tai cho cua co tu cung, khong dac hieu",
@@ -28128,7 +28128,7 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cổ tử cung",
+      "type_name": "u ác biểu mô tại chỗ của cổ tử cung",
       "source": "ICD10",
       "sex_constraint": "female"
     }
@@ -28136,7 +28136,7 @@
   {
     "code": "D07",
     "code_no_dot": "D07",
-    "name_vi": "Ung thư biểu mô tại chỗ của cơ quan sinh dục khác và không xác định",
+    "name_vi": "u ác biểu mô tại chỗ của cơ quan sinh dục khác và không xác định",
     "name_en": "Carcinoma in situ of other and unspecified genital organs",
     "synonyms": [
       "ung thu bieu mo tai cho cua co quan sinh duc khac va khong xac dinh"
@@ -28145,14 +28145,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cơ quan sinh dục khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ của cơ quan sinh dục khác và không xác định",
       "source": "ICD10"
     }
   },
   {
     "code": "D07.0",
     "code_no_dot": "D070",
-    "name_vi": "Ung thư biểu mô tại chỗ của nội mạc tử cung",
+    "name_vi": "u ác biểu mô tại chỗ của nội mạc tử cung",
     "name_en": "Carcinoma in situ: Endometrium",
     "synonyms": [
       "ung thu bieu mo tai cho cua noi mac tu cung",
@@ -28162,7 +28162,7 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cơ quan sinh dục khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ của cơ quan sinh dục khác và không xác định",
       "source": "ICD10",
       "sex_constraint": "female"
     }
@@ -28170,7 +28170,7 @@
   {
     "code": "D07.1",
     "code_no_dot": "D071",
-    "name_vi": "Ung thư biểu mô tại chỗ của âm hộ",
+    "name_vi": "u ác biểu mô tại chỗ của âm hộ",
     "name_en": "Carcinoma in situ: Vulva",
     "synonyms": [
       "ung thu bieu mo tai cho cua am ho",
@@ -28180,7 +28180,7 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cơ quan sinh dục khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ của cơ quan sinh dục khác và không xác định",
       "source": "ICD10",
       "sex_constraint": "female"
     }
@@ -28188,7 +28188,7 @@
   {
     "code": "D07.2",
     "code_no_dot": "D072",
-    "name_vi": "Ung thư biểu mô tại chỗ của âm đạo",
+    "name_vi": "u ác biểu mô tại chỗ của âm đạo",
     "name_en": "Carcinoma in situ: Vagina",
     "synonyms": [
       "ung thu bieu mo tai cho cua am dao",
@@ -28198,7 +28198,7 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cơ quan sinh dục khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ của cơ quan sinh dục khác và không xác định",
       "source": "ICD10",
       "sex_constraint": "female"
     }
@@ -28206,7 +28206,7 @@
   {
     "code": "D07.3",
     "code_no_dot": "D073",
-    "name_vi": "Ung thư biểu mô tại chỗ của cơ quan sinh dục nữ khác và không xác định",
+    "name_vi": "u ác biểu mô tại chỗ của cơ quan sinh dục nữ khác và không xác định",
     "name_en": "Carcinoma in situ: Other and unspecified female genital organs",
     "synonyms": [
       "ung thu bieu mo tai cho cua co quan sinh duc nu khac va khong xac dinh",
@@ -28216,7 +28216,7 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cơ quan sinh dục khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ của cơ quan sinh dục khác và không xác định",
       "source": "ICD10",
       "sex_constraint": "female"
     }
@@ -28224,7 +28224,7 @@
   {
     "code": "D07.4",
     "code_no_dot": "D074",
-    "name_vi": "Ung thư biểu mô tại chỗ của dương vật",
+    "name_vi": "u ác biểu mô tại chỗ của dương vật",
     "name_en": "Carcinoma in situ: Penis",
     "synonyms": [
       "ung thu bieu mo tai cho cua duong vat",
@@ -28234,7 +28234,7 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cơ quan sinh dục khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ của cơ quan sinh dục khác và không xác định",
       "source": "ICD10",
       "sex_constraint": "male"
     }
@@ -28242,7 +28242,7 @@
   {
     "code": "D07.5",
     "code_no_dot": "D075",
-    "name_vi": "Ung thư biểu mô tại chỗ của tuyến tiền liệt",
+    "name_vi": "u ác biểu mô tại chỗ của tuyến tiền liệt",
     "name_en": "Carcinoma in situ: Prostate",
     "synonyms": [
       "ung thu bieu mo tai cho cua tuyen tien liet",
@@ -28252,7 +28252,7 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cơ quan sinh dục khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ của cơ quan sinh dục khác và không xác định",
       "source": "ICD10",
       "sex_constraint": "male"
     }
@@ -28260,7 +28260,7 @@
   {
     "code": "D07.6",
     "code_no_dot": "D076",
-    "name_vi": "Ung thư biểu mô tại chỗ của cơ quan sinh dục nam khác và không xác định",
+    "name_vi": "u ác biểu mô tại chỗ của cơ quan sinh dục nam khác và không xác định",
     "name_en": "Carcinoma in situ: Other and unspecified male genital organs",
     "synonyms": [
       "ung thu bieu mo tai cho cua co quan sinh duc nam khac va khong xac dinh",
@@ -28270,7 +28270,7 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ của cơ quan sinh dục khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ của cơ quan sinh dục khác và không xác định",
       "source": "ICD10",
       "sex_constraint": "male"
     }
@@ -28278,7 +28278,7 @@
   {
     "code": "D09",
     "code_no_dot": "D09",
-    "name_vi": "Ung thư biểu mô tại chỗ ở vị trí khác và không xác định",
+    "name_vi": "u ác biểu mô tại chỗ ở vị trí khác và không xác định",
     "name_en": "Carcinoma in situ of other and unspecified sites",
     "synonyms": [
       "ung thu bieu mo tai cho o vi tri khac va khong xac dinh"
@@ -28287,14 +28287,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ ở vị trí khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ ở vị trí khác và không xác định",
       "source": "ICD10"
     }
   },
   {
     "code": "D09.0",
     "code_no_dot": "D090",
-    "name_vi": "Ung thư biểu mô tại chỗ của bàng quang",
+    "name_vi": "u ác biểu mô tại chỗ của bàng quang",
     "name_en": "Carcinoma in situ: Bladder",
     "synonyms": [
       "ung thu bieu mo tai cho cua bang quang",
@@ -28304,14 +28304,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ ở vị trí khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ ở vị trí khác và không xác định",
       "source": "ICD10"
     }
   },
   {
     "code": "D09.1",
     "code_no_dot": "D091",
-    "name_vi": "Ung thư biểu mô tại chỗ của cơ quan tiết niệu khác và không xác định",
+    "name_vi": "u ác biểu mô tại chỗ của cơ quan tiết niệu khác và không xác định",
     "name_en": "Carcinoma in situ: Other and unspecified urinary organs",
     "synonyms": [
       "ung thu bieu mo tai cho cua co quan tiet nieu khac va khong xac dinh",
@@ -28321,14 +28321,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ ở vị trí khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ ở vị trí khác và không xác định",
       "source": "ICD10"
     }
   },
   {
     "code": "D09.2",
     "code_no_dot": "D092",
-    "name_vi": "Ung thư biểu mô tại chỗ của mắt",
+    "name_vi": "u ác biểu mô tại chỗ của mắt",
     "name_en": "Carcinoma in situ: Eye",
     "synonyms": [
       "ung thu bieu mo tai cho cua mat",
@@ -28338,14 +28338,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ ở vị trí khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ ở vị trí khác và không xác định",
       "source": "ICD10"
     }
   },
   {
     "code": "D09.3",
     "code_no_dot": "D093",
-    "name_vi": "Ung thư biểu mô tại chỗ của tuyến giáp và tuyến nội tiết khác",
+    "name_vi": "u ác biểu mô tại chỗ của tuyến giáp và tuyến nội tiết khác",
     "name_en": "Carcinoma in situ: Thyroid and other endocrine glands",
     "synonyms": [
       "ung thu bieu mo tai cho cua tuyen giap va tuyen noi tiet khac",
@@ -28355,14 +28355,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ ở vị trí khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ ở vị trí khác và không xác định",
       "source": "ICD10"
     }
   },
   {
     "code": "D09.7",
     "code_no_dot": "D097",
-    "name_vi": "Ung thư biểu mô tại chỗ ở vị trí xác định khác",
+    "name_vi": "u ác biểu mô tại chỗ ở vị trí xác định khác",
     "name_en": "Carcinoma in situ of other specified sites",
     "synonyms": [
       "ung thu bieu mo tai cho o vi tri xac dinh khac",
@@ -28372,14 +28372,14 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ ở vị trí khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ ở vị trí khác và không xác định",
       "source": "ICD10"
     }
   },
   {
     "code": "D09.9",
     "code_no_dot": "D099",
-    "name_vi": "Ung thư biểu mô tại chỗ, không xác định",
+    "name_vi": "u ác biểu mô tại chỗ, không xác định",
     "name_en": "Carcinoma in situ, unspecified",
     "synonyms": [
       "ung thu bieu mo tai cho, khong xac dinh",
@@ -28389,7 +28389,7 @@
       "chapter_no": "II",
       "chapter_name": "U tân sinh",
       "group_code": "",
-      "type_name": "Ung thư biểu mô tại chỗ ở vị trí khác và không xác định",
+      "type_name": "u ác biểu mô tại chỗ ở vị trí khác và không xác định",
       "source": "ICD10"
     }
   },
@@ -104788,12 +104788,12 @@
   {
     "code": "M36.1",
     "code_no_dot": "M361",
-    "name_vi": "Bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác (C00-D48†)",
+    "name_vi": "Bệnh khớp trong các bệnh u ác đã được xếp ở mục khác (C00-D48†)",
     "name_en": "Arthropathy in neoplastic disease (C00-D48†)",
     "synonyms": [
       "benh khop trong cac benh ung thu da duoc xep o muc khac (c00-d48†)",
       "m361",
-      "bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác"
+      "bệnh khớp trong các bệnh u ác đã được xếp ở mục khác"
     ],
     "meta": {
       "chapter_no": "XIII",
@@ -104807,12 +104807,12 @@
   {
     "code": "M36.10",
     "code_no_dot": "M3610",
-    "name_vi": "Bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác (C00-D48†), Nhiều vị trí",
+    "name_vi": "Bệnh khớp trong các bệnh u ác đã được xếp ở mục khác (C00-D48†), Nhiều vị trí",
     "name_en": "Arthropathy in neoplastic disease (C00-D48†), Multiple sites",
     "synonyms": [
       "benh khop trong cac benh ung thu da duoc xep o muc khac (c00-d48†), nhieu vi tri",
       "m3610",
-      "bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác , nhiều vị trí"
+      "bệnh khớp trong các bệnh u ác đã được xếp ở mục khác , nhiều vị trí"
     ],
     "meta": {
       "chapter_no": "XIII",
@@ -104825,12 +104825,12 @@
   {
     "code": "M36.11",
     "code_no_dot": "M3611",
-    "name_vi": "Bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác (C00-D48†), vùng bả vai",
+    "name_vi": "Bệnh khớp trong các bệnh u ác đã được xếp ở mục khác (C00-D48†), vùng bả vai",
     "name_en": "Arthropathy in neoplastic disease (C00-D48†), Shoulder region",
     "synonyms": [
       "benh khop trong cac benh ung thu da duoc xep o muc khac (c00-d48†), vung ba vai",
       "m3611",
-      "bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác , vùng bả vai"
+      "bệnh khớp trong các bệnh u ác đã được xếp ở mục khác , vùng bả vai"
     ],
     "meta": {
       "chapter_no": "XIII",
@@ -104843,12 +104843,12 @@
   {
     "code": "M36.12",
     "code_no_dot": "M3612",
-    "name_vi": "Bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác (C00-D48†), cánh tay",
+    "name_vi": "Bệnh khớp trong các bệnh u ác đã được xếp ở mục khác (C00-D48†), cánh tay",
     "name_en": "Arthropathy in neoplastic disease (C00-D48†), Upper arm",
     "synonyms": [
       "benh khop trong cac benh ung thu da duoc xep o muc khac (c00-d48†), canh tay",
       "m3612",
-      "bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác , cánh tay"
+      "bệnh khớp trong các bệnh u ác đã được xếp ở mục khác , cánh tay"
     ],
     "meta": {
       "chapter_no": "XIII",
@@ -104861,12 +104861,12 @@
   {
     "code": "M36.13",
     "code_no_dot": "M3613",
-    "name_vi": "Bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác (C00-D48†), cẳng tay",
+    "name_vi": "Bệnh khớp trong các bệnh u ác đã được xếp ở mục khác (C00-D48†), cẳng tay",
     "name_en": "Arthropathy in neoplastic disease (C00-D48†), forearm",
     "synonyms": [
       "benh khop trong cac benh ung thu da duoc xep o muc khac (c00-d48†), cang tay",
       "m3613",
-      "bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác , cẳng tay"
+      "bệnh khớp trong các bệnh u ác đã được xếp ở mục khác , cẳng tay"
     ],
     "meta": {
       "chapter_no": "XIII",
@@ -104879,12 +104879,12 @@
   {
     "code": "M36.14",
     "code_no_dot": "M3614",
-    "name_vi": "Bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác (C00-D48†), bàn tay",
+    "name_vi": "Bệnh khớp trong các bệnh u ác đã được xếp ở mục khác (C00-D48†), bàn tay",
     "name_en": "Arthropathy in neoplastic disease (C00-D48†), hand",
     "synonyms": [
       "benh khop trong cac benh ung thu da duoc xep o muc khac (c00-d48†), ban tay",
       "m3614",
-      "bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác , bàn tay"
+      "bệnh khớp trong các bệnh u ác đã được xếp ở mục khác , bàn tay"
     ],
     "meta": {
       "chapter_no": "XIII",
@@ -104897,12 +104897,12 @@
   {
     "code": "M36.15",
     "code_no_dot": "M3615",
-    "name_vi": "Bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác (C00-D48†), vùng chậu và đùi",
+    "name_vi": "Bệnh khớp trong các bệnh u ác đã được xếp ở mục khác (C00-D48†), vùng chậu và đùi",
     "name_en": "Arthropathy in neoplastic disease (C00-D48†), pelvic region and thigh",
     "synonyms": [
       "benh khop trong cac benh ung thu da duoc xep o muc khac (c00-d48†), vung chau va dui",
       "m3615",
-      "bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác , vùng chậu và đùi"
+      "bệnh khớp trong các bệnh u ác đã được xếp ở mục khác , vùng chậu và đùi"
     ],
     "meta": {
       "chapter_no": "XIII",
@@ -104915,12 +104915,12 @@
   {
     "code": "M36.16",
     "code_no_dot": "M3616",
-    "name_vi": "Bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác (C00-D48†), cẳng chân",
+    "name_vi": "Bệnh khớp trong các bệnh u ác đã được xếp ở mục khác (C00-D48†), cẳng chân",
     "name_en": "Arthropathy in neoplastic disease (C00-D48†), lower leg",
     "synonyms": [
       "benh khop trong cac benh ung thu da duoc xep o muc khac (c00-d48†), cang chan",
       "m3616",
-      "bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác , cẳng chân"
+      "bệnh khớp trong các bệnh u ác đã được xếp ở mục khác , cẳng chân"
     ],
     "meta": {
       "chapter_no": "XIII",
@@ -104933,12 +104933,12 @@
   {
     "code": "M36.17",
     "code_no_dot": "M3617",
-    "name_vi": "Bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác (C00-D48†), cổ, bàn chân",
+    "name_vi": "Bệnh khớp trong các bệnh u ác đã được xếp ở mục khác (C00-D48†), cổ, bàn chân",
     "name_en": "Arthropathy in neoplastic disease (C00-D48†), ankle and foot",
     "synonyms": [
       "benh khop trong cac benh ung thu da duoc xep o muc khac (c00-d48†), co, ban chan",
       "m3617",
-      "bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác , cổ, bàn chân"
+      "bệnh khớp trong các bệnh u ác đã được xếp ở mục khác , cổ, bàn chân"
     ],
     "meta": {
       "chapter_no": "XIII",
@@ -104951,12 +104951,12 @@
   {
     "code": "M36.18",
     "code_no_dot": "M3618",
-    "name_vi": "Bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác (C00-D48†), vị trí khác",
+    "name_vi": "Bệnh khớp trong các bệnh u ác đã được xếp ở mục khác (C00-D48†), vị trí khác",
     "name_en": "Arthropathy in neoplastic disease (C00-D48†), other",
     "synonyms": [
       "benh khop trong cac benh ung thu da duoc xep o muc khac (c00-d48†), vi tri khac",
       "m3618",
-      "bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác , vị trí khác"
+      "bệnh khớp trong các bệnh u ác đã được xếp ở mục khác , vị trí khác"
     ],
     "meta": {
       "chapter_no": "XIII",
@@ -104969,12 +104969,12 @@
   {
     "code": "M36.19",
     "code_no_dot": "M3619",
-    "name_vi": "Bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác (C00-D48†), vị trí không xác định",
+    "name_vi": "Bệnh khớp trong các bệnh u ác đã được xếp ở mục khác (C00-D48†), vị trí không xác định",
     "name_en": "Arthropathy in neoplastic disease (C00-D48†), Site unspecified",
     "synonyms": [
       "benh khop trong cac benh ung thu da duoc xep o muc khac (c00-d48†), vi tri khong xac dinh",
       "m3619",
-      "bệnh khớp trong các bệnh ung thư đã được xếp ở mục khác , vị trí không xác định"
+      "bệnh khớp trong các bệnh u ác đã được xếp ở mục khác , vị trí không xác định"
     ],
     "meta": {
       "chapter_no": "XIII",
@@ -178078,7 +178078,7 @@
   {
     "code": "T45.1",
     "code_no_dot": "T451",
-    "name_vi": "Ngộ độc Thuốc chống ung thư và ức chế miễn dịch",
+    "name_vi": "Ngộ độc Thuốc chống u ác và ức chế miễn dịch",
     "name_en": "Poisoning: Antineoplastic and immunosuppressive drugs",
     "synonyms": [
       "ngo doc thuoc chong ung thu va uc che mien dich",
@@ -185325,7 +185325,7 @@
   {
     "code": "U85",
     "code_no_dot": "U85",
-    "name_vi": "Kháng các thuốc kháng ung thư",
+    "name_vi": "Kháng các thuốc kháng u ác",
     "name_en": "Resistance to antineolastics drugs",
     "synonyms": [
       "khang cac thuoc khang ung thu"
@@ -185334,7 +185334,7 @@
       "chapter_no": "XXII",
       "chapter_name": "Mã phục vụ những mục đích đặc biệt",
       "group_code": "",
-      "type_name": "Kháng các thuốc kháng ung thư",
+      "type_name": "Kháng các thuốc kháng u ác",
       "source": "ICD10"
     }
   },
@@ -200115,7 +200115,7 @@
     "synonyms": [
       "theo doi khi nghi ngo u ac tinh",
       "z031",
-      "theo dõi khi nghi ngờ ung thư",
+      "theo dõi khi nghi ngờ u ác",
       "theo doi khi nghi ngo ung thu"
     ],
     "meta": {
@@ -200421,7 +200421,7 @@
     "name_en": "Follow-up examination after treatment for malignant neoplasms",
     "synonyms": [
       "kham theo doi sau dieu tri u ac tinh",
-      "khám theo dõi sau điều trị ung thư",
+      "khám theo dõi sau điều trị u ác",
       "kham theo doi sau dieu tri ung thu"
     ],
     "meta": {
@@ -200440,7 +200440,7 @@
     "synonyms": [
       "kham theo doi sau phau thuat khoi u ac tinh",
       "z080",
-      "khám theo dõi sau phẫu thuật khối ung thư",
+      "khám theo dõi sau phẫu thuật khối u ác",
       "kham theo doi sau phau thuat khoi ung thu"
     ],
     "meta": {
@@ -200459,7 +200459,7 @@
     "synonyms": [
       "kham theo doi sau dieu tri xa tri u ac tinh",
       "z081",
-      "khám theo dõi sau điều trị xạ trị ung thư",
+      "khám theo dõi sau điều trị xạ trị u ác",
       "kham theo doi sau dieu tri xa tri ung thu"
     ],
     "meta": {
@@ -200478,7 +200478,7 @@
     "synonyms": [
       "kham theo doi sau hoa tri lieu u ac tinh",
       "z082",
-      "khám theo dõi sau hóa trị liệu ung thư",
+      "khám theo dõi sau hóa trị liệu u ác",
       "kham theo doi sau hoa tri lieu ung thu"
     ],
     "meta": {
@@ -200497,7 +200497,7 @@
     "synonyms": [
       "kham theo doi sau dieu tri phoi hop u ac tinh",
       "z087",
-      "khám theo dõi sau điều trị phối hợp ung thư",
+      "khám theo dõi sau điều trị phối hợp u ác",
       "kham theo doi sau dieu tri phoi hop ung thu"
     ],
     "meta": {
@@ -200516,7 +200516,7 @@
     "synonyms": [
       "kham theo doi sau dieu tri khac cua u ac tinh",
       "z088",
-      "khám theo dõi sau điều trị khác của ung thư",
+      "khám theo dõi sau điều trị khác của u ác",
       "kham theo doi sau dieu tri khac cua ung thu"
     ],
     "meta": {
@@ -200535,7 +200535,7 @@
     "synonyms": [
       "kham theo doi sau dieu tri khong dac hieu cua u ac tinh",
       "z089",
-      "khám theo dõi sau điều trị không đặc hiệu của ung thư",
+      "khám theo dõi sau điều trị không đặc hiệu của u ác",
       "kham theo doi sau dieu tri khong dac hieu cua ung thu"
     ],
     "meta": {
@@ -200553,7 +200553,7 @@
     "name_en": "Follow-up examination after treatment for conditions other than malignant neoplasms",
     "synonyms": [
       "kham theo doi sau dieu tri cac tinh trang benh khac di kem voi khoi u ac tinh",
-      "khám theo dõi sau điều trị các tình trạng bệnh khác đi kèm với khối ung thư",
+      "khám theo dõi sau điều trị các tình trạng bệnh khác đi kèm với khối u ác",
       "kham theo doi sau dieu tri cac tinh trang benh khac di kem voi khoi ung thu"
     ],
     "meta": {
@@ -203830,7 +203830,7 @@
     "synonyms": [
       "phau thuat du phong cac nguy co lien quan den khoi u ac tinh",
       "z400",
-      "phẫu thuật dự phòng các nguy cơ liên quan đến khối ung thư",
+      "phẫu thuật dự phòng các nguy cơ liên quan đến khối u ác",
       "phau thuat du phong cac nguy co lien quan den khoi ung thu"
     ],
     "meta": {
@@ -208620,7 +208620,7 @@
     "name_en": "Family history of malignant neoplasm",
     "synonyms": [
       "tien su gia dinh co khoi u ac tinh",
-      "tiền sử gia đình có khối ung thư",
+      "tiền sử gia đình có khối u ác",
       "tien su gia dinh co khoi ung thu"
     ],
     "meta": {
@@ -208639,7 +208639,7 @@
     "synonyms": [
       "tien su gia dinh co khoi u ac tinh o co quan tieu hoa",
       "z800",
-      "tiền sử gia đình có khối ung thư ở cơ quan tiêu hóa",
+      "tiền sử gia đình có khối u ác ở cơ quan tiêu hóa",
       "tien su gia dinh co khoi ung thu o co quan tieu hoa"
     ],
     "meta": {
@@ -208658,7 +208658,7 @@
     "synonyms": [
       "?tien su gia dinh co khoi u ac tinh o khi quan, phe quan va phoi",
       "z801",
-      "?tiền sử gia đình có khối ung thư ở khí quản, phế quản và phổi",
+      "?tiền sử gia đình có khối u ác ở khí quản, phế quản và phổi",
       "?tien su gia dinh co khoi ung thu o khi quan, phe quan va phoi"
     ],
     "meta": {
@@ -208677,7 +208677,7 @@
     "synonyms": [
       "?tien su gia dinh co khoi u ac tinh o cac co quan ho hap va trong long nguc khac",
       "z802",
-      "?tiền sử gia đình có khối ung thư ở các cơ quan hô hấp và trong lồng ngực khác",
+      "?tiền sử gia đình có khối u ác ở các cơ quan hô hấp và trong lồng ngực khác",
       "?tien su gia dinh co khoi ung thu o cac co quan ho hap va trong long nguc khac"
     ],
     "meta": {
@@ -208696,7 +208696,7 @@
     "synonyms": [
       "?tien su gia dinh co khoi u ac tinh o vu",
       "z803",
-      "?tiền sử gia đình có khối ung thư ở vú",
+      "?tiền sử gia đình có khối u ác ở vú",
       "?tien su gia dinh co khoi ung thu o vu"
     ],
     "meta": {
@@ -208715,7 +208715,7 @@
     "synonyms": [
       "?tien su gia dinh co khoi u ac tinh o co quan sinh duc",
       "z804",
-      "?tiền sử gia đình có khối ung thư ở cơ quan sinh dục",
+      "?tiền sử gia đình có khối u ác ở cơ quan sinh dục",
       "?tien su gia dinh co khoi ung thu o co quan sinh duc"
     ],
     "meta": {
@@ -208734,7 +208734,7 @@
     "synonyms": [
       "?tien su gia dinh co khoi u ac tinh o duong tiet nieu",
       "z805",
-      "?tiền sử gia đình có khối ung thư ở đường tiết niệu",
+      "?tiền sử gia đình có khối u ác ở đường tiết niệu",
       "?tien su gia dinh co khoi ung thu o duong tiet nieu"
     ],
     "meta": {
@@ -208771,7 +208771,7 @@
       "?tien su gia dinh co u ac tinh dang lympho (bach huyet), he tao mau va cac to chuc lien quan",
       "z807",
       "?tiền sử gia đình có u ác tính dạng lympho , hệ tạo máu và các tổ chức liên quan",
-      "?tiền sử gia đình có ung thư dạng lympho (bạch huyết), hệ tạo máu và các tổ chức liên quan",
+      "?tiền sử gia đình có u ác dạng lympho (bạch huyết), hệ tạo máu và các tổ chức liên quan",
       "?tien su gia dinh co ung thu dang lympho (bach huyet), he tao mau va cac to chuc lien quan"
     ],
     "meta": {
@@ -208790,7 +208790,7 @@
     "synonyms": [
       "?tien su gia dinh co khoi u ac tinh cua co quan va he thong khac",
       "z808",
-      "?tiền sử gia đình có khối ung thư của cơ quan và hệ thống khác",
+      "?tiền sử gia đình có khối u ác của cơ quan và hệ thống khác",
       "?tien su gia dinh co khoi ung thu cua co quan va he thong khac"
     ],
     "meta": {
@@ -208809,7 +208809,7 @@
     "synonyms": [
       "?tien su gia dinh co khoi u ac tinh, khong dac hieu",
       "z809",
-      "?tiền sử gia đình có khối ung thư, không đặc hiệu",
+      "?tiền sử gia đình có khối u ác, không đặc hiệu",
       "?tien su gia dinh co khoi ung thu, khong dac hieu"
     ],
     "meta": {
@@ -209368,7 +209368,7 @@
     "name_en": "Personal history of malignant neoplasm",
     "synonyms": [
       "tien su ca nhan co khoi u ac tinh",
-      "tiền sử cá nhân có khối ung thư",
+      "tiền sử cá nhân có khối u ác",
       "tien su ca nhan co khoi ung thu"
     ],
     "meta": {
@@ -209387,7 +209387,7 @@
     "synonyms": [
       "tien su ca nhan co u ac tinh cua co quan tieu hoa",
       "z850",
-      "tiền sử cá nhân có ung thư của cơ quan tiêu hóa",
+      "tiền sử cá nhân có u ác của cơ quan tiêu hóa",
       "tien su ca nhan co ung thu cua co quan tieu hoa"
     ],
     "meta": {
@@ -209407,7 +209407,7 @@
     "synonyms": [
       "tien su ca nhan co khoi u ac tinh o khi quan, phe quan va phoi",
       "z851",
-      "tiền sử cá nhân có khối ung thư ở khí quản, phế quản và phổi",
+      "tiền sử cá nhân có khối u ác ở khí quản, phế quản và phổi",
       "tien su ca nhan co khoi ung thu o khi quan, phe quan va phoi"
     ],
     "meta": {
@@ -209427,7 +209427,7 @@
     "synonyms": [
       "tien su ca nhan co khoi u ac tinh o cac co quan ho hap va cac co quan khac trong long nguc",
       "z852",
-      "tiền sử cá nhân có khối ung thư ở các cơ quan hô hấp và các cơ quan khác trong lồng ngực",
+      "tiền sử cá nhân có khối u ác ở các cơ quan hô hấp và các cơ quan khác trong lồng ngực",
       "tien su ca nhan co khoi ung thu o cac co quan ho hap va cac co quan khac trong long nguc"
     ],
     "meta": {
@@ -209447,7 +209447,7 @@
     "synonyms": [
       "tien su ca nhan co khoi u ac tinh o vu",
       "z853",
-      "tiền sử cá nhân có khối ung thư ở vú",
+      "tiền sử cá nhân có khối u ác ở vú",
       "tien su ca nhan co khoi ung thu o vu"
     ],
     "meta": {
@@ -209467,7 +209467,7 @@
     "synonyms": [
       "tien su ca nhan co u ac tinh o cac co quan sinh duc",
       "z854",
-      "tiền sử cá nhân có ung thư ở các cơ quan sinh dục",
+      "tiền sử cá nhân có u ác ở các cơ quan sinh dục",
       "tien su ca nhan co ung thu o cac co quan sinh duc"
     ],
     "meta": {
@@ -209487,7 +209487,7 @@
     "synonyms": [
       "tien su ca nhan co u ac tinh cua duong tiet nieu",
       "z855",
-      "tiền sử cá nhân có ung thư của đường tiết niệu",
+      "tiền sử cá nhân có u ác của đường tiết niệu",
       "tien su ca nhan co ung thu cua duong tiet nieu"
     ],
     "meta": {
@@ -209525,7 +209525,7 @@
     "synonyms": [
       "tien su ca nhan co u ac tinh he lympho, co quan tao mau va to chuc tao mau",
       "z857",
-      "tiền sử cá nhân có ung thư hệ lympho, cơ quan tạo máu và tổ chức tạo máu",
+      "tiền sử cá nhân có u ác hệ lympho, cơ quan tạo máu và tổ chức tạo máu",
       "tien su ca nhan co ung thu he lympho, co quan tao mau va to chuc tao mau"
     ],
     "meta": {
@@ -209545,7 +209545,7 @@
     "synonyms": [
       "tien su ca nhan co khoi u ac tinh o cac co quan va he thong khac",
       "z858",
-      "tiền sử cá nhân có khối ung thư ở các cơ quan và hệ thống khác",
+      "tiền sử cá nhân có khối u ác ở các cơ quan và hệ thống khác",
       "tien su ca nhan co khoi ung thu o cac co quan va he thong khac"
     ],
     "meta": {
@@ -209565,7 +209565,7 @@
     "synonyms": [
       "tien su ca nhan co khoi u ac tinh, khong dac hieu",
       "z859",
-      "tiền sử cá nhân có khối ung thư, không đặc hiệu",
+      "tiền sử cá nhân có khối u ác, không đặc hiệu",
       "tien su ca nhan co khoi ung thu, khong dac hieu"
     ],
     "meta": {
