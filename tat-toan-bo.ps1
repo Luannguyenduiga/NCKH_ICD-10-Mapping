@@ -24,6 +24,7 @@ if ($docker) {
     & $docker compose stop | Out-Null
     Pop-Location
     & $docker stop vnpt-his-db *> $null
+    & $docker stop vnpt-his-db-local *> $null
     Write-Host "[OK]   Da dung EMR Cloud va PostgreSQL VNPT" -ForegroundColor Green
 }
 
