@@ -147,20 +147,20 @@ def is_valid_code(code: str) -> bool:
 # Cặp thuật ngữ hành chính <-> thuật ngữ bác sĩ dùng khi viết chẩn đoán.
 #
 # Danh mục Bộ Y tế đặt tên khối u ác theo lối văn bản: 426 mã mang cụm "u ác",
-# 40 mã "u ác tính". Trong khi đó chỉ 81 mã có chữ "ung thư", và chúng dồn vào
+# 40 mã "u ác tính". Trong khi đó chỉ 81 mã có chữ "u ác", và chúng dồn vào
 # vài nhóm hẹp - C22 (gan), C46 (Kaposi), D00 (tại chỗ).
 #
-# Hậu quả đo được trên tập kiểm tra độc lập: "ung thư phổi", "ung thư dạ dày",
-# "ung thư đại tràng" đều trả về C22.0 "Ung thư biểu mô tế bào gan", vì đó là
-# một trong số ít tên có sẵn chữ "ung thư" để bám vào. Ba mã đúng C34, C16, C18
+# Hậu quả đo được trên tập kiểm tra độc lập: "u ác phổi", "u ác dạ dày",
+# "u ác đại tràng" đều trả về C22.0 "u ác biểu mô tế bào gan", vì đó là
+# một trong số ít tên có sẵn chữ "u ác" để bám vào. Ba mã đúng C34, C16, C18
 # lại mang tên "U ác của..." nên không khớp được từ nào.
 #
 # Sinh thêm biến thể để bác sĩ gõ theo lối nào cũng tra ra. Thứ tự trong danh
 # sách có ý nghĩa: cụm dài phải đứng trước cụm ngắn, nếu không "u ác tính" sẽ bị
-# luật "u ác" cắt trước thành "ung thư tính".
+# luật "u ác" cắt trước thành "u ác tính".
 CLINICAL_TERM_VARIANTS = [
-    ("u ác tính", "ung thư"),
-    ("u ác", "ung thư"),
+    ("u ác tính", "u ác"),
+    ("u ác", "u ác"),
 ]
 
 
@@ -169,7 +169,7 @@ def build_term_variants(lowered: str) -> list:
     Sinh biến thể theo cặp thuật ngữ hành chính <-> thông dụng.
 
     Dừng ngay sau cụm khớp đầu tiên. Nếu để chạy hết danh sách thì "u ác tính
-    của da" vừa sinh "ung thư của da" (đúng) vừa sinh "ung thư tính của da"
+    của da" vừa sinh "u ác của da" (đúng) vừa sinh "u ác tính của da"
     (rác), do luật "u ác" cũng khớp trên chính chuỗi gốc đó.
     """
     for formal, common in CLINICAL_TERM_VARIANTS:
@@ -201,7 +201,7 @@ def build_synonyms(name_vi: str, code_no_dot: str, code: str) -> list:
     if without_paren and without_paren != lowered:
         synonyms.append(without_paren)
 
-    # Biến thể theo cách bác sĩ quen viết ("u ác của phổi" -> "ung thư của phổi"),
+    # Biến thể theo cách bác sĩ quen viết ("u ác của phổi" -> "u ác của phổi"),
     # kèm cả dạng không dấu của biến thể đó.
     for variant in build_term_variants(lowered):
         synonyms.append(variant)
