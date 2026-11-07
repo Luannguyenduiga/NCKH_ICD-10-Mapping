@@ -12,6 +12,8 @@ $ErrorActionPreference = 'Continue'
 $ProgressPreference = 'SilentlyContinue'
 $root = $PSScriptRoot
 Set-Location $root
+$env:PYTHONIOENCODING = 'utf-8'
+$env:PYTHONUTF8 = '1'
 
 function Buoc($msg)  { Write-Host ""; Write-Host "== $msg" -ForegroundColor Cyan }
 function Ok($msg)    { Write-Host "[OK]   $msg" -ForegroundColor Green }
@@ -53,7 +55,7 @@ function Wait-Url($url, $giay) {
 
 function Mo-CuaSo($tieuDe, $lenh) {
     $script = "`$host.UI.RawUI.WindowTitle = '$tieuDe'; Set-Location '$root'; $lenh"
-    Start-Process powershell -ArgumentList @('-NoExit', '-ExecutionPolicy', 'Bypass', '-Command', $script) | Out-Null
+    Start-Process powershell -WindowStyle Hidden -ArgumentList @('-NoExit', '-ExecutionPolicy', 'Bypass', '-Command', $script) | Out-Null
 }
 
 # ---------- 1. Docker Desktop ----------
@@ -80,7 +82,7 @@ if (-not $dockerChay) {
     }
     if ($exe) {
         Canh "Docker chua chay, dang mo Docker Desktop..."
-        Start-Process $exe | Out-Null
+        Start-Process $exe -WindowStyle Hidden | Out-Null
         $het = (Get-Date).AddSeconds(240)
         while ((Get-Date) -lt $het) {
             & $docker info *> $null
@@ -108,6 +110,12 @@ if (Test-Url 'http://127.0.0.1:8090/fhir/metadata') {
 
 # ---------- 3. PostgreSQL cho VNPT ----------
 Buoc "PostgreSQL cua VNPT HIS"
+$vnptLocalDb = & $docker ps -a --filter "name=^/vnpt-his-db-local$" --format '{{.Names}}'
+if ($vnptLocalDb -eq 'vnpt-his-db-local') {
+    & $docker start vnpt-his-db-local | Out-Null
+    $env:SPRING_DATASOURCE_URL = 'jdbc:postgresql://127.0.0.1:5434/vnpt_his'
+    Ok "PostgreSQL VNPT dung container local, cong 5434"
+} else {
 $tonTai = & $docker ps -a --filter "name=^/vnpt-his-db$" --format '{{.Names}}'
 if ($tonTai -eq 'vnpt-his-db') {
     & $docker start vnpt-his-db | Out-Null
@@ -125,6 +133,7 @@ if ($tonTai -eq 'vnpt-his-db') {
 Start-Sleep -Seconds 5
 if ((& $docker ps --filter "name=^/vnpt-his-db$" --format '{{.Status}}') -match 'Up') { Ok "PostgreSQL VNPT dang chay" }
 else { Loi "PostgreSQL VNPT khong chay. Xem: docker logs vnpt-his-db" }
+}
 
 # ---------- 4. Moi truong Python cho Gateway va HIS ----------
 Buoc "Moi truong Python (.venv)"
@@ -151,7 +160,11 @@ if ($vramTrong -ge 3000) {
 }
 if (Test-Gateway) { Ok "Gateway da chay, bo qua" }
 else {
-    Mo-CuaSo 'SMIG Gateway 8000' ($gpuLenh + "& '.\run.ps1' -Port 8000 -AllowClientFacility")
+    $env:SMIG_FACILITY_CODE = '79001'
+    $env:SMIG_FACILITY_NAME = 'Benh vien mo phong Viettel'
+    $env:SMIG_ALLOW_CLIENT_FACILITY = '1'
+    $env:SMIG_ALLOWED_ORIGINS = 'http://127.0.0.1:8000,http://localhost:8000,http://127.0.0.1:8085,http://localhost:8085,http://127.0.0.1:8086,http://localhost:8086,http://127.0.0.1:3000,http://localhost:3000'
+    Mo-CuaSo 'SMIG Gateway 8000' ($gpuLenh + "& '.\.venv\Scripts\python.exe' -m uvicorn backend.main:app --host 127.0.0.1 --port 8000")
     Ok "Da mo cua so Gateway (nap mo hinh mat 1-2 phut lan dau)"
 }
 
@@ -165,8 +178,19 @@ else { Mo-CuaSo 'HIS B 8086' "& '.\hospital_his\run_his.ps1' -Port 8086 -Facilit
 
 # ---------- 7. VNPT HIS: backend Java (8089) va frontend (3000) ----------
 Buoc "VNPT HIS"
+# Nap khoa cua VNPT truoc khi khoi dong backend (khong dung khoa cua HIS Python).
+$vnptEnvFile = Join-Path $root 'VNPT_HIS\.env'
+if (Test-Path $vnptEnvFile) {
+    Get-Content $vnptEnvFile | ForEach-Object {
+        $line = $_.Trim()
+        if ($line -and -not $line.StartsWith('#') -and $line.Contains('=')) {
+            $k, $v = $line.Split('=', 2)
+            [Environment]::SetEnvironmentVariable($k.Trim(), $v.Trim().Trim('"'), 'Process')
+        }
+    }
+}
 $jdk = $null
-foreach ($h in @($env:JAVA_HOME, 'D:\tools\jdk17')) {
+foreach ($h in @($env:JAVA_HOME, 'D:\tools\jdk17', 'C:\Program Files\Java\jdk-26.0.2')) {
     if ($h -and (Test-Path (Join-Path $h 'bin\java.exe'))) { $jdk = $h; break }
 }
 
