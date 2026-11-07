@@ -55,7 +55,7 @@ QUERY_ABBREVIATIONS = {
     # Bổ sung từ danh sách viết tắt của người dùng. Chỉ mở rộng tên bệnh,
     # không tự thêm thể cấp/mạn, nguyên nhân hay mã ICD-10 chi tiết.
     # K chỉ nhận trước các vị trí đã nêu, tránh đổi chữ k trong ngữ cảnh khác.
-    r"\bk\s+(?=(?:vú|đại tràng|phổi)\b)": "ung thư ",
+    r"\bk\s+(?=(?:vú|đại tràng|phổi)\b)": "u ác ",
     r"\btđ\b": "đái tháo đường",
     r"\brltch\b": "rối loạn chuyển hóa",
     r"\brllp\b": "rối loạn lipid máu",
@@ -167,9 +167,9 @@ BRIDGE_TERMS = [
     ("tuýp 2", "không phụ thuộc insuline"),
     ("tuýp 1", "phụ thuộc insuline"),
     ("vô căn", "nguyên phát"),
-    # Toàn bộ chương C (553 mã) dùng "u ác", không có mã nào ghi "ung thư" - đây
+    # Toàn bộ chương C (553 mã) dùng "u ác", không có mã nào ghi "u ác" - đây
     # là khoảng cách từ vựng lớn nhất giữa lời bác sĩ và danh mục Bộ Y tế.
-    ("ung thư", "u ác"),
+    ("u ác", "u ác"),
     ("ung bướu", "u ác"),
     ("khối u ác tính", "u ác"),
     ("đường huyết", "glucose máu"),
@@ -299,7 +299,7 @@ OTHER_PENALTY = 0.04         # mã .8 chỉ dùng khi thể bệnh đã nêu mà
 # chương II rơi vào diện này, và luật chỉ áp khi tách vế nên không ảnh hưởng tới
 # câu chẩn đoán chỉ có một bệnh.
 NEOPLASM_TERMS = [
-    r"u", r"ung thư", r"bướu", r"khối u", r"đa u tủy", r"polyp", r"nốt ruồi",
+    r"u", r"u ác", r"bướu", r"khối u", r"đa u tủy", r"polyp", r"nốt ruồi",
     r"bạch cầu", r"tân sinh", r"loạn sản", r"di căn", r"ác tính", r"lành tính",
     r"carcinom\w*", r"sarcom\w*", r"lympho\w*", r"melanom\w*", r"mesotheliom\w*",
 ]
