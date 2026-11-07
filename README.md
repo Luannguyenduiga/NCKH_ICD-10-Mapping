@@ -199,7 +199,7 @@ Tách riêng khỏi bộ máy để sửa **tri thức** mà không đụng **th
 | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ABBREVIATIONS`, `QUERY_ABBREVIATIONS`            | Viết tắt bác sĩ hay dùng:`đtđ` → đái tháo đường, `THA` → tăng huyết áp                                                                                                                  |
 | `NOISE_PREFIXES`, `NOISE_SUFFIXES`, `STOPWORDS` | Cụm không mang thông tin chẩn đoán: "bệnh nhân bị", "theo dõi", "nhẹ"                                                                                                                              |
-| `BRIDGE_TERMS`                                      | **Cầu nối từ vựng** — nối thuật ngữ chuẩn của danh mục vào truy vấn. *"ung thư"* → *"u ác"*: cả 553 mã chương C dùng "u ác", không mã nào ghi "ung thư"                   |
+| `BRIDGE_TERMS`                                      | **Cầu nối từ vựng** — nối thuật ngữ chuẩn của danh mục vào truy vấn. *"u ác"* → *"u ác"*: cả 553 mã chương C dùng "u ác", không mã nào ghi "u ác"                   |
 | `POLARITY_AXES`                                     | **Trục đối lập ngữ nghĩa** — 5 trục: típ đái tháo đường, nguyên nhân tăng huyết áp, biến chứng, cấp/mạn, dị ứng. Nhãn truy vấn xung đột nhãn ứng viên thì trừ điểm |
 | `CHAPTER_GATES`                                     | **Cổng chương** — chương O (thai sản), S/T (chấn thương), V–Y (ngoại sinh), Z chỉ hợp lệ khi câu chẩn đoán có ngữ cảnh tương ứng                                               |
 | `UNSPECIFIED_*`, `OTHER_*`                        | **Mức chi tiết** — không nêu thể bệnh thì ưu tiên mã ".9 không đặc hiệu"; có nêu thì hạ bậc ".9" và ".8 khác"                                                                     |
@@ -212,7 +212,7 @@ Tách riêng khỏi bộ máy để sửa **tri thức** mà không đụng **th
 
 | Khiếm khuyết                                                | Khắc phục                           |
 | ------------------------------------------------------------- | ------------------------------------- |
-| Danh mục dùng "u ác", bác sĩ nói "ung thư" (553 mã)   | Cầu nối từ vựng                   |
+| Danh mục dùng "u ác", bác sĩ nói "u ác" (553 mã)   | Cầu nối từ vựng                   |
 | Danh mục ghi "(Có hôn mê)" chứ không ghi "biến chứng" | Mở rộng phạm vi trục biến chứng |
 | Truy vấn không nêu thể bệnh lại ra mã ".8 khác"       | Luật mức chi tiết                  |
 | Tương tự với "hạ glucose máu", "u cơ trơn tử cung"   | Cầu nối từ vựng                   |

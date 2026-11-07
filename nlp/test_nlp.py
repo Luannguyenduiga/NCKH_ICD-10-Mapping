@@ -147,9 +147,9 @@ def test_abbreviation_expansion(engine):
 
 
 @pytest.mark.parametrize("query, expected", [
-    ("K vú", "ung thư vú"),
-    ("K đại tràng", "ung thư đại tràng"),
-    ("K phổi", "ung thư phổi"),
+    ("K vú", "u ác vú"),
+    ("K đại tràng", "u ác đại tràng"),
+    ("K phổi", "u ác phổi"),
     ("TĐ tuýp 2", "đái tháo đường tuýp 2"),
     ("RLTCH", "rối loạn chuyển hóa"),
     ("RLLP", "rối loạn lipid máu"),

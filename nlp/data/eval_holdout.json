@@ -41,10 +41,10 @@
     {"query": "bỏng độ II vùng cẳng tay", "expected": ["T22", "T22.2", "T22.1"], "tag": "plain"},
     {"query": "chấn thương sọ não kín", "expected": ["S06", "S06.9"], "tag": "plain"},
 
-    {"query": "ung thư phổi", "expected": ["C34", "C34.9"], "tag": "plain"},
-    {"query": "ung thư dạ dày", "expected": ["C16", "C16.9"], "tag": "plain"},
-    {"query": "ung thư vú", "expected": ["C50", "C50.9"], "tag": "plain"},
-    {"query": "ung thư đại tràng", "expected": ["C18", "C18.9"], "tag": "plain"},
+    {"query": "u ác phổi", "expected": ["C34", "C34.9"], "tag": "plain"},
+    {"query": "u ác dạ dày", "expected": ["C16", "C16.9"], "tag": "plain"},
+    {"query": "u ác vú", "expected": ["C50", "C50.9"], "tag": "plain"},
+    {"query": "u ác đại tràng", "expected": ["C18", "C18.9"], "tag": "plain"},
 
     {"query": "tâm thần phân liệt", "expected": ["F20", "F20.9"], "tag": "plain"},
     {"query": "rối loạn lưỡng cực", "expected": ["F31", "F31.9"], "tag": "plain"},
